@@ -1,0 +1,19 @@
+services:
+  openstreetmap-quality-framework-db:
+    image: postgres:17.6
+    container_name: openstreetmap-quality-framework-db
+    environment:
+      POSTGRES_DB: osm_quality_framework
+      POSTGRES_USER: osm_quality_framework_user
+      POSTGRES_PASSWORD: osm_quality_framework_pass
+    ports:
+      - "54322:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
+
+networks:
+  default:
+    name: openstreetmap-quality-framework
