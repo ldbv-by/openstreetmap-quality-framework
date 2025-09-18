@@ -5,6 +5,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_contract.dto.Changese
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.service.QualityHubService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +25,13 @@ public class QualityHubController {
     /**
      * Persists the changeset and publishes it to the configured quality services.
      */
-    @PostMapping("/check/changeset/{changesetId}")
-    public ResponseEntity<List<ChangesetQualityResultDto>> checkChangesetQuality(
+    @PostMapping(
+            value = "/check/changeset/{changesetId}",
+            consumes = MediaType.APPLICATION_XML_VALUE,
+            produces = MediaType.APPLICATION_XML_VALUE
+    )
+//    public ResponseEntity<List<ChangesetQualityResultDto>> checkChangesetQuality(
+    public ResponseEntity<ChangesetDto> checkChangesetQuality(
             @PathVariable Long changesetId,
             @RequestBody ChangesetDto changesetDto) {
 
@@ -36,6 +42,7 @@ public class QualityHubController {
 
         log.info("Result for changeset {}: {}", changesetId, changesetQualityResults);
 
-        return ResponseEntity.ok(changesetQualityResults);
+        //return ResponseEntity.ok(changesetQualityResults);
+        return ResponseEntity.ok(changesetDto);
     }
 }

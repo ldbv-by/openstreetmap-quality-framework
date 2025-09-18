@@ -12,7 +12,7 @@ public class ChangesetMapper {
      */
     public Changeset toDomain(ChangesetDto changesetDto) {
         if (changesetDto == null) return null;
-        return new Changeset(changesetDto.changesetXml());
+        return null; //return new Changeset(changesetDto.changesetXml());
     }
 
     /**
@@ -20,6 +20,6 @@ public class ChangesetMapper {
      */
     public ChangesetDto toDto(Changeset changeset) {
         if (changeset == null) return null;
-        return new ChangesetDto(changeset.changesetXml);
+        return null;//return new ChangesetDto(changeset.changesetXml);
     }
 }
