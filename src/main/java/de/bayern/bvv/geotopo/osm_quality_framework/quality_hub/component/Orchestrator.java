@@ -107,12 +107,12 @@ public class Orchestrator {
                             this.publishedPipelineSteps.put(step.getId(), QualityPipeline.Step.State.FINISHED);
 
                             // Add result of quality service to response list
-                            this.changesetQualityResults.add(ChangesetQualityResultMapper.toDomain(changesetQualityResultDto));
+                            this.changesetQualityResults.add(ChangesetQualityResultMapper.toDomain(changeset.getId(), changesetQualityResultDto));
 
                             // publish next quality services with modified changeset
                             this.publishRunnableSteps(
                                     (changesetQualityResultDto.modifiedChangesetDto() != null)
-                                            ? ChangesetMapper.toDomain(changesetQualityResultDto.modifiedChangesetDto())
+                                            ? ChangesetMapper.toDomain(changeset.getId(), changesetQualityResultDto.modifiedChangesetDto())
                                             : changeset,
                                     cntRemainingSteps,
                                     allStepsDone

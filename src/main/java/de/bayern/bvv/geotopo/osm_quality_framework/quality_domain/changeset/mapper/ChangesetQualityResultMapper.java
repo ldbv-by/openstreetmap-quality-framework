@@ -9,13 +9,13 @@ public class ChangesetQualityResultMapper {
     /**
      * Map changeset quality result dto to domain.
      */
-    public ChangesetQualityResult toDomain(ChangesetQualityResultDto changesetQualityResultDto) {
+    public ChangesetQualityResult toDomain(Long changesetId, ChangesetQualityResultDto changesetQualityResultDto) {
         if (changesetQualityResultDto == null) return null;
 
         return new ChangesetQualityResult(
                 changesetQualityResultDto.qualityServiceId(),
                 changesetQualityResultDto.isValid(),
-                ChangesetMapper.toDomain(changesetQualityResultDto.modifiedChangesetDto()));
+                ChangesetMapper.toDomain(changesetId, changesetQualityResultDto.modifiedChangesetDto()));
     }
 
     /**

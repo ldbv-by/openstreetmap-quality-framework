@@ -38,7 +38,7 @@ public class QualityHubController {
         log.info("Check changeset {}: {}", changesetId, changesetDto);
 
         List<ChangesetQualityResultDto> changesetQualityResults =
-                this.qualityHubService.checkChangesetQuality(changesetDto);
+                this.qualityHubService.checkChangesetQuality(changesetId, changesetDto);
 
         log.info("Result for changeset {}: {}", changesetId, changesetQualityResults);
 

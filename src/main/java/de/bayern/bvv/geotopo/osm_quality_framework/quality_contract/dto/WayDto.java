@@ -26,19 +26,19 @@ public class WayDto extends OsmPrimitiveDto{
 
     @XmlAttribute(name = "version")
     @Override
-    public String getVersion() { return super.getVersion(); }
+    public Long getVersion() { return super.getVersion(); }
 
     @Override
-    public void setVersion(String version) {
+    public void setVersion(Long version) {
         super.setVersion(version);
     }
 
     @XmlAttribute(name = "changeset")
     @Override
-    public Integer getChangesetId() { return super.getChangesetId(); }
+    public Long getChangesetId() { return super.getChangesetId(); }
 
     @Override
-    public void setChangesetId(Integer changesetId) {
+    public void setChangesetId(Long changesetId) {
         super.setChangesetId(changesetId);
     }
 

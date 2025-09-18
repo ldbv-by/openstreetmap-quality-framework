@@ -1,5 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.service;
 
+import de.bayern.bvv.geotopo.osm_quality_framework.changeset_prepare.spi.ChangesetPrepareService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_contract.dto.ChangesetQualityResultDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.component.Orchestrator;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_contract.dto.ChangesetDto;
@@ -21,8 +22,8 @@ public class QualityHubService {
     /**
      * Persists the changeset and publishes it to the configured quality services.
      */
-    public List<ChangesetQualityResultDto> checkChangesetQuality(ChangesetDto changesetDto) {
-        Changeset changeset = ChangesetMapper.toDomain(changesetDto);
+    public List<ChangesetQualityResultDto> checkChangesetQuality(Long changesetId, ChangesetDto changesetDto) {
+        Changeset changeset = ChangesetMapper.toDomain(changesetId, changesetDto);
 
         List<ChangesetQualityResult> changesetQualityResults = this.orchestrator.start(changeset);
 

@@ -10,7 +10,7 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = {"id", "version", "changesetId", "relationMembers", "tags"})
+@XmlType(propOrder = {"id", "version", "changesetId", "members", "tags"})
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -26,24 +26,24 @@ public class RelationDto extends OsmPrimitiveDto{
 
     @XmlAttribute(name = "version")
     @Override
-    public String getVersion() { return super.getVersion(); }
+    public Long getVersion() { return super.getVersion(); }
 
     @Override
-    public void setVersion(String version) {
+    public void setVersion(Long version) {
         super.setVersion(version);
     }
 
     @XmlAttribute(name = "changeset")
     @Override
-    public Integer getChangesetId() { return super.getChangesetId(); }
+    public Long getChangesetId() { return super.getChangesetId(); }
 
     @Override
-    public void setChangesetId(Integer changesetId) {
+    public void setChangesetId(Long changesetId) {
         super.setChangesetId(changesetId);
     }
 
-    @XmlElement(name = "members")
-    private List<RelationMemberDto> relationMembers;
+    @XmlElement(name = "member")
+    private List<MemberDto> members;
 
     @XmlElement(name = "tag")
     @Override
@@ -59,12 +59,12 @@ public class RelationDto extends OsmPrimitiveDto{
     @AllArgsConstructor
     @NoArgsConstructor
     @Data
-    public static class RelationMemberDto {
+    public static class MemberDto {
         @XmlAttribute(name = "type")
         private String type;
 
         @XmlAttribute(name = "ref")
-        private String ref;
+        private Long ref;
 
         @XmlAttribute(name = "role")
         private String role;
