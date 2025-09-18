@@ -1,6 +1,6 @@
 services:
   openstreetmap-quality-framework-db:
-    image: postgres:17.6
+    image: postgis/postgis:17-3.5
     container_name: openstreetmap-quality-framework-db
     environment:
       POSTGRES_DB: osm_quality_framework
@@ -10,6 +10,30 @@ services:
       - "54322:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+
+  openstreetmap-quality-framework:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      args:
+        OSM2PGSQL_REPO_URL: https://github.com/ldbv-by/osm2pgsql.git
+        OSM2PGSQL_REPO_BRANCH: v2.0.0-ldbv
+        #OSM2PGSQL_REPO_URL: https://github.com/osm2pgsql-dev/osm2pgsql.git
+        #OSM2PGSQL_REPO_BRANCH: master
+    container_name: openstreetmap-quality-framework
+    ports:
+      - "8080:8080"
+    depends_on:
+      - openstreetmap-quality-framework-db
+    environment:
+      OSM_QUALITY_FRAMEWORK_DATABASE: osm_quality_framework
+      OSM_QUALITY_FRAMEWORK_DATABASE_HOST: openstreetmap-quality-framework-db
+      OSM_QUALITY_FRAMEWORK_DATABASE_PORT: 5432
+      OSM_QUALITY_FRAMEWORK_DATABASE_USERNAME: osm_quality_framework_user
+      OSM_QUALITY_FRAMEWORK_DATABASE_PASSWORD: osm_quality_framework_pass
+    volumes:
+      - ./docker/pbf/6140-135-11.osm.pbf:/app/import/data.osm.pbf:ro
+      #- ./docker/pbf/district-of-columbia-250916.osm.pbf:/app/import/data.osm.pbf:ro
 
 volumes:
   db-data:
