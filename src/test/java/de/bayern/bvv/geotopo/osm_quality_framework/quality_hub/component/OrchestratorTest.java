@@ -1,10 +1,10 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.component;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_contract.dto.ChangesetQualityRequestDto;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_contract.dto.ChangesetQualityResultDto;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_contract.spi.QualityService;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_domain.changeset.model.Changeset;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_domain.changeset.model.ChangesetQualityResult;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.ChangesetQualityServiceRequestDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.ChangesetQualityServiceResultDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.spi.QualityService;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.model.ChangesetQualityServiceResult;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.QualityPipeline;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.exception.QualityServiceException;
 import org.junit.jupiter.api.Test;
@@ -59,18 +59,18 @@ class OrchestratorTest {
         services.put("C", svcC);
 
         // Each service returns a non-null DTO
-        when(svcA.checkChangesetQuality(any(ChangesetQualityRequestDto.class)))
-                .thenReturn(mock(ChangesetQualityResultDto.class));
-        when(svcB.checkChangesetQuality(any(ChangesetQualityRequestDto.class)))
-                .thenReturn(mock(ChangesetQualityResultDto.class));
-        when(svcC.checkChangesetQuality(any(ChangesetQualityRequestDto.class)))
-                .thenReturn(mock(ChangesetQualityResultDto.class));
+        when(svcA.checkChangesetQuality(any(ChangesetQualityServiceRequestDto.class)))
+                .thenReturn(mock(ChangesetQualityServiceResultDto.class));
+        when(svcB.checkChangesetQuality(any(ChangesetQualityServiceRequestDto.class)))
+                .thenReturn(mock(ChangesetQualityServiceResultDto.class));
+        when(svcC.checkChangesetQuality(any(ChangesetQualityServiceRequestDto.class)))
+                .thenReturn(mock(ChangesetQualityServiceResultDto.class));
 
         Orchestrator orchestrator = orchestratorWith(pipeline, services);
         Changeset changeset = mock(Changeset.class);
 
         // Act
-        List<ChangesetQualityResult> results = orchestrator.start(changeset);
+        List<ChangesetQualityServiceResult> results = orchestrator.start(changeset);
 
         // Assert
         assertEquals(3, results.size(), "All three steps should produce a result");
@@ -105,15 +105,15 @@ class OrchestratorTest {
 
         when(svcA.checkChangesetQuality(any())).thenAnswer(_ -> {
             latchAB.countDown();
-            return mock(ChangesetQualityResultDto.class);
+            return mock(ChangesetQualityServiceResultDto.class);
         });
         when(svcB.checkChangesetQuality(any())).thenAnswer(_ -> {
             latchAB.countDown();
-            return mock(ChangesetQualityResultDto.class);
+            return mock(ChangesetQualityServiceResultDto.class);
         });
         when(svcC.checkChangesetQuality(any())).thenAnswer(_ -> {
             assertTrue(latchAB.await(2, TimeUnit.SECONDS), "C must start after A and B completed");
-            return mock(ChangesetQualityResultDto.class);
+            return mock(ChangesetQualityServiceResultDto.class);
         });
 
         Orchestrator orchestrator = orchestratorWith(pipeline, new HashMap<>(services));
@@ -149,7 +149,7 @@ class OrchestratorTest {
         services.put("B", svcB);
         services.put("C", svcC);
 
-        when(svcA.checkChangesetQuality(any())).thenReturn(mock(ChangesetQualityResultDto.class));
+        when(svcA.checkChangesetQuality(any())).thenReturn(mock(ChangesetQualityServiceResultDto.class));
         when(svcB.checkChangesetQuality(any())).thenThrow(new RuntimeException("boom"));
 
         Orchestrator orchestrator = orchestratorWith(pipeline, services);

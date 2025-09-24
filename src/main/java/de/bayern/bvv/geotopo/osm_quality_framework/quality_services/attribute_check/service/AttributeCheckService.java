@@ -1,8 +1,8 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.attribute_check.service;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_contract.dto.ChangesetQualityRequestDto;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_contract.dto.ChangesetQualityResultDto;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_contract.spi.QualityService;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.ChangesetQualityServiceRequestDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.ChangesetQualityServiceResultDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.spi.QualityService;
 import org.springframework.stereotype.Service;
 
 @Service("attribute-check")
@@ -13,7 +13,7 @@ public class AttributeCheckService implements QualityService {
      * Check attribute consistency.
      */
     @Override
-    public ChangesetQualityResultDto checkChangesetQuality(ChangesetQualityRequestDto request) {
+    public ChangesetQualityServiceResultDto checkChangesetQuality(ChangesetQualityServiceRequestDto request) {
         System.out.println("AttributeCheckService started");
 
         try {
@@ -23,7 +23,7 @@ public class AttributeCheckService implements QualityService {
 
         System.out.println("AttributeCheckService finished");
 
-        return new ChangesetQualityResultDto("attribute-check", true, null);
+        return new ChangesetQualityServiceResultDto("attribute-check", true, null);
     }
 
 }

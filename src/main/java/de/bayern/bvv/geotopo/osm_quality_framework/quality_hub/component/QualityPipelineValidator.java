@@ -1,6 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.component;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_contract.spi.QualityService;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.spi.QualityService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.QualityPipeline;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.exception.QualityServiceException;
 import jakarta.annotation.PostConstruct;

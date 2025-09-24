@@ -11,6 +11,11 @@ spring:
     password: ${OSM_QUALITY_FRAMEWORK_DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
 quality:
   pipeline:
     steps:

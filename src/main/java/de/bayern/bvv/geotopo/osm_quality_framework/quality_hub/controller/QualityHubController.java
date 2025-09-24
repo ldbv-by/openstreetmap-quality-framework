@@ -1,7 +1,7 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.controller;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_contract.dto.ChangesetDto;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_contract.dto.ChangesetQualityResultDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.dto.ChangesetDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.ChangesetQualityServiceResultDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.service.QualityHubService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class QualityHubController {
 
         log.info("Check changeset {}: {}", changesetId, changesetDto);
 
-        List<ChangesetQualityResultDto> changesetQualityResults =
+        List<ChangesetQualityServiceResultDto> changesetQualityResults =
                 this.qualityHubService.checkChangesetQuality(changesetId, changesetDto);
 
         log.info("Result for changeset {}: {}", changesetId, changesetQualityResults);

@@ -32,7 +32,7 @@ services:
       OSM_QUALITY_FRAMEWORK_DATABASE_USERNAME: osm_quality_framework_user
       OSM_QUALITY_FRAMEWORK_DATABASE_PASSWORD: osm_quality_framework_pass
     volumes:
-      - ./docker/pbf/6140-135-11.osm.pbf:/app/import/data.osm.pbf:ro
+      - ./docker/pbf/basis-dlm-by.osm.pbf:/app/import/data.osm.pbf:ro
       #- ./docker/pbf/district-of-columbia-250916.osm.pbf:/app/import/data.osm.pbf:ro
 
 volumes:

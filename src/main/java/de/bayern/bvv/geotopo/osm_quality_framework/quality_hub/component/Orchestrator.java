@@ -1,12 +1,12 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.component;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_contract.dto.ChangesetQualityRequestDto;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_contract.spi.QualityService;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.ChangesetQualityServiceRequestDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.spi.QualityService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.QualityPipeline;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_domain.changeset.mapper.ChangesetMapper;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_domain.changeset.mapper.ChangesetQualityResultMapper;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_domain.changeset.model.Changeset;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_domain.changeset.model.ChangesetQualityResult;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.mapper.ChangesetQualityServiceResultMapper;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.model.ChangesetQualityServiceResult;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.exception.QualityServiceException;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class Orchestrator {
     private final Map<String, QualityPipeline.Step.State> publishedPipelineSteps = new ConcurrentHashMap<>();
     private final Map<String, QualityService> qualityServices;
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-    private final List<ChangesetQualityResult> changesetQualityResults = new CopyOnWriteArrayList<>();
+    private final List<ChangesetQualityServiceResult> changesetQualityServiceResults = new CopyOnWriteArrayList<>();
 
     /**
      * Starts the pipeline for the given {@link Changeset} and blocks until:
@@ -40,10 +40,10 @@ public class Orchestrator {
      * - Any service failed, or
      * - The overall timeout is reached.
      **/
-    public List<ChangesetQualityResult> start(Changeset changeset) {
+    public List<ChangesetQualityServiceResult> start(Changeset changeset) {
         // Clear previous run state
         this.publishedPipelineSteps.clear();
-        this.changesetQualityResults.clear();
+        this.changesetQualityServiceResults.clear();
 
         final AtomicInteger cntRemainingSteps = new AtomicInteger(this.qualityPipeline.getSteps().size());
         final CompletableFuture<Void> allStepsDone = new CompletableFuture<>();
@@ -64,7 +64,7 @@ public class Orchestrator {
             throw new QualityServiceException("Pipeline failed or timed out", cause);
         }
 
-        return this.changesetQualityResults;
+        return this.changesetQualityServiceResults;
     }
 
     /**
@@ -93,8 +93,8 @@ public class Orchestrator {
             // Send changeset to quality service asynchronous
             CompletableFuture
                 .supplyAsync(() -> {
-                    ChangesetQualityRequestDto changesetQualityRequest =
-                            new ChangesetQualityRequestDto(ChangesetMapper.toDto(changeset));
+                    ChangesetQualityServiceRequestDto changesetQualityRequest =
+                            new ChangesetQualityServiceRequestDto(ChangesetMapper.toDto(changeset));
 
                     return qualityServiceBean.checkChangesetQuality(changesetQualityRequest);
                 }, executor)
@@ -107,7 +107,7 @@ public class Orchestrator {
                             this.publishedPipelineSteps.put(step.getId(), QualityPipeline.Step.State.FINISHED);
 
                             // Add result of quality service to response list
-                            this.changesetQualityResults.add(ChangesetQualityResultMapper.toDomain(changeset.getId(), changesetQualityResultDto));
+                            this.changesetQualityServiceResults.add(ChangesetQualityServiceResultMapper.toDomain(changeset.getId(), changesetQualityResultDto));
 
                             // publish next quality services with modified changeset
                             this.publishRunnableSteps(

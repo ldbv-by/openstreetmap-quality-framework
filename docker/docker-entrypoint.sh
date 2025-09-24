@@ -36,6 +36,7 @@ if [ "$HAS_SCHEMA" != "1" ]; then
     echo "ERROR: Lua style '$LUA_STYLE' not found." >&2
     exit 1
   fi
+
   if [ -s "$PBF_FILE" ]; then
     osm2pgsql -c -s --log-level=debug --log-sql \
       -d "$PGDATABASE" \
@@ -51,6 +52,11 @@ if [ "$HAS_SCHEMA" != "1" ]; then
   else
     echo "No import is necessary. New Project!"
   fi
+
+  psql -v ON_ERROR_STOP=1 -c "CREATE INDEX IF NOT EXISTS planet_osm_rels_rel_members_idx
+                              ON ${SCHEMA_NAME}.planet_osm_rels
+                              USING gin (${SCHEMA_NAME}.planet_osm_member_ids(members, 'R'::character(1)))
+                              WITH (fastupdate = off);"
 
 else
   echo "Schema ${SCHEMA_NAME} already exists – skipping import."
