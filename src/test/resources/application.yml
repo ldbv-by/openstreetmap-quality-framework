@@ -4,3 +4,7 @@ spring:
     username: ${OSM_QUALITY_FRAMEWORK_DATABASE_USERNAME}
     password: ${OSM_QUALITY_FRAMEWORK_DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
+openstreetmap-tools:
+  osm2pgsql: ${OSM2PGSQL_EXECUTABLE}
+  osmosis: ${OSMOSIS_EXECUTABLE}

@@ -24,3 +24,7 @@ quality:
 
       - id: "overlay-check"
         waitsFor: ["attribute-check"]
+
+openstreetmap-tools:
+  osm2pgsql: ${OSM2PGSQL_EXECUTABLE}
+  osmosis: ${OSMOSIS_EXECUTABLE}

@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Quality Hub Service.
+ */
 @Service
 @RequiredArgsConstructor
 public class QualityHubService {

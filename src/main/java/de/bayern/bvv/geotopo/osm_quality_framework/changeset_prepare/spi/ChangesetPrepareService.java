@@ -8,7 +8,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.dto.Ch
 public interface ChangesetPrepareService {
 
     /**
-     * Prepare Changeset.
+     * Prepare the changeset and persist its data to the database.
      */
      void prepareChangeset(Long changesetId, ChangesetDto changesetDto);
 }

@@ -8,15 +8,25 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Data Transfer Object representing an OSM tag.
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {"k", "v"})
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class TagDto {
+
+    /**
+     * Tag key.
+     */
     @XmlAttribute(name = "k")
     private String k;
 
+    /**
+     * Tag value.
+     */
     @XmlAttribute(name = "v")
     private String v;
 }

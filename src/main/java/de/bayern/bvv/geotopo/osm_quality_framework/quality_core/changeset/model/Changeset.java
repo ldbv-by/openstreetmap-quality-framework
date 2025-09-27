@@ -9,15 +9,42 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+/**
+ * OSM changeset.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class Changeset {
+
+    /**
+     * Changeset identifier.
+     */
     private Long id;
+
+    /**
+     * Changeset version.
+     */
     private String version;
+
+    /**
+     * Changeset generator e.g. JOSM.
+     */
     private String generator;
+
+    /**
+     * OSM primitives created in this changeset.
+     */
     private List<OsmPrimitive> createPrimitives = new ArrayList<>();
+
+    /**
+     * OSM primitives modified in this changeset.
+     */
     private List<OsmPrimitive> modifyPrimitives = new ArrayList<>();
+
+    /**
+     * OSM primitives deleted in this changeset.
+     */
     private List<OsmPrimitive> deletePrimitives = new ArrayList<>();
 
     /**

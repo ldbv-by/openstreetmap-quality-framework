@@ -10,6 +10,9 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Way;
 import lombok.experimental.UtilityClass;
 
+/**
+ * Mapping between {@link OsmPrimitive} and {@link OsmPrimitiveDto}.
+ */
 @UtilityClass
 public class OsmPrimitiveMapper {
 

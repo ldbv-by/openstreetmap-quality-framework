@@ -4,6 +4,9 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.dto.Ta
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Tag;
 import lombok.experimental.UtilityClass;
 
+/**
+ * Mapping between {@link Tag} and {@link TagDto}.
+ */
 @UtilityClass
 public class TagMapper {
 

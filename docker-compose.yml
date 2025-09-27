@@ -2,6 +2,7 @@ services:
   openstreetmap-quality-framework-db:
     image: postgis/postgis:17-3.5
     container_name: openstreetmap-quality-framework-db
+    command: ["postgres", "-c", "max_connections=300"]
     environment:
       POSTGRES_DB: osm_quality_framework
       POSTGRES_USER: osm_quality_framework_user
@@ -16,10 +17,9 @@ services:
       context: .
       dockerfile: ./docker/Dockerfile
       args:
-        OSM2PGSQL_REPO_URL: https://github.com/ldbv-by/osm2pgsql.git
-        OSM2PGSQL_REPO_BRANCH: v2.0.0-ldbv
-        #OSM2PGSQL_REPO_URL: https://github.com/osm2pgsql-dev/osm2pgsql.git
-        #OSM2PGSQL_REPO_BRANCH: master
+        OSM2PGSQL_REPO_URL: https://github.com/osm2pgsql-dev/osm2pgsql.git
+        OSM2PGSQL_REPO_BRANCH: master
+        OSMOSIS_REPO_TAR: https://github.com/openstreetmap/osmosis/releases/download/0.49.2/osmosis-0.49.2.tar
     container_name: openstreetmap-quality-framework
     ports:
       - "8080:8080"
@@ -32,8 +32,7 @@ services:
       OSM_QUALITY_FRAMEWORK_DATABASE_USERNAME: osm_quality_framework_user
       OSM_QUALITY_FRAMEWORK_DATABASE_PASSWORD: osm_quality_framework_pass
     volumes:
-      - ./docker/pbf/basis-dlm-by.osm.pbf:/app/import/data.osm.pbf:ro
-      #- ./docker/pbf/district-of-columbia-250916.osm.pbf:/app/import/data.osm.pbf:ro
+      - ./docker/data/pbf/data.osm.pbf:/app/import/data.osm.pbf:ro
 
 volumes:
   db-data:

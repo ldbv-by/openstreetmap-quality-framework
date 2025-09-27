@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Transferring an OSM changeset in XML format.
+ * Data Transfer Object of an OSM changeset.
  */
 @XmlRootElement(name = "osmChange")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -18,12 +18,21 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class ChangesetDto {
+    /**
+     * Changeset version.
+     */
     @XmlAttribute(name = "version")
     private String version;
 
+    /**
+     * Changeset generator e.g. JOSM.
+     */
     @XmlAttribute(name = "generator")
     private String generator;
 
+    /**
+     * OSM primitives created in this changeset.
+     */
     @XmlElementWrapper(name = "create")
     @XmlElements({
             @XmlElement(name = "node", type = NodeDto.class),
@@ -32,6 +41,9 @@ public class ChangesetDto {
     })
     private List<OsmPrimitiveDto> createPrimitives = new ArrayList<>();
 
+    /**
+     * OSM primitives modified in this changeset.
+     */
     @XmlElementWrapper(name = "modify")
     @XmlElements({
             @XmlElement(name = "node", type = NodeDto.class),
@@ -40,6 +52,9 @@ public class ChangesetDto {
     })
     private List<OsmPrimitiveDto> modifyPrimitives = new ArrayList<>();
 
+    /**
+     * OSM primitives deleted in this changeset.
+     */
     @XmlElementWrapper(name = "delete")
     @XmlElements({
             @XmlElement(name = "node", type = NodeDto.class),

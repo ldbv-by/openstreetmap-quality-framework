@@ -29,10 +29,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class Orchestrator {
     private final QualityPipeline qualityPipeline;
-    private final Map<String, QualityPipeline.Step.State> publishedPipelineSteps = new ConcurrentHashMap<>();
     private final Map<String, QualityService> qualityServices;
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-    private final List<ChangesetQualityServiceResult> changesetQualityServiceResults = new CopyOnWriteArrayList<>();
 
     /**
      * Starts the pipeline for the given {@link Changeset} and blocks until:
@@ -41,15 +39,14 @@ public class Orchestrator {
      * - The overall timeout is reached.
      **/
     public List<ChangesetQualityServiceResult> start(Changeset changeset) {
-        // Clear previous run state
-        this.publishedPipelineSteps.clear();
-        this.changesetQualityServiceResults.clear();
+        final Map<String, QualityPipeline.Step.State> publishedPipelineSteps = new ConcurrentHashMap<>();
+        final List<ChangesetQualityServiceResult> changesetQualityServiceResults = new CopyOnWriteArrayList<>();
 
         final AtomicInteger cntRemainingSteps = new AtomicInteger(this.qualityPipeline.getSteps().size());
         final CompletableFuture<Void> allStepsDone = new CompletableFuture<>();
 
         // Execute pipeline
-        this.publishRunnableSteps(changeset, cntRemainingSteps, allStepsDone);
+        this.publishRunnableSteps(changeset, publishedPipelineSteps, changesetQualityServiceResults, cntRemainingSteps, allStepsDone);
 
         // Wait for completion (maximum 5 minutes)
         try {
@@ -64,17 +61,19 @@ public class Orchestrator {
             throw new QualityServiceException("Pipeline failed or timed out", cause);
         }
 
-        return this.changesetQualityServiceResults;
+        return changesetQualityServiceResults;
     }
 
     /**
      * Enqueue all currently runnable services.
      */
     private void publishRunnableSteps(Changeset changeset,
+                                      Map<String, QualityPipeline.Step.State> publishedPipelineSteps,
+                                      List<ChangesetQualityServiceResult> changesetQualityServiceResults,
                                       AtomicInteger cntRemainingSteps,
                                       CompletableFuture<Void> allStepsDone) {
 
-        Set<QualityPipeline.Step> runnableSteps = this.getRunnableSteps();
+        Set<QualityPipeline.Step> runnableSteps = this.getRunnableSteps(publishedPipelineSteps);
 
         for (QualityPipeline.Step step : runnableSteps) {
 
@@ -104,16 +103,18 @@ public class Orchestrator {
                         if (throwable == null && changesetQualityResultDto != null) {
 
                             // Set step to state finished
-                            this.publishedPipelineSteps.put(step.getId(), QualityPipeline.Step.State.FINISHED);
+                            publishedPipelineSteps.put(step.getId(), QualityPipeline.Step.State.FINISHED);
 
                             // Add result of quality service to response list
-                            this.changesetQualityServiceResults.add(ChangesetQualityServiceResultMapper.toDomain(changeset.getId(), changesetQualityResultDto));
+                            changesetQualityServiceResults.add(ChangesetQualityServiceResultMapper.toDomain(changeset.getId(), changesetQualityResultDto));
 
                             // publish next quality services with modified changeset
                             this.publishRunnableSteps(
                                     (changesetQualityResultDto.modifiedChangesetDto() != null)
                                             ? ChangesetMapper.toDomain(changeset.getId(), changesetQualityResultDto.modifiedChangesetDto())
                                             : changeset,
+                                    publishedPipelineSteps,
+                                    changesetQualityServiceResults,
                                     cntRemainingSteps,
                                     allStepsDone
                             );
@@ -143,17 +144,18 @@ public class Orchestrator {
      * Get all quality services that are ready for execution.
      * Executable quality services are all those that have not startet yet and are not waiting for any other service.
      */
-    private Set<QualityPipeline.Step> getRunnableSteps() {
+    private Set<QualityPipeline.Step> getRunnableSteps(Map<String, QualityPipeline.Step.State> publishedPipelineSteps) {
         return this.qualityPipeline.getSteps().stream()
-                .filter(step -> !this.publishedPipelineSteps.containsKey(step.getId()) &&
-                        !this.isWaitingOnAnotherQualityService(step))
+                .filter(step -> !publishedPipelineSteps.containsKey(step.getId()) &&
+                        !this.isWaitingOnAnotherQualityService(publishedPipelineSteps, step))
                 .collect(Collectors.toSet());
     }
 
     /**
      * Check if quality service is waiting on other service that has either not startet yes or has not finished.
      */
-    private boolean isWaitingOnAnotherQualityService(QualityPipeline.Step step) {
+    private boolean isWaitingOnAnotherQualityService(Map<String, QualityPipeline.Step.State> publishedPipelineSteps,
+                                                     QualityPipeline.Step step) {
         if (step.getWaitsFor().isEmpty()) {
             return false;
         }
@@ -161,8 +163,8 @@ public class Orchestrator {
         return step.getWaitsFor().stream()
                 .anyMatch(waitForQualityServiceId -> this.qualityPipeline.getSteps().stream()
                         .filter(waitForStep -> waitForStep.getId().equals(waitForQualityServiceId))
-                        .anyMatch(waitForStep -> !this.publishedPipelineSteps.containsKey(waitForStep.getId()) ||
-                                this.publishedPipelineSteps.get(waitForStep.getId()) != QualityPipeline.Step.State.FINISHED));
+                        .anyMatch(waitForStep -> !publishedPipelineSteps.containsKey(waitForStep.getId()) ||
+                                publishedPipelineSteps.get(waitForStep.getId()) != QualityPipeline.Step.State.FINISHED));
     }
 
     /**

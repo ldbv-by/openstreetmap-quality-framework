@@ -7,14 +7,15 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class JacksonConfiguration {
-
+/*
     @Bean
     public JtsModule jtsModule() { return new JtsModule(); }
+
 
     @Bean
     public ObjectMapper objectMapper(JtsModule jtsModule) {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(jtsModule);
         return objectMapper;
-    }
+    }*/
 }

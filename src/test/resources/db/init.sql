@@ -1,3 +1,0 @@
-CREATE EXTENSION IF NOT EXISTS postgis;
-
-CREATE SCHEMA IF NOT EXISTS openstreetmap_geometries;

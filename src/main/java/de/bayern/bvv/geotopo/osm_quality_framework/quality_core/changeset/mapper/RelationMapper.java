@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Mapping between {@link Relation} and {@link RelationDto}.
+ */
 @UtilityClass
 public class RelationMapper {
 

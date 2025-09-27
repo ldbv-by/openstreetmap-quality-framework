@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Repository for the changeset_prepare_X schema. (implementation)
+ */
 @Repository
 @RequiredArgsConstructor
 @Slf4j
@@ -19,6 +22,9 @@ public class ChangesetPrepareRepositoryImpl implements ChangesetPrepareRepositor
 
     private final JdbcTemplate jdbcTemplate;
 
+    /**
+     * Creates a changeset prepare schema.
+     */
     @Override
     public void createSchemaByChangesetId(Long changesetId) {
         String srcSchemaName = "openstreetmap_geometries";
@@ -40,12 +46,29 @@ public class ChangesetPrepareRepositoryImpl implements ChangesetPrepareRepositor
                 this.jdbcTemplate.execute(sql);
             }
 
+            // copy openstreetmap_geometries functions
+            List<String> functionDefs = jdbcTemplate.query(
+                    "SELECT pg_get_functiondef(p.oid) AS def " +
+                            "FROM pg_proc p " +
+                            "JOIN pg_namespace n ON n.oid = p.pronamespace " +
+                            "WHERE n.nspname = ?",
+                    ps -> ps.setString(1, srcSchemaName),
+                    (rs, i) -> rs.getString("def"));
+
+            for (String def : functionDefs) {
+                this.jdbcTemplate.execute(def.replace(srcSchemaName, dstSchemaName));
+            }
+
+
             log.info("Schema {} created.", dstSchemaName);
         } catch (Exception e) {
             throw new IllegalStateException("Schema " + dstSchemaName + " creation failed:\n" + e.getMessage());
         }
     }
 
+    /**
+     * Drops a changeset prepare schema.
+     */
     @Override
     public void dropSchemaByChangeset(Long changesetId) {
         String dstSchemaName = "changeset_prepare_" + changesetId;
@@ -53,6 +76,9 @@ public class ChangesetPrepareRepositoryImpl implements ChangesetPrepareRepositor
         log.info("Schema {} dropped.", dstSchemaName);
     }
 
+    /**
+     * Copies all depending changeset objects from openstreetmap_geometries schema.
+     */
     @Override
     public void insertDependingOsmObjects(Changeset changeset) {
         String dstSchemaName = "changeset_prepare_" + changeset.getId();
@@ -62,9 +88,9 @@ public class ChangesetPrepareRepositoryImpl implements ChangesetPrepareRepositor
         Set<Long> relationIds = changeset.getAllPrimitives().stream().filter(Relation.class::isInstance).map(OsmPrimitive::getId).collect(Collectors.toSet());
 
         try (InputStream inputStream = this.getClass().getClassLoader()
-                .getResourceAsStream("changeset_prepare/sql/insertDependingOsmObjects.sql")) {
+                .getResourceAsStream("sql/insertDependingOsmObjects.sql")) {
 
-            if (inputStream == null) throw new IllegalStateException("changeset_prepare/sql/insertDependingOsmObjects.sql is null.");
+            if (inputStream == null) throw new IllegalStateException("sql/insertDependingOsmObjects.sql is null.");
 
             String query = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8)
                     .replace("___CHANGESET_PREPARE___", dstSchemaName)

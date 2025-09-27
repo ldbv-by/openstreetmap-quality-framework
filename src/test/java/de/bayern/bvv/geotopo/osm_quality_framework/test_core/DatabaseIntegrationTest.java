@@ -1,0 +1,155 @@
+package de.bayern.bvv.geotopo.osm_quality_framework.test_core;
+
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.dto.CreateSchemaDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.spi.Osm2PgSqlService;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+
+import java.nio.file.Path;
+import java.util.List;
+
+@SpringBootTest
+public abstract class DatabaseIntegrationTest {
+    @Autowired
+    protected Osm2PgSqlService osm2PgSqlService;
+
+    @Autowired
+    protected JdbcTemplate jdbcTemplate;
+
+    private static final PostgreSQLContainer<?> testDatabaseContainer =
+            TestDatabase.TEST_DATABASE_CONTAINER;
+
+    @DynamicPropertySource
+    static void overrideProps(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", testDatabaseContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", testDatabaseContainer::getUsername);
+        registry.add("spring.datasource.password", testDatabaseContainer::getPassword);
+        registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
+
+        registry.add("OSM_QUALITY_FRAMEWORK_DATABASE", testDatabaseContainer::getDatabaseName);
+        registry.add("OSM_QUALITY_FRAMEWORK_DATABASE_HOST", testDatabaseContainer::getHost);
+        registry.add("OSM_QUALITY_FRAMEWORK_DATABASE_PORT", () -> String.valueOf(testDatabaseContainer.getMappedPort(5432)));
+        registry.add("OSM_QUALITY_FRAMEWORK_DATABASE_USERNAME", testDatabaseContainer::getUsername);
+        registry.add("OSM_QUALITY_FRAMEWORK_DATABASE_PASSWORD", testDatabaseContainer::getPassword);
+    }
+
+    @BeforeEach
+    void resetSchema() throws Exception {
+        this.jdbcTemplate.execute("CREATE EXTENSION IF NOT EXISTS postgis;");
+
+        this.createSchemaOpenStreetMapGeometries();
+        this.createSchemaChangesetData();
+    }
+
+    private void createSchemaOpenStreetMapGeometries() throws Exception {
+        this.jdbcTemplate.execute("DROP SCHEMA IF EXISTS openstreetmap_geometries CASCADE");
+        this.jdbcTemplate.execute("CREATE SCHEMA openstreetmap_geometries");
+
+        Path pbf = new ClassPathResource("pbf/test.osm.pbf").getFile().toPath();
+        Path lua = new ClassPathResource("lua/openstreetmap_geometries.lua").getFile().toPath();
+
+        CreateSchemaDto createSchemaDto = new CreateSchemaDto(
+                pbf,
+                lua,
+                testDatabaseContainer.getDatabaseName(),
+                "openstreetmap_geometries",
+                testDatabaseContainer.getHost(),
+                String.valueOf(testDatabaseContainer.getMappedPort(5432)),
+                testDatabaseContainer.getUsername(),
+                testDatabaseContainer.getPassword()
+        );
+
+        this.osm2PgSqlService.createSchema(createSchemaDto);
+
+        String sql = """
+                CREATE INDEX IF NOT EXISTS planet_osm_rels_rel_members_idx
+                        ON openstreetmap_geometries.planet_osm_rels
+                        USING gin (openstreetmap_geometries.planet_osm_member_ids(members, 'R'::character(1)))
+                        WITH (fastupdate = off);
+                """;
+        this.jdbcTemplate.execute(sql);
+    }
+
+    private void createSchemaChangesetData() {
+        String srcSchemaName = "openstreetmap_geometries";
+        String dstSchemaName = "changeset_data";
+
+        try {
+            this.jdbcTemplate.execute("DROP SCHEMA IF EXISTS " + dstSchemaName + " CASCADE");
+            this.jdbcTemplate.execute("CREATE SCHEMA " + dstSchemaName);
+
+            // copy openstreetmap_geometries tables
+            List<String> tables = this.jdbcTemplate.queryForList(
+                    "SELECT table_name FROM information_schema.tables " +
+                            "WHERE table_schema = ? AND table_type = 'BASE TABLE'",
+                    String.class, srcSchemaName);
+
+            for (String table : tables) {
+                String sql = "CREATE TABLE " + dstSchemaName + "." + table +
+                        " (LIKE " + srcSchemaName + "." + table + " INCLUDING ALL INCLUDING INDEXES)";
+
+                this.jdbcTemplate.execute(sql);
+            }
+
+            // copy openstreetmap_geometries functions
+            List<String> functionDefs = this.jdbcTemplate.query(
+                    "SELECT pg_get_functiondef(p.oid) AS def " +
+                            "FROM pg_proc p " +
+                            "JOIN pg_namespace n ON n.oid = p.pronamespace " +
+                            "WHERE n.nspname = ?",
+                    ps -> ps.setString(1, srcSchemaName),
+                    (rs, i) -> rs.getString("def"));
+
+            for (String def : functionDefs) {
+                this.jdbcTemplate.execute(def.replace(srcSchemaName, dstSchemaName));
+            }
+
+            // create changeset_objects table and add changeset_id to object tables
+            String ddl = """
+            CREATE TABLE IF NOT EXISTS changeset_data.changeset_objects (
+              id                bigserial    PRIMARY KEY,
+              osm_id            bigint       NOT NULL,
+              osm_geometry_type char(1)      NOT NULL,
+              changeset_id      bigint       NOT NULL,
+              operation_type    text         NOT NULL,
+              created_at        timestamptz  NOT NULL DEFAULT now(),
+              CONSTRAINT chk_changeset_objects_geom_type
+                CHECK (osm_geometry_type IN ('N','W','R','A')),
+              CONSTRAINT chk_changeset_objects_op_type
+                CHECK (operation_type IN ('CREATE','MODIFY','DELETE'))
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_changeset_objects_changeset_id
+              ON changeset_data.changeset_objects (changeset_id);
+
+            CREATE INDEX IF NOT EXISTS idx_changeset_objects_osm
+              ON changeset_data.changeset_objects (osm_geometry_type, osm_id);
+
+            CREATE UNIQUE INDEX IF NOT EXISTS uq_changeset_objects
+              ON changeset_data.changeset_objects (changeset_id, osm_geometry_type, osm_id, operation_type);
+
+            ALTER TABLE IF EXISTS changeset_data.nodes             ADD COLUMN IF NOT EXISTS changeset_id bigint;
+            ALTER TABLE IF EXISTS changeset_data.ways              ADD COLUMN IF NOT EXISTS changeset_id bigint;
+            ALTER TABLE IF EXISTS changeset_data.areas             ADD COLUMN IF NOT EXISTS changeset_id bigint;
+            ALTER TABLE IF EXISTS changeset_data.relations         ADD COLUMN IF NOT EXISTS changeset_id bigint;
+            ALTER TABLE IF EXISTS changeset_data.relation_members  ADD COLUMN IF NOT EXISTS changeset_id bigint;
+            """;
+
+            for (String stmt : ddl.split(";")) {
+                String s = stmt.trim();
+                if (!s.isEmpty()) {
+                    this.jdbcTemplate.execute(s);
+                }
+            }
+
+        } catch (Exception e) {
+            throw new IllegalStateException("Schema " + dstSchemaName + " creation failed:\n" + e.getMessage());
+        }
+    }
+}

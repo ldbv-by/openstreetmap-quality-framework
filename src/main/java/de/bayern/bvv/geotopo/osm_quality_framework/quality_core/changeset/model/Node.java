@@ -5,11 +5,22 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/**
+ * Node primitive.
+ */
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class Node extends OsmPrimitive {
+
+    /**
+     * Latitude of the node.
+     */
     private String lat;
+
+    /**
+     * Longitude of the node.
+     */
     private String lon;
 }
