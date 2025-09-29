@@ -1,17 +1,15 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.service;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_prepare.spi.ChangesetPrepareService;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.ChangesetQualityServiceResultDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.dto.QualityHubResultDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.mapper.QualityHubResultMapper;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.model.QualityHubResult;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.component.Orchestrator;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.dto.ChangesetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.mapper.ChangesetQualityServiceResultMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.model.ChangesetQualityServiceResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * Quality Hub Service.
@@ -26,12 +24,12 @@ public class QualityHubService {
     /**
      * Persists the changeset and publishes it to the configured quality services.
      */
-    public List<ChangesetQualityServiceResultDto> checkChangesetQuality(Long changesetId, ChangesetDto changesetDto) {
+    public QualityHubResultDto checkChangesetQuality(Long changesetId, ChangesetDto changesetDto) {
         this.changesetPrepareService.prepareChangeset(changesetId, changesetDto);
 
         Changeset changeset = ChangesetMapper.toDomain(changesetId, changesetDto);
-        List<ChangesetQualityServiceResult> changesetQualityServiceResults = this.orchestrator.start(changeset);
+        QualityHubResult qualityHubResult = this.orchestrator.start(changeset);
 
-        return changesetQualityServiceResults.stream().map(ChangesetQualityServiceResultMapper::toDto).toList();
+        return QualityHubResultMapper.toDto(qualityHubResult);
     }
 }

@@ -1,19 +1,17 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.component;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.ChangesetQualityServiceRequestDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.model.QualityHubResult;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceRequestDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.spi.QualityService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.QualityPipeline;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.mapper.ChangesetQualityServiceResultMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.model.ChangesetQualityServiceResult;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.exception.QualityServiceException;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
@@ -38,15 +36,15 @@ public class Orchestrator {
      * - Any service failed, or
      * - The overall timeout is reached.
      **/
-    public List<ChangesetQualityServiceResult> start(Changeset changeset) {
-        final Map<String, QualityPipeline.Step.State> publishedPipelineSteps = new ConcurrentHashMap<>();
-        final List<ChangesetQualityServiceResult> changesetQualityServiceResults = new CopyOnWriteArrayList<>();
+    public QualityHubResult start(Changeset changeset) {
+        QualityHubResult qualityHubResult = new QualityHubResult(changeset);
 
+        final Map<String, QualityPipeline.Step.State> publishedPipelineSteps = new ConcurrentHashMap<>();
         final AtomicInteger cntRemainingSteps = new AtomicInteger(this.qualityPipeline.getSteps().size());
         final CompletableFuture<Void> allStepsDone = new CompletableFuture<>();
 
         // Execute pipeline
-        this.publishRunnableSteps(changeset, publishedPipelineSteps, changesetQualityServiceResults, cntRemainingSteps, allStepsDone);
+        this.publishRunnableSteps(changeset, publishedPipelineSteps, qualityHubResult, cntRemainingSteps, allStepsDone);
 
         // Wait for completion (maximum 5 minutes)
         try {
@@ -61,7 +59,7 @@ public class Orchestrator {
             throw new QualityServiceException("Pipeline failed or timed out", cause);
         }
 
-        return changesetQualityServiceResults;
+        return qualityHubResult;
     }
 
     /**
@@ -69,7 +67,7 @@ public class Orchestrator {
      */
     private void publishRunnableSteps(Changeset changeset,
                                       Map<String, QualityPipeline.Step.State> publishedPipelineSteps,
-                                      List<ChangesetQualityServiceResult> changesetQualityServiceResults,
+                                      QualityHubResult qualityHubResult,
                                       AtomicInteger cntRemainingSteps,
                                       CompletableFuture<Void> allStepsDone) {
 
@@ -92,29 +90,38 @@ public class Orchestrator {
             // Send changeset to quality service asynchronous
             CompletableFuture
                 .supplyAsync(() -> {
-                    ChangesetQualityServiceRequestDto changesetQualityRequest =
-                            new ChangesetQualityServiceRequestDto(ChangesetMapper.toDto(changeset));
+                    QualityServiceRequestDto qualityServiceRequestDto =
+                            new QualityServiceRequestDto(
+                                    step.getId(),
+                                    changeset.getId(),
+                                    ChangesetMapper.toDto(changeset));
 
-                    return qualityServiceBean.checkChangesetQuality(changesetQualityRequest);
+                    return qualityServiceBean.checkChangesetQuality(qualityServiceRequestDto);
                 }, executor)
                 .orTimeout(5, TimeUnit.MINUTES)
-                .whenComplete((changesetQualityResultDto, throwable) -> {
+                .whenComplete((qualityServiceResultDto, throwable) -> {
                     try {
-                        if (throwable == null && changesetQualityResultDto != null) {
+                        if (throwable == null && qualityServiceResultDto != null) {
 
                             // Set step to state finished
                             publishedPipelineSteps.put(step.getId(), QualityPipeline.Step.State.FINISHED);
 
                             // Add result of quality service to response list
-                            changesetQualityServiceResults.add(ChangesetQualityServiceResultMapper.toDomain(changeset.getId(), changesetQualityResultDto));
+                            if (qualityServiceResultDto.modifiedChangesetDto() != null) {
+                                qualityHubResult.setChangeset(ChangesetMapper.toDomain(changeset.getId(), qualityServiceResultDto.modifiedChangesetDto()));
+                            }
+
+                            if (qualityHubResult.isValid() && !qualityServiceResultDto.isValid()) {
+                                qualityHubResult.setValid(false);
+                            }
+
+                            qualityHubResult.addQualityServiceResult(qualityServiceResultDto);
 
                             // publish next quality services with modified changeset
                             this.publishRunnableSteps(
-                                    (changesetQualityResultDto.modifiedChangesetDto() != null)
-                                            ? ChangesetMapper.toDomain(changeset.getId(), changesetQualityResultDto.modifiedChangesetDto())
-                                            : changeset,
+                                    qualityHubResult.getChangeset(),
                                     publishedPipelineSteps,
-                                    changesetQualityServiceResults,
+                                    qualityHubResult,
                                     cntRemainingSteps,
                                     allStepsDone
                             );

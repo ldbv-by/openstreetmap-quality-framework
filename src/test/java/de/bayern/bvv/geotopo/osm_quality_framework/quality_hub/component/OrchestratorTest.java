@@ -1,10 +1,10 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.component;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.ChangesetQualityServiceRequestDto;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.ChangesetQualityServiceResultDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.model.QualityHubResult;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceRequestDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceResultDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.spi.QualityService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.model.ChangesetQualityServiceResult;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.QualityPipeline;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.exception.QualityServiceException;
 import org.junit.jupiter.api.Test;
@@ -59,21 +59,21 @@ class OrchestratorTest {
         services.put("C", svcC);
 
         // Each service returns a non-null DTO
-        when(svcA.checkChangesetQuality(any(ChangesetQualityServiceRequestDto.class)))
-                .thenReturn(mock(ChangesetQualityServiceResultDto.class));
-        when(svcB.checkChangesetQuality(any(ChangesetQualityServiceRequestDto.class)))
-                .thenReturn(mock(ChangesetQualityServiceResultDto.class));
-        when(svcC.checkChangesetQuality(any(ChangesetQualityServiceRequestDto.class)))
-                .thenReturn(mock(ChangesetQualityServiceResultDto.class));
+        when(svcA.checkChangesetQuality(any(QualityServiceRequestDto.class)))
+                .thenReturn(mock(QualityServiceResultDto.class));
+        when(svcB.checkChangesetQuality(any(QualityServiceRequestDto.class)))
+                .thenReturn(mock(QualityServiceResultDto.class));
+        when(svcC.checkChangesetQuality(any(QualityServiceRequestDto.class)))
+                .thenReturn(mock(QualityServiceResultDto.class));
 
         Orchestrator orchestrator = orchestratorWith(pipeline, services);
         Changeset changeset = mock(Changeset.class);
 
         // Act
-        List<ChangesetQualityServiceResult> results = orchestrator.start(changeset);
+        QualityHubResult qualityHubResult = orchestrator.start(changeset);
 
         // Assert
-        assertEquals(3, results.size(), "All three steps should produce a result");
+        assertEquals(3, qualityHubResult.getQualityServiceResults().size(), "All three steps should produce a result");
         verify(svcA, times(1)).checkChangesetQuality(any());
         verify(svcB, times(1)).checkChangesetQuality(any());
         verify(svcC, times(1)).checkChangesetQuality(any());
@@ -105,24 +105,24 @@ class OrchestratorTest {
 
         when(svcA.checkChangesetQuality(any())).thenAnswer(_ -> {
             latchAB.countDown();
-            return mock(ChangesetQualityServiceResultDto.class);
+            return mock(QualityServiceResultDto.class);
         });
         when(svcB.checkChangesetQuality(any())).thenAnswer(_ -> {
             latchAB.countDown();
-            return mock(ChangesetQualityServiceResultDto.class);
+            return mock(QualityServiceResultDto.class);
         });
         when(svcC.checkChangesetQuality(any())).thenAnswer(_ -> {
             assertTrue(latchAB.await(2, TimeUnit.SECONDS), "C must start after A and B completed");
-            return mock(ChangesetQualityServiceResultDto.class);
+            return mock(QualityServiceResultDto.class);
         });
 
         Orchestrator orchestrator = orchestratorWith(pipeline, new HashMap<>(services));
 
         // Act
-        var results = orchestrator.start(mock(Changeset.class));
+        QualityHubResult qualityHubResult = orchestrator.start(mock(Changeset.class));
 
         // Assert
-        assertEquals(3, results.size(), "All three steps should produce a result");
+        assertEquals(3, qualityHubResult.getQualityServiceResults().size(), "All three steps should produce a result");
         verify(svcA, times(1)).checkChangesetQuality(any());
         verify(svcB, times(1)).checkChangesetQuality(any());
         verify(svcC, times(1)).checkChangesetQuality(any());
@@ -149,7 +149,7 @@ class OrchestratorTest {
         services.put("B", svcB);
         services.put("C", svcC);
 
-        when(svcA.checkChangesetQuality(any())).thenReturn(mock(ChangesetQualityServiceResultDto.class));
+        when(svcA.checkChangesetQuality(any())).thenReturn(mock(QualityServiceResultDto.class));
         when(svcB.checkChangesetQuality(any())).thenThrow(new RuntimeException("boom"));
 
         Orchestrator orchestrator = orchestratorWith(pipeline, services);
