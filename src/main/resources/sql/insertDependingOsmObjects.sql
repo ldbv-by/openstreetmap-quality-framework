@@ -7,26 +7,26 @@ DECLARE
     m_new int;
     m_cnt int;
 BEGIN
-    CREATE TEMP TABLE copy_nodes (id bigint PRIMARY KEY) ON COMMIT DROP;
-    CREATE TEMP TABLE copy_ways  (id bigint PRIMARY KEY) ON COMMIT DROP;
-    CREATE TEMP TABLE copy_rels  (id bigint PRIMARY KEY) ON COMMIT DROP;
+    CREATE TEMP TABLE copy_nodes (id bigint PRIMARY KEY, directlyAffected boolean NOT NULL DEFAULT FALSE) ON COMMIT DROP;
+    CREATE TEMP TABLE copy_ways  (id bigint PRIMARY KEY, directlyAffected boolean NOT NULL DEFAULT FALSE) ON COMMIT DROP;
+    CREATE TEMP TABLE copy_rels  (id bigint PRIMARY KEY, directlyAffected boolean NOT NULL DEFAULT FALSE) ON COMMIT DROP;
 
     -- init copy tables with changeset nodes, ways and relations
     INSERT INTO copy_nodes
-    SELECT DISTINCT unnest(m_node_ids) WHERE m_node_ids IS NOT NULL
+    SELECT DISTINCT unnest(m_node_ids), TRUE WHERE m_node_ids IS NOT NULL
     ON CONFLICT DO NOTHING;
 
     INSERT INTO copy_ways
-    SELECT DISTINCT unnest(m_way_ids) WHERE m_way_ids IS NOT NULL
+    SELECT DISTINCT unnest(m_way_ids), TRUE WHERE m_way_ids IS NOT NULL
     ON CONFLICT DO NOTHING;
 
     INSERT INTO copy_rels
-    SELECT DISTINCT unnest(m_rel_ids) WHERE m_rel_ids IS NOT NULL
+    SELECT DISTINCT unnest(m_rel_ids), TRUE WHERE m_rel_ids IS NOT NULL
     ON CONFLICT DO NOTHING;
 
     -- Node -> Ways (only for changeset nodes)
     INSERT INTO copy_ways
-    SELECT DISTINCT w.id
+    SELECT DISTINCT w.id, TRUE
     FROM openstreetmap_geometries.planet_osm_ways w,
          (SELECT array_agg(id)::bigint[] AS ids FROM copy_nodes) cn
     WHERE w.nodes && cn.ids
@@ -39,73 +39,89 @@ BEGIN
 
         -- 1. Way -> Nodes
         INSERT INTO copy_nodes
-        SELECT DISTINCT unnest(w.nodes)
+        SELECT DISTINCT unnest(w.nodes), FALSE
         FROM openstreetmap_geometries.planet_osm_ways w,
              copy_ways cw
         WHERE cw.id = w.id
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
 
-        -- 2. Relations -> Nodes, Ways, Relations (Downstream)
-        -- 2a. Relations -> Nodes
+                -- 2. Relations -> Nodes, Ways, Relations (Downstream)
+                -- 2a. Relations -> Nodes
         INSERT INTO copy_nodes
-        SELECT DISTINCT (member->>'ref')::bigint
+        SELECT DISTINCT (member->>'ref')::bigint, FALSE
         FROM openstreetmap_geometries.planet_osm_rels r,
              copy_rels cr,
              jsonb_array_elements(r.members) AS member
         WHERE cr.id = r.id
-        AND member->>'type' = 'N'
+          AND member->>'type' = 'N'
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
 
-        -- 2b. Relations -> Ways
+                -- 2b. Relations -> Ways
         INSERT INTO copy_ways
-        SELECT DISTINCT (member->>'ref')::bigint
+        SELECT DISTINCT (member->>'ref')::bigint, FALSE
         FROM openstreetmap_geometries.planet_osm_rels r,
              copy_rels cr,
              jsonb_array_elements(r.members) AS member
         WHERE cr.id = r.id
-        AND member->>'type' = 'W'
+          AND member->>'type' = 'W'
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
 
-        -- 2c. Relations -> Relations
+                -- 2c. Relations -> Relations
         INSERT INTO copy_rels
-        SELECT DISTINCT (member->>'ref')::bigint
+        SELECT DISTINCT (member->>'ref')::bigint, FALSE
         FROM openstreetmap_geometries.planet_osm_rels r,
              copy_rels cr,
              jsonb_array_elements(r.members) AS member
         WHERE cr.id = r.id
-        AND member->>'type' = 'R'
+          AND member->>'type' = 'R'
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
 
-        -- 3. Node, Way, Relation -> Relation (Upstream)
+                -- 3. Node, Way, Relation -> Relation (Upstream)
 
-        -- 3a. Node -> Relation
+                -- 3a. Node -> Relation
         INSERT INTO copy_rels
-        SELECT r.id
+        SELECT r.id,
+               CASE WHEN openstreetmap_geometries.planet_osm_member_ids(r.members, 'N'::char(1)) && cn.ids_direct THEN TRUE
+                    ELSE FALSE
+                   END AS directlyAffected
         FROM openstreetmap_geometries.planet_osm_rels r,
-             (SELECT array_agg(id) AS ids FROM copy_nodes) cn
+             (SELECT COALESCE(array_agg(id) FILTER (WHERE directlyAffected), '{}')::bigint[] AS ids_direct,
+                  COALESCE(array_agg(id), '{}')::bigint[]                                 AS ids
+              FROM copy_nodes) cn
         WHERE openstreetmap_geometries.planet_osm_member_ids(members, 'N'::char(1)) && cn.ids
-        ON CONFLICT DO NOTHING;
+        ON CONFLICT (id) DO UPDATE
+                                SET directlyAffected = copy_rels.directlyAffected OR EXCLUDED.directlyAffected;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
 
-        -- 3b. Way -> Relation
+                -- 3b. Way -> Relation
         INSERT INTO copy_rels
-        SELECT r.id
+        SELECT r.id,
+               CASE WHEN openstreetmap_geometries.planet_osm_member_ids(r.members, 'W'::char(1)) && cw.ids_direct THEN TRUE
+                    ELSE FALSE
+                   END AS directlyAffected
         FROM openstreetmap_geometries.planet_osm_rels r,
-             (SELECT array_agg(id)::bigint[] AS ids FROM copy_ways) cw
+             (SELECT COALESCE(array_agg(id) FILTER (WHERE directlyAffected), '{}')::bigint[] AS ids_direct,
+                  COALESCE(array_agg(id), '{}')::bigint[]                                 AS ids
+              FROM copy_ways) cw
         WHERE openstreetmap_geometries.planet_osm_member_ids(members, 'W'::char(1)) && cw.ids
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
 
-        -- 3c. Relation -> Relation
-        -- INFO: planet_osm_rels_rel_members_idx is necessary
+                -- 3c. Relation -> Relation
+                -- INFO: planet_osm_rels_rel_members_idx is necessary
         INSERT INTO copy_rels
-        SELECT r.id
+        SELECT r.id,
+               CASE WHEN openstreetmap_geometries.planet_osm_member_ids(r.members, 'R'::char(1)) && cr.ids_direct THEN TRUE
+                    ELSE FALSE
+                   END AS directlyAffected
         FROM openstreetmap_geometries.planet_osm_rels r,
-             (SELECT array_agg(id)::bigint[] AS ids FROM copy_rels) cr
+             (SELECT COALESCE(array_agg(id) FILTER (WHERE directlyAffected), '{}')::bigint[] AS ids_direct,
+                  COALESCE(array_agg(id), '{}')::bigint[]                                 AS ids
+              FROM copy_rels) cr
         WHERE openstreetmap_geometries.planet_osm_member_ids(members, 'R'::char(1)) && cr.ids
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
@@ -120,7 +136,7 @@ BEGIN
     RAISE NOTICE 'Found Ways:  %', (SELECT COUNT(*) FROM copy_ways);
     RAISE NOTICE 'Found Rels:  %', (SELECT COUNT(*) FROM copy_rels);
 
-    -- Copy planet to changeset_prepare
+        -- Copy planet to changeset_prepare
     INSERT INTO ___CHANGESET_PREPARE___.planet_osm_nodes
     SELECT pn.*
     FROM openstreetmap_geometries.planet_osm_nodes pn,
@@ -143,46 +159,64 @@ BEGIN
     INSERT INTO ___CHANGESET_PREPARE___.nodes
     SELECT nd.*
     FROM openstreetmap_geometries.nodes nd,
-         ___CHANGESET_PREPARE___.planet_osm_nodes pn
+         ___CHANGESET_PREPARE___.planet_osm_nodes pn,
+         copy_nodes cn
     WHERE pn.tags IS NOT NULL
-    AND pn.id = nd.osm_id;
+      AND pn.id = nd.osm_id
+      AND cn.id = pn.id
+      AND cn.directlyAffected;
 
     INSERT INTO ___CHANGESET_PREPARE___.ways
     SELECT w.*
     FROM openstreetmap_geometries.ways w,
-         ___CHANGESET_PREPARE___.planet_osm_ways pw
+         ___CHANGESET_PREPARE___.planet_osm_ways pw,
+         copy_ways cw
     WHERE pw.tags IS NOT NULL
-    AND pw.id = w.osm_id;
+      AND pw.id = w.osm_id
+      AND cw.id = pw.id
+      AND cw.directlyAffected;
 
     INSERT INTO ___CHANGESET_PREPARE___.areas
     SELECT a.*
     FROM openstreetmap_geometries.areas a,
-         ___CHANGESET_PREPARE___.planet_osm_ways pw
+         ___CHANGESET_PREPARE___.planet_osm_ways pw,
+         copy_ways cw
     WHERE pw.tags IS NOT NULL
-    AND pw.id = a.osm_id
-    AND a.osm_geometry_type = 'W';
+      AND pw.id = a.osm_id
+      AND a.osm_geometry_type = 'W'
+      AND cw.id = pw.id
+      AND cw.directlyAffected;
 
     INSERT INTO ___CHANGESET_PREPARE___.areas
     SELECT a.*
     FROM openstreetmap_geometries.areas a,
-         ___CHANGESET_PREPARE___.planet_osm_rels pr
+         ___CHANGESET_PREPARE___.planet_osm_rels pr,
+         copy_rels cr
     WHERE pr.tags IS NOT NULL
-    AND pr.id = a.osm_id
-    AND a.osm_geometry_type = 'R';
+      AND pr.id = a.osm_id
+      AND a.osm_geometry_type = 'R'
+      AND cr.id = pr.id
+      AND cr.directlyAffected;
 
     INSERT INTO ___CHANGESET_PREPARE___.relations
     SELECT r.*
     FROM openstreetmap_geometries.relations r,
-         ___CHANGESET_PREPARE___.planet_osm_rels pr
+         ___CHANGESET_PREPARE___.planet_osm_rels pr,
+         copy_rels cr
     WHERE pr.tags IS NOT NULL
-    AND pr.id = r.osm_id;
+      AND pr.id = r.osm_id
+      AND cr.id = pr.id
+      AND cr.directlyAffected;
 
     INSERT INTO ___CHANGESET_PREPARE___.relation_members
     SELECT rm.*
     FROM openstreetmap_geometries.relation_members rm,
-         ___CHANGESET_PREPARE___.planet_osm_rels pr
+         ___CHANGESET_PREPARE___.planet_osm_rels pr,
+         copy_rels cr
     WHERE pr.tags IS NOT NULL
-    AND pr.id = rm.relation_osm_id;
+      AND pr.id = rm.relation_osm_id
+      AND cr.id = pr.id
+      AND cr.directlyAffected;
 
     -- insert osm2pgsql properties
     INSERT INTO ___CHANGESET_PREPARE___.osm2pgsql_properties
