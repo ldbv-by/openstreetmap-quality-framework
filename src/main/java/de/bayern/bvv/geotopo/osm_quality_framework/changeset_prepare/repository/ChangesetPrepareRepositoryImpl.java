@@ -88,7 +88,7 @@ public class ChangesetPrepareRepositoryImpl implements ChangesetPrepareRepositor
         Set<Long> relationIds = changeset.getAllPrimitives().stream().filter(Relation.class::isInstance).map(OsmPrimitive::getId).collect(Collectors.toSet());
 
         try (InputStream inputStream = this.getClass().getClassLoader()
-                .getResourceAsStream("sql/insertDependingOsmObjects.sql")) {
+                .getResourceAsStream("sql/changeset_prepare/insertDependingOsmObjects.sql")) {
 
             if (inputStream == null) throw new IllegalStateException("sql/insertDependingOsmObjects.sql is null.");
 

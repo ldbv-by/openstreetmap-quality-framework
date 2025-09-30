@@ -10,11 +10,21 @@ spring:
     username: ${OSM_QUALITY_FRAMEWORK_DATABASE_USERNAME}
     password: ${OSM_QUALITY_FRAMEWORK_DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-init-sql: CREATE SCHEMA IF NOT EXISTS openstreetmap_schema;
 
   jpa:
     show-sql: true
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: update
+
+  sql:
+    init:
+      mode: always
+      data-locations:
+        - classpath:sql/openstreetmap_schema/aaa-basis-schema.sql
+        - classpath:sql/openstreetmap_schema/atkis-basis-dlm-schema.sql
 
 quality:
   pipeline:
