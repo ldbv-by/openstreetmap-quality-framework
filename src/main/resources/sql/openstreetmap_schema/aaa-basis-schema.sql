@@ -126,8 +126,8 @@ INSERT INTO openstreetmap_schema.datatypes (datatype_id, datatype_type) VALUES
     ('AA_NAS_Ausgabeform', 'DICTIONARY'),
     ('AA_Benutzungsauftrag', 'COMPLEX'),
     ('AA_Anlassart_Benutzungsauftrag', 'DICTIONARY'),
-    ('SC_CRS', 'COMPLEX'), --?
-    ('Query', 'COMPLEX'), --?
+    ('SC_CRS', 'PRIMITIVE'),
+    ('Query', 'PRIMITIVE'),
     ('AA_Fortfuehrungsauftrag', 'COMPLEX'),
     ('AA_Koordinatenreferenzsystemangaben', 'COMPLEX'),
     ('Transaction', 'COMPLEX'),
