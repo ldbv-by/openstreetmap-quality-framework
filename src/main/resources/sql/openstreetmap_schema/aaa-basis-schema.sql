@@ -388,7 +388,6 @@ INSERT INTO openstreetmap_schema.datatypes_dictionary (datatype_id, dictionary_k
 ON CONFLICT (datatype_id, dictionary_key) DO NOTHING;
 
 INSERT INTO openstreetmap_schema.tags (object_type, tag_key, multiplicity, tag_datatype_id) VALUES
-    -- AA_Objekt
     ('AA_Objekt', 'FDV_zeigtAufExternes', '0..*', 'AA_Fachdatenverbindung'),
     ('AA_Objekt', 'QID_quellobjektID', '0..1', 'CharacterString'),
     ('AA_Objekt', 'OID_identifikator', '1', 'AA_UUID'),
