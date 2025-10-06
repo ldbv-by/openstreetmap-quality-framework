@@ -2,6 +2,8 @@
         allowedDependencies = {
                 "quality_services :: dto",
                 "quality_services :: spi",
+                "quality_services :: mapper",
+                "quality_services :: model",
                 "quality_core :: changeset-model",
                 "quality_core :: changeset-mapper",
                 "quality_core :: changeset-dto"
