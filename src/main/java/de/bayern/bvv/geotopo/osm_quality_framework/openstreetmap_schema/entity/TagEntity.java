@@ -27,7 +27,8 @@ public class TagEntity {
             referencedColumnName = "object_type",
             foreignKey = @ForeignKey(name = "FK_tags_object_types")
     )
-    @ToString.Exclude @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private ObjectTypeEntity objectType;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

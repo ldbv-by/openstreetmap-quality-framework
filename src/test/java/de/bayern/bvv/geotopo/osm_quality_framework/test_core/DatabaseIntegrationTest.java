@@ -2,18 +2,23 @@ package de.bayern.bvv.geotopo.osm_quality_framework.test_core;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.dto.CreateSchemaDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.spi.Osm2PgSqlService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 
+import javax.sql.DataSource;
 import java.nio.file.Path;
 import java.util.List;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
 public abstract class DatabaseIntegrationTest {
     @Autowired
@@ -21,6 +26,9 @@ public abstract class DatabaseIntegrationTest {
 
     @Autowired
     protected JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    protected DataSource dataSource;
 
     private static final PostgreSQLContainer<?> testDatabaseContainer =
             TestDatabase.TEST_DATABASE_CONTAINER;
@@ -32,6 +40,11 @@ public abstract class DatabaseIntegrationTest {
         registry.add("spring.datasource.password", testDatabaseContainer::getPassword);
         registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
 
+        registry.add("spring.datasource.hikari.connection-init-sql",
+                () -> "CREATE SCHEMA IF NOT EXISTS openstreetmap_schema");
+
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+
         registry.add("OSM_QUALITY_FRAMEWORK_DATABASE", testDatabaseContainer::getDatabaseName);
         registry.add("OSM_QUALITY_FRAMEWORK_DATABASE_HOST", testDatabaseContainer::getHost);
         registry.add("OSM_QUALITY_FRAMEWORK_DATABASE_PORT", () -> String.valueOf(testDatabaseContainer.getMappedPort(5432)));
@@ -39,10 +52,14 @@ public abstract class DatabaseIntegrationTest {
         registry.add("OSM_QUALITY_FRAMEWORK_DATABASE_PASSWORD", testDatabaseContainer::getPassword);
     }
 
+    @BeforeAll
+    void init() {
+        this.jdbcTemplate.execute("CREATE EXTENSION IF NOT EXISTS postgis;");
+        this.createOpenStreetMapSchema();
+    }
+
     @BeforeEach
     void resetSchema() throws Exception {
-        this.jdbcTemplate.execute("CREATE EXTENSION IF NOT EXISTS postgis;");
-
         this.createSchemaOpenStreetMapGeometries();
         this.createSchemaChangesetData();
     }
@@ -151,5 +168,18 @@ public abstract class DatabaseIntegrationTest {
         } catch (Exception e) {
             throw new IllegalStateException("Schema " + dstSchemaName + " creation failed:\n" + e.getMessage());
         }
+    }
+
+    private void createOpenStreetMapSchema() {
+        this.jdbcTemplate.execute("CREATE SCHEMA IF NOT EXISTS openstreetmap_schema");
+
+        ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+        populator.setSeparator(";");
+        populator.setContinueOnError(false);
+        populator.addScripts(
+                new ClassPathResource("sql/openstreetmap_schema/aaa-basis-schema.sql"),
+                new ClassPathResource("sql/openstreetmap_schema/atkis-basis-dlm-schema.sql")
+        );
+        populator.execute(this.dataSource);
     }
 }
