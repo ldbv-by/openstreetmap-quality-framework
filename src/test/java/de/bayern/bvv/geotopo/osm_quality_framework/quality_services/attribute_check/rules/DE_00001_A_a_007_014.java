@@ -14,7 +14,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class DE_00001_A_a_007 extends DatabaseIntegrationTest {
+class DE_00001_A_a_007_014 extends DatabaseIntegrationTest {
 
     @Autowired
     private AttributeCheckService attributeCheckService;
