@@ -56,6 +56,7 @@ ON CONFLICT (object_type) DO NOTHING;
 
 INSERT INTO openstreetmap_schema.object_types_inheritance (object_type, extends_object_type) VALUES
     ('AA_REO', 'AA_Objekt'),
+    ('AA_NREO', 'AA_Objekt'),
     ('AA_ZUSO', 'AA_Objekt'),
     ('AA_PMO', 'AA_Objekt'),
     ('AG_Objekt', 'AG_ObjektMitGemeinsamerGeometrie'),
