@@ -23,7 +23,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
     void testCompleteTaggedObject() {
         // Arrange
         Map<String, String> tags = new HashMap<>();
-        tags.put("zeigtAufExternes:art", "urn:adv:atkis:basis-dlm");
+        tags.put("zeigtAufExternes:art", "https://www.adv-online.de/AdV-Produkte/Geotopographie/Digitale-Landschaftsmodelle/Basis-DLM/");
         tags.put("zeigtAufExternes:fachdatenobjekt:name", "Test");
         tags.put("zeigtAufExternes:fachdatenobjekt:uri", "Test-URI");
         tags.put("quellobjektID", "DEBYBDLMCI0001qd");
