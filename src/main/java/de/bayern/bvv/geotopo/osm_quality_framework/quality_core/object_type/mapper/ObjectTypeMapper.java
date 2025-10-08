@@ -1,8 +1,10 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.mapper;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.dto.ObjectTypeDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.dto.RuleDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.dto.TagDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.ObjectType;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Rule;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Tag;
 import lombok.experimental.UtilityClass;
 
@@ -26,6 +28,7 @@ public class ObjectTypeMapper {
         ObjectType objectType = new ObjectType();
         objectType.setName(objectTypeDto.name());
         objectType.setTags(mapTagsToDomain(objectTypeDto.tags()));
+        objectType.setRules(mapRulesToDomain(objectTypeDto.rules()));
 
         return objectType;
     }
@@ -38,7 +41,8 @@ public class ObjectTypeMapper {
 
         return new ObjectTypeDto(
                 objectType.getName(),
-                mapTagsToDto(objectType.getTags())
+                mapTagsToDto(objectType.getTags()),
+                mapRulesToDto(objectType.getRules())
         );
     }
 
@@ -62,6 +66,29 @@ public class ObjectTypeMapper {
         return tags.stream()
                 .filter(Objects::nonNull)
                 .map(TagMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Map rules to dto.
+     */
+    private List<RuleDto> mapRulesToDto(List<Rule> rules) {
+        if (rules == null || rules.isEmpty()) return Collections.emptyList();
+        return rules.stream()
+                .filter(Objects::nonNull)
+                .map(RuleMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Map rules to domain.
+     */
+    private List<Rule> mapRulesToDomain(List<RuleDto> rules) {
+        if (rules == null || rules.isEmpty()) return Collections.emptyList();
+
+        return rules.stream()
+                .filter(Objects::nonNull)
+                .map(RuleMapper::toDomain)
                 .collect(Collectors.toList());
     }
 }

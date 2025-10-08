@@ -7,5 +7,6 @@ import java.util.List;
  */
 public record ObjectTypeDto(
         String name,
-        List<TagDto> tags
+        List<TagDto> tags,
+        List<RuleDto> rules
 ) {}

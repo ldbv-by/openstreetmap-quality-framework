@@ -1,12 +1,12 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.component;
 
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.QualityPipeline;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.exception.QualityServiceException;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.model.QualityHubResult;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceRequestDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.spi.QualityService;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.QualityPipeline;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.exception.QualityServiceException;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -94,7 +94,8 @@ public class Orchestrator {
                             new QualityServiceRequestDto(
                                     step.getId(),
                                     changeset.getId(),
-                                    ChangesetMapper.toDto(changeset));
+                                    ChangesetMapper.toDto(changeset),
+                                    null); // todo: tagged objects laden
 
                     return qualityServiceBean.checkChangesetQuality(qualityServiceRequestDto);
                 }, executor)

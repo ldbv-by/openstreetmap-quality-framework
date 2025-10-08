@@ -8,6 +8,9 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -16,6 +19,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 import javax.sql.DataSource;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -180,6 +185,19 @@ public abstract class DatabaseIntegrationTest {
                 new ClassPathResource("sql/openstreetmap_schema/aaa-basis-schema.sql"),
                 new ClassPathResource("sql/openstreetmap_schema/atkis-basis-dlm-schema.sql")
         );
+
+        try {
+            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+            Resource[] ruleScripts = resolver.getResources(
+                    "classpath*:sql/openstreetmap_schema/rules/attribute_check/*.sql" // oder **/*.sql
+            );
+
+            Arrays.sort(ruleScripts, Comparator.comparing(Resource::getFilename));
+            populator.addScripts(ruleScripts);
+        } catch (Exception e) {
+            throw new IllegalStateException("No rules found:\n" + e.getMessage());
+        }
+
         populator.execute(this.dataSource);
     }
 }

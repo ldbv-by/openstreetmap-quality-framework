@@ -2,9 +2,7 @@ package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity.id.TagId;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * Representing an object type attribute.
@@ -12,6 +10,8 @@ import lombok.ToString;
 @Entity
 @Table(name = "tags", schema = "openstreetmap_schema")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TagEntity {
 
     @EmbeddedId

@@ -16,11 +16,20 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Tag {
+    public static final String SUBTYPE_SEPARATOR = ":";
+
     private String key;
     private Type type;
     private Multiplicity multiplicity;
     private Map<String, String> dictionary = new HashMap<>();
     private List<Tag> subTags = new ArrayList<>();
+
+    /**
+     * Check if tag is required.
+     */
+    public boolean isRequired() {
+        return this.multiplicity != null && this.multiplicity.min() > 0;
+    }
 
     public enum Type {
         PRIMITIVE,

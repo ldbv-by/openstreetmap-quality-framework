@@ -2,6 +2,7 @@ package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.mapper;
 
 
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity.ObjectTypeEntity;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity.RuleEntity;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity.TagEntity;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.ObjectType;
 import lombok.experimental.UtilityClass;
@@ -22,6 +23,7 @@ public class ObjectTypeEntityMapper {
         objectType.setName(objectTypeEntity.getObjectType());
 
         addAllTags(objectType, objectTypeEntity);
+        addAllRules(objectType, objectTypeEntity);
 
         return objectType;
     }
@@ -36,6 +38,19 @@ public class ObjectTypeEntityMapper {
 
         for (ObjectTypeEntity parent : objectTypeEntity.getParents()) {
             addAllTags(objectType, parent);
+        }
+    }
+
+    /**
+     * Add all rules to the object type.
+     */
+    private void addAllRules(ObjectType objectType, ObjectTypeEntity objectTypeEntity) {
+        for (RuleEntity ruleEntity : objectTypeEntity.getRules()) {
+            objectType.getRules().add(RuleEntityMapper.toDomain(ruleEntity));
+        }
+
+        for (ObjectTypeEntity parent : objectTypeEntity.getParents()) {
+            addAllRules(objectType, parent);
         }
     }
 

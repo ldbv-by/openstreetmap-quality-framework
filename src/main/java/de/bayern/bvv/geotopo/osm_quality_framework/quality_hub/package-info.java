@@ -4,6 +4,8 @@
                 "quality_core :: changeset-mapper",
                 "quality_core :: changeset-dto",
                 "quality_core :: changeset-util",
+                "quality_core :: feature-model",
+                "quality_core :: feature-dto",
                 "quality_services :: dto",
                 "quality_services :: spi",
                 "changeset_prepare :: spi"

@@ -2,7 +2,9 @@ package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity.id.DictionaryId;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Representing a dictionary schema datatype.
@@ -10,6 +12,8 @@ import lombok.Data;
 @Entity
 @Table(name = "datatypes_dictionary", schema = "openstreetmap_schema")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class DatatypeDictionaryEntity {
 
     @EmbeddedId
