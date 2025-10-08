@@ -1,4 +1,4 @@
-package de.bayern.bvv.geotopo.osm_quality_framework.quality_core.rule_engine.api;
+package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

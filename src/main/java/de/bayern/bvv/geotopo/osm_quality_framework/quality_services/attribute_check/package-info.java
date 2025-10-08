@@ -10,6 +10,11 @@
                 "quality_core :: feature-dto",
                 "quality_core :: feature-mapper",
                 "quality_core :: feature-model",
+                "quality_core :: object-type-dto",
+                "quality_core :: object-type-mapper",
+                "quality_core :: object-type-model",
+                "rule_engine :: api",
+                "rule_engine :: parser",
                 "openstreetmap_schema :: spi"
         }
 )

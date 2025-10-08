@@ -1,8 +1,8 @@
-package de.bayern.bvv.geotopo.osm_quality_framework.quality_core.rule_engine.parser;
+package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.rule_engine.api.Expression;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.rule_engine.registry.ExpressionRegistry;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.registry.ExpressionRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

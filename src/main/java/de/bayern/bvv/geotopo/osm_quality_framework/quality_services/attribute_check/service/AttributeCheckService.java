@@ -9,8 +9,8 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.mapp
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.ObjectType;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Rule;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Tag;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.rule_engine.api.Expression;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.rule_engine.parser.ExpressionParser;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.ExpressionParser;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceRequestDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceResultDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.mapper.QualityServiceResultMapper;

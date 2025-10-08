@@ -1,4 +1,4 @@
-package de.bayern.bvv.geotopo.osm_quality_framework.quality_core.rule_engine.api;
+package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.feature.model.TaggedObject;
 
