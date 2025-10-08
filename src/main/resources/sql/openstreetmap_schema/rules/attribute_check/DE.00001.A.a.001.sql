@@ -13,5 +13,5 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
             ]
         }
     }',
-    'Die Zeitangabe ist nicht GeoInfoDok-konform')
+    'Die Zeitangabe ist nicht GeoInfoDok-konform.')
 ON CONFLICT (id) DO NOTHING;
