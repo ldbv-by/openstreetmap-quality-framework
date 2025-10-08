@@ -1,3 +1,17 @@
+/*
+ TODO: 19x Komplexe Datentypen die multiple vergeben werden können, müssen als Relationen geführt werden!
+ TODO: Die Relationsart mit Inverse Relationsart sollte die Bezeichnung als Rolle führen, zudem ist der object_type nur der nicht inversen Bezeichnung
+ TODO: AA_ZUSO werden als Relationen geführt.
+
+
+object_types_relations
+ - object_type_1, object_type_2, multiplicity
+ - z.B. AA_Objekt, AA_Modellart, 1..*
+
+ - z.B. AA_REO
+ */
+
+
 INSERT INTO openstreetmap_schema.object_types (object_type, is_abstract) VALUES
     ('AA_Objekt', true),
     ('AA_ObjektOhneRaumbezug', true),
@@ -66,6 +80,7 @@ INSERT INTO openstreetmap_schema.object_types_inheritance (object_type, extends_
     ('AA_Benutzer', 'AA_NREO'),
     ('AP_PPO', 'AP_GPO'),
     ('AP_PPO', 'AU_Punkthaufenobjekt'),
+    ('AU_Punkthaufenobjekt', 'AU_ObjektMitUnabhaengigerGeometrie'),
     ('AP_LPO', 'AP_GPO'),
     ('AP_LPO', 'AU_Linienobjekt'),
     ('AP_FPO', 'AP_GPO'),

@@ -66,6 +66,7 @@ INSERT INTO openstreetmap_schema.object_types_inheritance (object_type, extends_
     ('AA_Benutzer', 'AA_NREO'),
     ('AP_PPO', 'AP_GPO'),
     ('AP_PPO', 'AU_Punkthaufenobjekt'),
+    ('AU_Punkthaufenobjekt', 'AU_ObjektMitUnabhaengigerGeometrie'),
     ('AP_LPO', 'AP_GPO'),
     ('AP_LPO', 'AU_Linienobjekt'),
     ('AP_FPO', 'AP_GPO'),
