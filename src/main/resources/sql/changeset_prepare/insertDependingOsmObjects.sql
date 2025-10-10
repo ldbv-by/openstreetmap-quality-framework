@@ -46,8 +46,8 @@ BEGIN
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
 
-                -- 2. Relations -> Nodes, Ways, Relations (Downstream)
-                -- 2a. Relations -> Nodes
+        -- 2. Relations -> Nodes, Ways, Relations (Downstream)
+        -- 2a. Relations -> Nodes
         INSERT INTO copy_nodes
         SELECT DISTINCT (member->>'ref')::bigint, FALSE
         FROM openstreetmap_geometries.planet_osm_rels r,
@@ -58,7 +58,7 @@ BEGIN
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
 
-                -- 2b. Relations -> Ways
+        -- 2b. Relations -> Ways
         INSERT INTO copy_ways
         SELECT DISTINCT (member->>'ref')::bigint, FALSE
         FROM openstreetmap_geometries.planet_osm_rels r,
@@ -69,7 +69,7 @@ BEGIN
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
 
-                -- 2c. Relations -> Relations
+        -- 2c. Relations -> Relations
         INSERT INTO copy_rels
         SELECT DISTINCT (member->>'ref')::bigint, FALSE
         FROM openstreetmap_geometries.planet_osm_rels r,
@@ -80,9 +80,9 @@ BEGIN
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
 
-                -- 3. Node, Way, Relation -> Relation (Upstream)
+        -- 3. Node, Way, Relation -> Relation (Upstream)
 
-                -- 3a. Node -> Relation
+        -- 3a. Node -> Relation
         INSERT INTO copy_rels
         SELECT r.id,
                CASE WHEN openstreetmap_geometries.planet_osm_member_ids(r.members, 'N'::char(1)) && cn.ids_direct THEN TRUE
@@ -97,7 +97,7 @@ BEGIN
                                 SET directlyAffected = copy_rels.directlyAffected OR EXCLUDED.directlyAffected;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
 
-                -- 3b. Way -> Relation
+        -- 3b. Way -> Relation
         INSERT INTO copy_rels
         SELECT r.id,
                CASE WHEN openstreetmap_geometries.planet_osm_member_ids(r.members, 'W'::char(1)) && cw.ids_direct THEN TRUE
@@ -111,8 +111,8 @@ BEGIN
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
 
-                -- 3c. Relation -> Relation
-                -- INFO: planet_osm_rels_rel_members_idx is necessary
+        -- 3c. Relation -> Relation
+        -- INFO: planet_osm_rels_rel_members_idx is necessary
         INSERT INTO copy_rels
         SELECT r.id,
                CASE WHEN openstreetmap_geometries.planet_osm_member_ids(r.members, 'R'::char(1)) && cr.ids_direct THEN TRUE
@@ -136,7 +136,7 @@ BEGIN
     RAISE NOTICE 'Found Ways:  %', (SELECT COUNT(*) FROM copy_ways);
     RAISE NOTICE 'Found Rels:  %', (SELECT COUNT(*) FROM copy_rels);
 
-        -- Copy planet to changeset_prepare
+    -- Copy planet to changeset_prepare
     INSERT INTO ___CHANGESET_PREPARE___.planet_osm_nodes
     SELECT pn.*
     FROM openstreetmap_geometries.planet_osm_nodes pn,
