@@ -1,6 +1,5 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_core.feature.dto;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +10,6 @@ public record RelationDto(
         Long osmId,
         String objectType,
         Map<String, String> tags,
-        HashSet<Long> memberOf,
-        List<MemberDto> members
+        List<MemberDto> members,
+        List<RelationDto> relations
 ) {}

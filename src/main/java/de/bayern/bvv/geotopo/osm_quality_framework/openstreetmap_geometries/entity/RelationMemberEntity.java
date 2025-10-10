@@ -3,7 +3,7 @@ package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.ent
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.entity.id.RelationMemberId;
 import jakarta.persistence.*;
 
-@Entity
+@Entity(name = "GeometryRelationMember")
 @Table(name = "relation_members", schema = "openstreetmap_geometries")
 public class RelationMemberEntity {
     @EmbeddedId

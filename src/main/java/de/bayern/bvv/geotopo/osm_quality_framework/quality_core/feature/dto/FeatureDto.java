@@ -13,7 +13,7 @@ public record FeatureDto(
         Long osmId,
         String objectType,
         Map<String, String> tags,
-        HashSet<Long> memberOf,
+        List<RelationDto> relations,
         Geometry geometry,
         Geometry geometryTransformed,
         List<GeometryNodeDto> geometryNodes

@@ -13,5 +13,5 @@ public record TagDto(
         Tag.Type type,
         MultiplicityDto multiplicity,
         Map<String, String> dictionary,
-        List<Tag> subTags
+        List<TagDto> subTags
 ) {}

@@ -8,6 +8,9 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.mode
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Tag;
 import lombok.experimental.UtilityClass;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Mapping between {@link ObjectType} and {@link ObjectTypeDto}.
  */
@@ -25,7 +28,12 @@ public class TagMapper {
         tag.setType(tagDto.type());
         tag.setMultiplicity(new Multiplicity(tagDto.multiplicity().min(), tagDto.multiplicity().max()));
         tag.setDictionary(tagDto.dictionary());
-        tag.setSubTags(tagDto.subTags());
+
+        List<Tag> subTags = new ArrayList<>();
+        for (TagDto subTag : tagDto.subTags()) {
+            subTags.add(toDomain(subTag));
+        }
+        tag.setSubTags(subTags);
 
         return tag;
     }
@@ -36,12 +44,17 @@ public class TagMapper {
     public TagDto toDto(Tag tag) {
         if (tag == null) return null;
 
+        List<TagDto> subTagDtos = new ArrayList<>();
+        for (Tag subTag : tag.getSubTags()) {
+            subTagDtos.add(toDto(subTag));
+        }
+
         return new TagDto(
                 tag.getKey(),
                 tag.getType(),
                 new MultiplicityDto(tag.getMultiplicity().min(), tag.getMultiplicity().max()),
                 tag.getDictionary(),
-                tag.getSubTags()
+                subTagDtos
         );
     }
 }

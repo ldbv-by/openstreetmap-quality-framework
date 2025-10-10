@@ -14,7 +14,10 @@ import java.util.Set;
 public class ObjectType {
     private String name;
     private List<Tag> tags = new ArrayList<>();
+    private List<Relation> relations = new ArrayList<>();
     private List<Rule> rules = new ArrayList<>();
+    private Boolean isRelation;
+
 
     /**
      * Get all tag keys.

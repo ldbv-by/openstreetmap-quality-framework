@@ -8,5 +8,6 @@ import java.util.List;
 public record ObjectTypeDto(
         String name,
         List<TagDto> tags,
+        List<RelationDto> relations,
         List<RuleDto> rules
 ) {}

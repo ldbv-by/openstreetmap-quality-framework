@@ -2,6 +2,7 @@ package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.mapper;
 
 
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity.ObjectTypeEntity;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity.RelationEntity;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity.RuleEntity;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity.TagEntity;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.ObjectType;
@@ -21,8 +22,10 @@ public class ObjectTypeEntityMapper {
 
         ObjectType objectType = new ObjectType();
         objectType.setName(objectTypeEntity.getObjectType());
+        objectType.setIsRelation(objectTypeEntity.getIsRelation());
 
         addAllTags(objectType, objectTypeEntity);
+        addAllRelations(objectType, objectTypeEntity);
         addAllRules(objectType, objectTypeEntity);
 
         return objectType;
@@ -38,6 +41,19 @@ public class ObjectTypeEntityMapper {
 
         for (ObjectTypeEntity parent : objectTypeEntity.getParents()) {
             addAllTags(objectType, parent);
+        }
+    }
+
+    /**
+     * Recursively add all relations to the object type (flat mapping).
+     */
+    private void addAllRelations(ObjectType objectType, ObjectTypeEntity objectTypeEntity) {
+        for (RelationEntity relationEntity : objectTypeEntity.getRelations()) {
+            objectType.getRelations().add(RelationEntityMapper.toDomain(relationEntity));
+        }
+
+        for (ObjectTypeEntity parent : objectTypeEntity.getParents()) {
+            addAllRelations(objectType, parent);
         }
     }
 

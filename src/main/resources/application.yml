@@ -25,6 +25,7 @@ spring:
       data-locations:
         - classpath:sql/openstreetmap_schema/aaa-basis-schema.sql
         - classpath:sql/openstreetmap_schema/atkis-basis-dlm-schema.sql
+        - classpath:sql/openstreetmap_schema/openstreetmap-quality-framework-schema.sql
         - classpath:sql/openstreetmap_schema/rules/attribute_check/*.sql
 
 quality:

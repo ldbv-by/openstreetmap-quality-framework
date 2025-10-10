@@ -4,9 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Base object representing both geometric features and relations.
@@ -20,5 +18,5 @@ public abstract class TaggedObject {
     private Long osmId;
     private String objectType;
     private Map<String, String> tags = new HashMap<>();
-    private HashSet<Long> memberOf;
+    private List<Relation> relations = new ArrayList<>();
 }

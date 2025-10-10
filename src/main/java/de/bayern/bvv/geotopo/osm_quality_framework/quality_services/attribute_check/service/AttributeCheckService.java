@@ -95,6 +95,9 @@ public class AttributeCheckService implements QualityService {
                 this.setError(taggedObject, "Tag '" + key + "' ist nicht im Schema definiert.");
             }
         }
+
+        // Todo: Prüfen, dass die Relations lt. Schema enthalten sind
+
     }
 
     /**

@@ -24,10 +24,13 @@ public class RelationMapper {
         relation.setOsmId(relationDto.osmId());
         relation.setObjectType(relationDto.objectType());
         relation.setTags(relationDto.tags());
-        relation.setMemberOf(relationDto.memberOf());
 
         for (MemberDto memberDto : relationDto.members()) {
             relation.getMembers().add(MemberMapper.toDomain(memberDto));
+        }
+
+        for (RelationDto parentRelation : relationDto.relations()) {
+            relation.getRelations().add(toDomain(parentRelation));
         }
 
         return relation;
@@ -44,11 +47,16 @@ public class RelationMapper {
             membersDto.add(MemberMapper.toDto(member));
         }
 
+        List<RelationDto> relationsDto = new ArrayList<>();
+        for (Relation parentRelation : relation.getRelations()) {
+            relationsDto.add(toDto(parentRelation));
+        }
+
         return new RelationDto(
                 relation.getOsmId(),
                 relation.getObjectType(),
                 relation.getTags(),
-                relation.getMemberOf(),
-                membersDto);
+                membersDto,
+                relationsDto);
     }
 }

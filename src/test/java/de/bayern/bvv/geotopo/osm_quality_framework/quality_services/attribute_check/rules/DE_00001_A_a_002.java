@@ -1,6 +1,8 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.attribute_check.rules;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.feature.dto.FeatureDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.feature.dto.MemberDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.feature.dto.RelationDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.feature.dto.TaggedObjectsDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.attribute_check.service.AttributeCheckService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceErrorDto;
@@ -23,15 +25,22 @@ class DE_00001_A_a_002 extends DatabaseIntegrationTest {
     void testEndedGreaterThenBegin() {
         // Arrange
         Map<String, String> tags = new HashMap<>();
+        tags.put("object_type", "AX_Wohnbauflaeche");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
         tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd_2021-03-12T11:48:42Z");
         tags.put("lebenszeitintervall:beginnt", "2021-03-12T11:48:42Z");
         tags.put("lebenszeitintervall:endet", "2022-03-12T11:48:42Z");
-        tags.put("modellart:advStandardModell", "Basis-DLM"); // Todo: modellart muss eine Relation sein
-        tags.put("modellart:sonstigesModell", "DTK10A"); // Todo: modellart muss eine Relation sein
+
+        RelationDto modellart = new RelationDto(
+                2L,
+                "AA_modellart",
+                Map.of("advStandardModell", "Basis-DLM"),
+                List.of(new MemberDto("*", 1L, "")),
+                new ArrayList<>()
+        );
 
         FeatureDto feature = new FeatureDto(
-                1L, "AX_Wohnbauflaeche", tags, new HashSet<>(), null, null, new ArrayList<>()
+                1L, "AX_Wohnbauflaeche", tags, List.of(modellart), null, null, new ArrayList<>()
         );
 
         TaggedObjectsDto taggedObjectsDto = new TaggedObjectsDto(
@@ -66,15 +75,22 @@ class DE_00001_A_a_002 extends DatabaseIntegrationTest {
     void testEndedLowerThenBegin() {
         // Arrange
         Map<String, String> tags = new HashMap<>();
+        tags.put("object_type", "AX_Wohnbauflaeche");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
         tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd_2021-03-12T11:48:42Z");
         tags.put("lebenszeitintervall:beginnt", "2022-03-12T11:48:42Z");
         tags.put("lebenszeitintervall:endet", "2021-03-12T11:48:42Z");
-        tags.put("modellart:advStandardModell", "Basis-DLM"); // Todo: modellart muss eine Relation sein
-        tags.put("modellart:sonstigesModell", "DTK10A"); // Todo: modellart muss eine Relation sein
+
+        RelationDto modellart = new RelationDto(
+                2L,
+                "AA_modellart",
+                Map.of("advStandardModell", "Basis-DLM"),
+                List.of(new MemberDto("*", 1L, "")),
+                new ArrayList<>()
+        );
 
         FeatureDto feature = new FeatureDto(
-                1L, "AX_Wohnbauflaeche", tags, new HashSet<>(), null, null, new ArrayList<>()
+                1L, "AX_Wohnbauflaeche", tags, List.of(modellart), null, null, new ArrayList<>()
         );
 
         TaggedObjectsDto taggedObjectsDto = new TaggedObjectsDto(
@@ -118,15 +134,22 @@ class DE_00001_A_a_002 extends DatabaseIntegrationTest {
     void testEndedIsEqualThenBegin() {
         // Arrange
         Map<String, String> tags = new HashMap<>();
+        tags.put("object_type", "AX_Wohnbauflaeche");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
         tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd_2021-03-12T11:48:42Z");
         tags.put("lebenszeitintervall:beginnt", "2022-03-12T11:48:42Z");
         tags.put("lebenszeitintervall:endet", "2022-03-12T11:48:42Z");
-        tags.put("modellart:advStandardModell", "Basis-DLM"); // Todo: modellart muss eine Relation sein
-        tags.put("modellart:sonstigesModell", "DTK10A"); // Todo: modellart muss eine Relation sein
+
+        RelationDto modellart = new RelationDto(
+                2L,
+                "AA_modellart",
+                Map.of("advStandardModell", "Basis-DLM"),
+                List.of(new MemberDto("*", 1L, "")),
+                new ArrayList<>()
+        );
 
         FeatureDto feature = new FeatureDto(
-                1L, "AX_Wohnbauflaeche", tags, new HashSet<>(), null, null, new ArrayList<>()
+                1L, "AX_Wohnbauflaeche", tags, List.of(modellart), null, null, new ArrayList<>()
         );
 
         TaggedObjectsDto taggedObjectsDto = new TaggedObjectsDto(
@@ -170,14 +193,21 @@ class DE_00001_A_a_002 extends DatabaseIntegrationTest {
     void testEndedIsMissing() {
         // Arrange
         Map<String, String> tags = new HashMap<>();
+        tags.put("object_type", "AX_Wohnbauflaeche");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
         tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd_2021-03-12T11:48:42Z");
         tags.put("lebenszeitintervall:beginnt", "2021-03-12T11:48:42Z");
-        tags.put("modellart:advStandardModell", "Basis-DLM"); // Todo: modellart muss eine Relation sein
-        tags.put("modellart:sonstigesModell", "DTK10A"); // Todo: modellart muss eine Relation sein
+
+        RelationDto modellart = new RelationDto(
+                2L,
+                "AA_modellart",
+                Map.of("advStandardModell", "Basis-DLM"),
+                List.of(new MemberDto("*", 1L, "")),
+                new ArrayList<>()
+        );
 
         FeatureDto feature = new FeatureDto(
-                1L, "AX_Wohnbauflaeche", tags, new HashSet<>(), null, null, new ArrayList<>()
+                1L, "AX_Wohnbauflaeche", tags, List.of(modellart), null, null, new ArrayList<>()
         );
 
         TaggedObjectsDto taggedObjectsDto = new TaggedObjectsDto(

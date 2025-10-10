@@ -23,6 +23,7 @@ class DE_00001_A_a_007_014 extends DatabaseIntegrationTest {
     void testValidHttpUrl() {
         // Arrange
         Map<String, String> tags = new HashMap<>();
+        tags.put("object_type", "AX_Wohnbauflaeche");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
         tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd_2021-03-12T11:48:42Z");
         tags.put("lebenszeitintervall:beginnt", "2021-03-12T11:48:42Z");
@@ -33,7 +34,7 @@ class DE_00001_A_a_007_014 extends DatabaseIntegrationTest {
         tags.put("zeigtAufExternes:fachdatenobjekt:uri", "Test-URI");
 
         FeatureDto feature = new FeatureDto(
-                1L, "AX_Wohnbauflaeche", tags, new HashSet<>(), null, null, new ArrayList<>()
+                1L, "AX_Wohnbauflaeche", tags, new ArrayList<>(), null, null, new ArrayList<>()
         );
 
         TaggedObjectsDto taggedObjectsDto = new TaggedObjectsDto(
@@ -68,6 +69,7 @@ class DE_00001_A_a_007_014 extends DatabaseIntegrationTest {
     void testInvalidHttpUrl() {
         // Arrange
         Map<String, String> tags = new HashMap<>();
+        tags.put("object_type", "AX_Wohnbauflaeche");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
         tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd_2021-03-12T11:48:42Z");
         tags.put("lebenszeitintervall:beginnt", "2021-03-12T11:48:42Z");
@@ -78,7 +80,7 @@ class DE_00001_A_a_007_014 extends DatabaseIntegrationTest {
         tags.put("zeigtAufExternes:fachdatenobjekt:uri", "Test-URI");
 
         FeatureDto feature = new FeatureDto(
-                1L, "AX_Wohnbauflaeche", tags, new HashSet<>(), null, null, new ArrayList<>()
+                1L, "AX_Wohnbauflaeche", tags, new ArrayList<>(), null, null, new ArrayList<>()
         );
 
         TaggedObjectsDto taggedObjectsDto = new TaggedObjectsDto(
@@ -122,6 +124,7 @@ class DE_00001_A_a_007_014 extends DatabaseIntegrationTest {
     void testValidUrn() {
         // Arrange
         Map<String, String> tags = new HashMap<>();
+        tags.put("object_type", "AX_Wohnbauflaeche");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
         tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd_2021-03-12T11:48:42Z");
         tags.put("lebenszeitintervall:beginnt", "2021-03-12T11:48:42Z");
@@ -132,7 +135,7 @@ class DE_00001_A_a_007_014 extends DatabaseIntegrationTest {
         tags.put("zeigtAufExternes:fachdatenobjekt:uri", "Test-URI");
 
         FeatureDto feature = new FeatureDto(
-                1L, "AX_Wohnbauflaeche", tags, new HashSet<>(), null, null, new ArrayList<>()
+                1L, "AX_Wohnbauflaeche", tags, new ArrayList<>(), null, null, new ArrayList<>()
         );
 
         TaggedObjectsDto taggedObjectsDto = new TaggedObjectsDto(
@@ -167,6 +170,7 @@ class DE_00001_A_a_007_014 extends DatabaseIntegrationTest {
     void testInvalidUrn() {
         // Arrange
         Map<String, String> tags = new HashMap<>();
+        tags.put("object_type", "AX_Wohnbauflaeche");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
         tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd_2021-03-12T11:48:42Z");
         tags.put("lebenszeitintervall:beginnt", "2021-03-12T11:48:42Z");
@@ -177,7 +181,7 @@ class DE_00001_A_a_007_014 extends DatabaseIntegrationTest {
         tags.put("zeigtAufExternes:fachdatenobjekt:uri", "Test-URI");
 
         FeatureDto feature = new FeatureDto(
-                1L, "AX_Wohnbauflaeche", tags, new HashSet<>(), null, null, new ArrayList<>()
+                1L, "AX_Wohnbauflaeche", tags, new ArrayList<>(), null, null, new ArrayList<>()
         );
 
         TaggedObjectsDto taggedObjectsDto = new TaggedObjectsDto(

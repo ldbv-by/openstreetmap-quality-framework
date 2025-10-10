@@ -1,9 +1,11 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.mapper;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.dto.ObjectTypeDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.dto.RelationDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.dto.RuleDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.dto.TagDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.ObjectType;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Relation;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Rule;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Tag;
 import lombok.experimental.UtilityClass;
@@ -28,6 +30,7 @@ public class ObjectTypeMapper {
         ObjectType objectType = new ObjectType();
         objectType.setName(objectTypeDto.name());
         objectType.setTags(mapTagsToDomain(objectTypeDto.tags()));
+        objectType.setRelations(mapRelationsToDomain(objectTypeDto.relations()));
         objectType.setRules(mapRulesToDomain(objectTypeDto.rules()));
 
         return objectType;
@@ -42,6 +45,7 @@ public class ObjectTypeMapper {
         return new ObjectTypeDto(
                 objectType.getName(),
                 mapTagsToDto(objectType.getTags()),
+                mapRelationsToDto(objectType.getRelations()),
                 mapRulesToDto(objectType.getRules())
         );
     }
@@ -66,6 +70,29 @@ public class ObjectTypeMapper {
         return tags.stream()
                 .filter(Objects::nonNull)
                 .map(TagMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Map relations to dto.
+     */
+    private List<RelationDto> mapRelationsToDto(List<Relation> relations) {
+        if (relations == null || relations.isEmpty()) return Collections.emptyList();
+        return relations.stream()
+                .filter(Objects::nonNull)
+                .map(RelationMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Map relations to domain.
+     */
+    private List<Relation> mapRelationsToDomain(List<RelationDto> tags) {
+        if (tags == null || tags.isEmpty()) return Collections.emptyList();
+
+        return tags.stream()
+                .filter(Objects::nonNull)
+                .map(RelationMapper::toDomain)
                 .collect(Collectors.toList());
     }
 

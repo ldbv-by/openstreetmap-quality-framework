@@ -9,7 +9,7 @@ import org.hibernate.annotations.Type;
 
 import java.util.List;
 
-@Entity
+@Entity(name = "GeometryRelation")
 @Table(name = "relations", schema = "openstreetmap_geometries")
 public class RelationEntity extends OsmObjectEntity {
 

@@ -27,8 +27,14 @@ public class ObjectTypeEntity {
     @Column(name = "is_abstract", nullable = false)
     private Boolean isAbstract;
 
+    @Column(name = "is_relation", nullable = false)
+    private Boolean isRelation;
+
     @OneToMany(mappedBy = "objectType", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TagEntity> tags = new ArrayList<>();
+
+    @OneToMany(mappedBy = "objectType", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RelationEntity> relations = new ArrayList<>();
 
     @OneToMany(mappedBy = "objectType", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RuleEntity> rules = new ArrayList<>();
