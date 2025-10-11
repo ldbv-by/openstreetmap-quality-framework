@@ -7,10 +7,14 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.locationtech.jts.geom.Geometry;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "nodes", schema = "openstreetmap_geometries")
+@Table(name = "ways", schema = "openstreetmap_geometries")
+@Data
 public class WayEntity extends OsmObjectEntity {
 
     @Column(name = "geom", columnDefinition = "Geometry(Geometry, 4326)")

@@ -1,10 +1,10 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.attribute_check.service;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.spi.OsmSchemaService;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.feature.mapper.TaggedObjectsMapper;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.feature.model.Feature;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.feature.model.TaggedObject;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.feature.model.TaggedObjects;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Feature;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.TaggedObject;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSet;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.mapper.ObjectTypeMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.ObjectType;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Rule;
@@ -41,10 +41,10 @@ public class AttributeCheckService implements QualityService {
         this.qualityServiceResult = new QualityServiceResult(qualityServiceRequestDto.qualityServiceId(), qualityServiceRequestDto.changesetId());
 
         // ----- Get tagged objects.
-        TaggedObjects taggedObjects = TaggedObjectsMapper.toDomain(qualityServiceRequestDto.taggedObjectsDto());
+        DataSet dataSet = DataSetMapper.toDomain(qualityServiceRequestDto.dataSetDto());
 
         // ----- Check for each tagged object the attribute consistency.
-        for (TaggedObject taggedObject : taggedObjects.getAll()) {
+        for (TaggedObject taggedObject : dataSet.getAll()) {
 
             // ----- Get schema configuration for tagged object.
             ObjectType objectType = Optional.ofNullable(this.osmSchemaService.getObjectTypeInfo(taggedObject.getObjectType()))

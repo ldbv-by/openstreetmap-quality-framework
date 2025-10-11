@@ -1,8 +1,139 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.service;
 
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.entity.AreaEntity;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.entity.NodeEntity;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.entity.RelationEntity;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.entity.WayEntity;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.mapper.AreaEntityMapper;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.mapper.NodeEntityMapper;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.mapper.RelationEntityMapper;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.mapper.WayEntityMapper;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.repository.AreaRepository;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.repository.NodeRepository;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.repository.RelationRepository;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.repository.WayRepository;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.spi.OsmGeometriesService;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSet;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Feature;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.FeatureFilter;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Relation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
+@RequiredArgsConstructor
 public class OsmGeometriesServiceImpl implements OsmGeometriesService {
+
+    private final NodeRepository nodeRepository;
+    private final WayRepository wayRepository;
+    private final AreaRepository areaRepository;
+    private final RelationRepository relationRepository;
+
+    /**
+     * Returns the current tagged objects.
+     */
+    @Override
+    public DataSetDto getDataSet(FeatureFilter featureFilter, String coordinateReferenceSystem) {
+        DataSet resultDataSet = new DataSet();
+
+        resultDataSet.getNodes().addAll(this.getNodesByFeatureFilter(featureFilter, coordinateReferenceSystem));
+        resultDataSet.getWays().addAll(this.getWaysByFeatureFilter(featureFilter, coordinateReferenceSystem));
+        resultDataSet.getAreas().addAll(this.getAreasByFeatureFilter(featureFilter, coordinateReferenceSystem));
+
+        // Todo: Bounding box filter currently excludes relations — necessary?
+        if (featureFilter.boundingBox() == null) {
+            resultDataSet.getRelations().addAll(this.getRelationsByFeatureFilter(featureFilter));
+        }
+
+        return DataSetMapper.toDto(resultDataSet);
+    }
+
+    /**
+     * Returns the current nodes by feature filter.
+     */
+    private List<Feature> getNodesByFeatureFilter(FeatureFilter featureFilter, String coordinateReferenceSystem) {
+        List<Feature> nodes = new ArrayList<>();
+        List<NodeEntity> nodeEntities = this.nodeRepository.findByFeatureFilter(featureFilter);
+
+        if (nodeEntities != null) {
+            for (NodeEntity nodeEntity : nodeEntities) {
+                List<Relation> relations = this.getRelationsForOsmObject("n", nodeEntity.getOsmId());
+                nodes.add(NodeEntityMapper.toFeature(nodeEntity, relations, coordinateReferenceSystem));
+            }
+        }
+
+        return nodes;
+    }
+
+    /**
+     * Returns the current ways by feature filter.
+     */
+    private List<Feature> getWaysByFeatureFilter(FeatureFilter featureFilter, String coordinateReferenceSystem) {
+        List<Feature> ways = new ArrayList<>();
+        List<WayEntity> wayEntities = this.wayRepository.findByFeatureFilter(featureFilter);
+
+        if (wayEntities != null) {
+            for (WayEntity wayEntity : wayEntities) {
+                List<Relation> relations = this.getRelationsForOsmObject("w", wayEntity.getOsmId());
+                ways.add(WayEntityMapper.toFeature(wayEntity, relations, coordinateReferenceSystem));
+            }
+        }
+
+        return ways;
+    }
+
+    /**
+     * Returns the current areas by feature filter.
+     */
+    private List<Feature> getAreasByFeatureFilter(FeatureFilter featureFilter, String coordinateReferenceSystem) {
+        List<Feature> areas = new ArrayList<>();
+        List<AreaEntity> areaEntities = this.areaRepository.findByFeatureFilter(featureFilter);
+
+        if (areaEntities != null) {
+            for (AreaEntity areaEntity : areaEntities) {
+                List<Relation> relations = this.getRelationsForOsmObject(areaEntity.getOsmGeometryType().toString(), areaEntity.getOsmId());
+                areas.add(AreaEntityMapper.toFeature(areaEntity, relations, coordinateReferenceSystem));
+            }
+        }
+
+        return areas;
+    }
+
+    /**
+     * Returns the current relations by feature filter.
+     */
+    private List<Relation> getRelationsByFeatureFilter(FeatureFilter featureFilter) {
+        List<Relation> relations = new ArrayList<>();
+        List<RelationEntity> relationEntities = this.relationRepository.findByFeatureFilter(featureFilter);
+
+        if (relationEntities != null) {
+            for (RelationEntity relationEntity : relationEntities) {
+                List<Relation> rels = this.getRelationsForOsmObject("r", relationEntity.getOsmId());
+                relations.add(RelationEntityMapper.toRelation(relationEntity, rels));
+            }
+        }
+
+        return relations;
+    }
+
+    /**
+     * Returns the current relations for an osm object.
+     */
+    private List<Relation> getRelationsForOsmObject(String memberType, Long memberOsmId) {
+        List<Relation> relations = new ArrayList<>();
+        List<RelationEntity> relationEntities = this.relationRepository.findAllByMember(memberType, memberOsmId);
+
+        for (RelationEntity relationEntity : relationEntities) {
+            List<Relation> rels = this.getRelationsForOsmObject("r", relationEntity.getOsmId());
+            relations.add(RelationEntityMapper.toRelation(relationEntity, rels));
+        }
+
+        return relations;
+    }
+
 }

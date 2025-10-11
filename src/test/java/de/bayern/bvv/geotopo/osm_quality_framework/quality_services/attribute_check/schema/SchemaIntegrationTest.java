@@ -1,9 +1,9 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.attribute_check.schema;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.feature.dto.FeatureDto;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.feature.dto.MemberDto;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.feature.dto.RelationDto;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.feature.dto.TaggedObjectsDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.FeatureDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.MemberDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.RelationDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.attribute_check.service.AttributeCheckService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceErrorDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceRequestDto;
@@ -55,7 +55,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 1L, "AX_Wohnbauflaeche", tags, List.of(modellart), null, null, new ArrayList<>()
         );
 
-        TaggedObjectsDto taggedObjectsDto = new TaggedObjectsDto(
+        DataSetDto dataSetDto = new DataSetDto(
                 new ArrayList<>(),
                 new ArrayList<>(),
                 List.of(feature),
@@ -66,7 +66,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 "attribute-check",
                 1L,
                 null,
-                taggedObjectsDto
+                dataSetDto
         );
 
         // Act
@@ -104,7 +104,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 1L, "AX_Wohnbauflaeche", tags, List.of(modellart), null, null, new ArrayList<>()
         );
 
-        TaggedObjectsDto taggedObjectsDto = new TaggedObjectsDto(
+        DataSetDto dataSetDto = new DataSetDto(
                 new ArrayList<>(),
                 new ArrayList<>(),
                 List.of(feature),
@@ -115,7 +115,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 "attribute-check",
                 1L,
                 null,
-                taggedObjectsDto
+                dataSetDto
         );
 
         // Act
@@ -154,7 +154,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 1L, "AX_Wohnbauflaeche", tags, List.of(modellart), null, null, new ArrayList<>()
         );
 
-        TaggedObjectsDto taggedObjectsDto = new TaggedObjectsDto(
+        DataSetDto dataSetDto = new DataSetDto(
                 new ArrayList<>(),
                 new ArrayList<>(),
                 List.of(feature),
@@ -165,7 +165,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 "attribute-check",
                 1L,
                 null,
-                taggedObjectsDto
+                dataSetDto
         );
 
         // Act
@@ -213,7 +213,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 1L, "AX_Wohnbauflaeche", tags, List.of(modellart), null, null, new ArrayList<>()
         );
 
-        TaggedObjectsDto taggedObjectsDto = new TaggedObjectsDto(
+        DataSetDto dataSetDto = new DataSetDto(
                 new ArrayList<>(),
                 new ArrayList<>(),
                 List.of(feature),
@@ -224,7 +224,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 "attribute-check",
                 1L,
                 null,
-                taggedObjectsDto
+                dataSetDto
         );
 
         // Act
@@ -270,7 +270,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 1L, "AX_Wohnbauflaeche", tags, List.of(modellart), null, null, new ArrayList<>()
         );
 
-        TaggedObjectsDto taggedObjectsDto = new TaggedObjectsDto(
+        DataSetDto dataSetDto = new DataSetDto(
                 new ArrayList<>(),
                 new ArrayList<>(),
                 List.of(feature),
@@ -281,7 +281,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 "attribute-check",
                 1L,
                 null,
-                taggedObjectsDto
+                dataSetDto
         );
 
         // Act
@@ -335,7 +335,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 1L, "AX_Wohnbauflaeche", tags, List.of(modellart), null, null, new ArrayList<>()
         );
 
-        TaggedObjectsDto taggedObjectsDto = new TaggedObjectsDto(
+        DataSetDto dataSetDto = new DataSetDto(
                 new ArrayList<>(),
                 new ArrayList<>(),
                 List.of(feature),
@@ -346,7 +346,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 "attribute-check",
                 1L,
                 null,
-                taggedObjectsDto
+                dataSetDto
         );
 
         // Act
@@ -394,7 +394,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 1L, "AX_Wohnbauflaeche", tags, List.of(modellart), null, null, new ArrayList<>()
         );
 
-        TaggedObjectsDto taggedObjectsDto = new TaggedObjectsDto(
+        DataSetDto dataSetDto = new DataSetDto(
                 new ArrayList<>(),
                 new ArrayList<>(),
                 List.of(feature),
@@ -405,7 +405,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 "attribute-check",
                 1L,
                 null,
-                taggedObjectsDto
+                dataSetDto
         );
 
         // Act
@@ -451,7 +451,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 1L, "AX_Unbekannt", tags, new ArrayList<>(), null, null, new ArrayList<>()
         );
 
-        TaggedObjectsDto taggedObjectsDto = new TaggedObjectsDto(
+        DataSetDto dataSetDto = new DataSetDto(
                 new ArrayList<>(),
                 new ArrayList<>(),
                 List.of(feature),
@@ -462,7 +462,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 "attribute-check",
                 1L,
                 null,
-                taggedObjectsDto
+                dataSetDto
         );
 
         // Act

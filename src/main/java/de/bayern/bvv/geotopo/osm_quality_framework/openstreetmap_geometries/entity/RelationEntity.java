@@ -5,12 +5,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity(name = "GeometryRelation")
 @Table(name = "relations", schema = "openstreetmap_geometries")
+@Data
 public class RelationEntity extends OsmObjectEntity {
 
     @Column(name = "members", columnDefinition = "jsonb")
