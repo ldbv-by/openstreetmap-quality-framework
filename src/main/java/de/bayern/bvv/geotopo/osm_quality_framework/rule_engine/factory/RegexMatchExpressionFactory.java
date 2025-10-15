@@ -39,8 +39,8 @@ public class RegexMatchExpressionFactory implements ExpressionFactory {
             }
         }
 
-        return feature -> {
-            String tagValue = feature.getTags().get(tagKey);
+        return taggedObject -> {
+            String tagValue = taggedObject.getTags().get(tagKey);
             if (tagValue == null) return false;
 
             return pattern.matcher(tagValue).matches();

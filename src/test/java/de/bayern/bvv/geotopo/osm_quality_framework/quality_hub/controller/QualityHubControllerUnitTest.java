@@ -1,6 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.controller;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.config.JacksonConfiguration;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.JacksonConfiguration;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.service.QualityHubService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

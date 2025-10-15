@@ -135,10 +135,10 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
                 WITH v_changeset AS (SELECT ?::bigint AS changeset_id)
         
                 INSERT INTO changeset_data.changeset_objects
-                    (osm_id, osm_geometry_type, changeset_id, operation_type)
+                    (osm_id, geometry_type, changeset_id, operation_type)
         
                 -- Nodes
-                SELECT c_node.osm_id, 'N', cs.changeset_id,
+                SELECT c_node.osm_id, 'NODE', cs.changeset_id,
                        CASE WHEN o_node.osm_id IS NULL THEN 'CREATE' ELSE 'MODIFY' END
                   FROM changeset_data.nodes c_node
                   CROSS JOIN v_changeset cs
@@ -149,7 +149,7 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
                 UNION ALL
 
                 -- Ways
-                SELECT c_way.osm_id, 'W', cs.changeset_id,
+                SELECT c_way.osm_id, 'WAY', cs.changeset_id,
                        CASE WHEN o_way.osm_id IS NULL THEN 'CREATE' ELSE 'MODIFY' END
                   FROM changeset_data.ways c_way
                   CROSS JOIN v_changeset cs
@@ -160,7 +160,7 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
                 UNION ALL
 
                 -- Areas
-                SELECT c_area.osm_id, c_area.osm_geometry_type, cs.changeset_id,
+                SELECT c_area.osm_id, case when c_area.osm_geometry_type = 'W' then 'AREA' else 'MULTIPOLYGON' end, cs.changeset_id,
                        CASE WHEN o_area.osm_id IS NULL THEN 'CREATE' ELSE 'MODIFY' END
                   FROM changeset_data.areas c_area
                   CROSS JOIN v_changeset cs
@@ -171,7 +171,7 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
                 UNION ALL
 
                 -- Relations
-                SELECT c_rel.osm_id, 'R', cs.changeset_id,
+                SELECT c_rel.osm_id, 'RELATION', cs.changeset_id,
                        CASE WHEN o_rel.osm_id IS NULL THEN 'CREATE' ELSE 'MODIFY' END
                   FROM changeset_data.relations c_rel
                   CROSS JOIN v_changeset cs
@@ -194,10 +194,10 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
                      v_rels(id) AS (SELECT unnest(coalesce(?::bigint[], '{}')))
         
                 INSERT INTO changeset_data.changeset_objects
-                    (osm_id, osm_geometry_type, changeset_id, operation_type)
+                    (osm_id, geometry_type, changeset_id, operation_type)
 
                 -- Nodes
-                SELECT o_node.osm_id, 'N', cs.changeset_id, 'DELETE'
+                SELECT o_node.osm_id, 'NODE', cs.changeset_id, 'DELETE'
                   FROM openstreetmap_geometries.nodes o_node
                   JOIN v_nodes ON v_nodes.id = o_node.osm_id
                  CROSS JOIN v_changeset cs
@@ -205,7 +205,7 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
                 UNION ALL
                 
                 -- Ways
-                SELECT o_way.osm_id, 'W', cs.changeset_id, 'DELETE'
+                SELECT o_way.osm_id, 'WAY', cs.changeset_id, 'DELETE'
                   FROM openstreetmap_geometries.ways o_way
                   JOIN v_ways ON v_ways.id = o_way.osm_id
                  CROSS JOIN v_changeset cs
@@ -213,14 +213,14 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
                  UNION ALL
 
                 -- Areas
-                SELECT o_area.osm_id, o_area.osm_geometry_type, cs.changeset_id, 'DELETE'
+                SELECT o_area.osm_id,  case when o_area.osm_geometry_type = 'W' then 'AREA' else 'MULTIPOLYGON' end, cs.changeset_id, 'DELETE'
                   FROM openstreetmap_geometries.areas o_area
                   JOIN v_ways ON v_ways.id = o_area.osm_id AND o_area.osm_geometry_type = 'W'
                  CROSS JOIN v_changeset cs
     
                 UNION ALL
                 
-                SELECT o_area.osm_id, o_area.osm_geometry_type, cs.changeset_id, 'DELETE'
+                SELECT o_area.osm_id, case when o_area.osm_geometry_type = 'W' then 'AREA' else 'MULTIPOLYGON' end, cs.changeset_id, 'DELETE'
                   FROM openstreetmap_geometries.areas o_area
                   JOIN v_rels ON v_rels.id = o_area.osm_id AND o_area.osm_geometry_type = 'R'
                  CROSS JOIN v_changeset cs
@@ -228,7 +228,7 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
                 UNION ALL
                 
                 -- Relations
-                SELECT o_rel.osm_id, 'R', cs.changeset_id, 'DELETE'
+                SELECT o_rel.osm_id, 'RELATION', cs.changeset_id, 'DELETE'
                   FROM openstreetmap_geometries.relations o_rel
                   JOIN v_rels ON v_rels.id = o_rel.osm_id
                  CROSS JOIN v_changeset cs

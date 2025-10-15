@@ -9,7 +9,7 @@ import org.hibernate.type.SqlTypes;
 
 import java.util.HashMap;
 
-@Entity
+@Entity(name = "PlanetWaysOsmGeometry")
 @Table(name = "planet_osm_ways", schema = "openstreetmap_geometries")
 public class PlanetOsmWayEntity {
     @Id

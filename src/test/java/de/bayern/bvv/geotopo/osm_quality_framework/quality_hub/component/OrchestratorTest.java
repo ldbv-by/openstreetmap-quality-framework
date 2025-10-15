@@ -1,5 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.component;
 
+import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.api.ChangesetDataService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.model.QualityHubResult;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceRequestDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceResultDto;
@@ -32,8 +33,8 @@ class OrchestratorTest {
     /**
      * Builds an Orchestrator with a mocked pipeline and a given services map
      **/
-    private Orchestrator orchestratorWith(QualityPipeline pipeline, Map<String, QualityService> services) {
-        return new Orchestrator(pipeline, services);
+    private Orchestrator orchestratorWith(QualityPipeline pipeline, Map<String, QualityService> services, ChangesetDataService changesetDataService) {
+        return new Orchestrator(pipeline, services, changesetDataService);
     }
 
     /**
@@ -66,7 +67,7 @@ class OrchestratorTest {
         when(svcC.checkChangesetQuality(any(QualityServiceRequestDto.class)))
                 .thenReturn(mock(QualityServiceResultDto.class));
 
-        Orchestrator orchestrator = orchestratorWith(pipeline, services);
+        Orchestrator orchestrator = orchestratorWith(pipeline, services, mock(ChangesetDataService.class));
         Changeset changeset = mock(Changeset.class);
 
         // Act
@@ -116,7 +117,7 @@ class OrchestratorTest {
             return mock(QualityServiceResultDto.class);
         });
 
-        Orchestrator orchestrator = orchestratorWith(pipeline, new HashMap<>(services));
+        Orchestrator orchestrator = orchestratorWith(pipeline, new HashMap<>(services), mock(ChangesetDataService.class));
 
         // Act
         QualityHubResult qualityHubResult = orchestrator.start(mock(Changeset.class));
@@ -152,7 +153,7 @@ class OrchestratorTest {
         when(svcA.checkChangesetQuality(any())).thenReturn(mock(QualityServiceResultDto.class));
         when(svcB.checkChangesetQuality(any())).thenThrow(new RuntimeException("boom"));
 
-        Orchestrator orchestrator = orchestratorWith(pipeline, services);
+        Orchestrator orchestrator = orchestratorWith(pipeline, services, mock(ChangesetDataService.class));
 
         // Act / Assert
         QualityServiceException ex = assertThrows(QualityServiceException.class,

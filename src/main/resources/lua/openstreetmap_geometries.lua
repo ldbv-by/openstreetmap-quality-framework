@@ -74,10 +74,12 @@ tables.relations = osm2pgsql.define_table({
 -- like `id`, `version`, etc. as well as all tags as a Lua table (`object.tags`).
 function osm2pgsql.process_node(object)
 	--  Uncomment next line to look at the object data:
+	local object_type = object.tags and object.tags.object_type
+
 	tables.nodes:insert({
 		version = object.version,
 		changeset_id = object.changeset,
-		object_type = object:grab_tag('object_type'),
+		object_type = object_type,
 		tags = object.tags,
 		geom = object:as_point()
 	})
@@ -86,6 +88,8 @@ end
 -- Called for every way in the input. The `object` argument contains the same information as with nodes
 -- and additionally a boolean `is_closed` flag and the list of node IDs referenced by the way (`object.nodes`).
 function osm2pgsql.process_way(object)
+    local object_type = object.tags and object.tags.object_type
+
 	local tag_count = 0
     for _ in pairs(object.tags) do
         tag_count = tag_count + 1
@@ -97,10 +101,10 @@ function osm2pgsql.process_way(object)
     end
 
 	if object.is_closed then
-		tables.areas:insert({
+        tables.areas:insert({
 			version = object.version,
 			changeset_id = object.changeset,
-			object_type = object:grab_tag('object_type'),
+			object_type = object_type,
 			tags = object.tags,
 			geom = object:as_polygon()
 		})
@@ -108,7 +112,7 @@ function osm2pgsql.process_way(object)
 		tables.ways:insert({
 			version = object.version,
 			changeset_id = object.changeset,
-			object_type = object:grab_tag('object_type'),
+			object_type = object_type,
 			tags = object.tags,
 			geom = object:as_linestring()
 		})
@@ -118,11 +122,13 @@ end
 -- Called for every relation in the input. The `object` argument contains the same information as with nodes
 -- and additionally an array of members (`object.members`).
 function osm2pgsql.process_relation(object)
+    local object_type = object.tags and object.tags.object_type
+
 	if object.tags.type == 'multipolygon' then
 		tables.areas:insert({
 			version = object.version,
 			changeset_id = object.changeset,
-			object_type = object:grab_tag('object_type'),
+			object_type = object_type,
 			tags = object.tags,
 			geom = object:as_multipolygon()
 		})
@@ -133,7 +139,7 @@ function osm2pgsql.process_relation(object)
 	tables.relations:insert({
 		version = object.version,
 		changeset_id = object.changeset,
-		object_type = object:grab_tag('object_type'),
+		object_type = object_type,
 		members = object.members,
 		tags = object.tags
 	})

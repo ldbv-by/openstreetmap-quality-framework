@@ -1,6 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.changeset_prepare;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.changeset_prepare.spi.ChangesetPrepareService;
+import de.bayern.bvv.geotopo.osm_quality_framework.changeset_prepare.api.ChangesetPrepareService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.dto.ChangesetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.util.ChangesetXml;
 import de.bayern.bvv.geotopo.osm_quality_framework.test_core.DatabaseIntegrationTest;

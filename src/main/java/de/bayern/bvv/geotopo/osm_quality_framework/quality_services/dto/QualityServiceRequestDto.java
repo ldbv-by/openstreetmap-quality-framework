@@ -1,6 +1,7 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.dto.ChangesetDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.ChangesetDataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 
 /**
@@ -10,5 +11,5 @@ public record QualityServiceRequestDto(
         String qualityServiceId,
         Long changesetId,
         ChangesetDto changesetDto,
-        DataSetDto dataSetDto
+        ChangesetDataSetDto changesetDataSetDto
 ) {}

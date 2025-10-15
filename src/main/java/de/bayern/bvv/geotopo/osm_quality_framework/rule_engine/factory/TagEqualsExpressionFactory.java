@@ -29,8 +29,8 @@ public class TagEqualsExpressionFactory implements ExpressionFactory {
             throw new IllegalArgumentException("tag_exists: 'value' is required");
         }
 
-        return feature -> {
-            String tagValue = feature.getTags().get(tagKey);
+        return taggedObject -> {
+            String tagValue = taggedObject.getTags().get(tagKey);
             if (tagValue == null) return false;
 
             return tagValue.equals(value);

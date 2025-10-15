@@ -1,6 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.spi.OsmSchemaService;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.api.OsmSchemaService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.dto.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Tag;
 import de.bayern.bvv.geotopo.osm_quality_framework.test_core.DatabaseIntegrationTest;

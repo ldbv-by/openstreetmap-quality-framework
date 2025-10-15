@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-@Entity
+@Entity(name = "PlanetRelsOsmGeometry")
 @Table(name = "planet_osm_rels", schema = "openstreetmap_geometries")
 public class PlanetOsmRelationEntity {
     @Id

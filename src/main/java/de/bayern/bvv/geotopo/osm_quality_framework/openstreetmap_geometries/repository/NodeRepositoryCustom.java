@@ -6,5 +6,5 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Fe
 import java.util.List;
 
 public interface NodeRepositoryCustom {
-    List<NodeEntity> findByFeatureFilter(FeatureFilter featureFilter);
+    List<NodeEntity> fetchByFeatureFilter(FeatureFilter featureFilter);
 }

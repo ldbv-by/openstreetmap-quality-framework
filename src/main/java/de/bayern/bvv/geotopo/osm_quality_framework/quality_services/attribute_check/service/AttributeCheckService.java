@@ -1,10 +1,11 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.attribute_check.service;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.spi.OsmSchemaService;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.api.OsmSchemaService;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.ChangesetDataSetMapper;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.ChangesetDataSet;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSet;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Feature;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.TaggedObject;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSet;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.mapper.ObjectTypeMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.ObjectType;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Rule;
@@ -21,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service("attribute-check")
 @RequiredArgsConstructor
@@ -41,10 +44,18 @@ public class AttributeCheckService implements QualityService {
         this.qualityServiceResult = new QualityServiceResult(qualityServiceRequestDto.qualityServiceId(), qualityServiceRequestDto.changesetId());
 
         // ----- Get tagged objects.
-        DataSet dataSet = DataSetMapper.toDomain(qualityServiceRequestDto.dataSetDto());
+        ChangesetDataSet changesetDataSet = ChangesetDataSetMapper.toDomain(qualityServiceRequestDto.changesetDataSetDto());
 
         // ----- Check for each tagged object the attribute consistency.
-        for (TaggedObject taggedObject : dataSet.getAll()) {
+        for (TaggedObject taggedObject : Stream.concat(
+                        Optional.ofNullable(changesetDataSet.getCreate())
+                                .map(DataSet::getAll).stream().flatMap(Collection::stream),
+                        Optional.ofNullable(changesetDataSet.getModify())
+                                .map(DataSet::getAll).stream().flatMap(Collection::stream)
+                )
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet())
+        ) {
 
             // ----- Get schema configuration for tagged object.
             ObjectType objectType = Optional.ofNullable(this.osmSchemaService.getObjectTypeInfo(taggedObject.getObjectType()))

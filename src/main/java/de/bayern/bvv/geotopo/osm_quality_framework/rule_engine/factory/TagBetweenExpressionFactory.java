@@ -5,11 +5,6 @@ import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.ExpressionFactory;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Evaluates whether a tag's (numeric) value lies between two bounds.
  */
@@ -46,8 +41,8 @@ public class TagBetweenExpressionFactory implements ExpressionFactory {
             throw new IllegalArgumentException("tag_between: 'from_value' must be <= 'to_value'");
         }
 
-        return feature -> {
-            String tagValue = feature.getTags().get(tagKey);
+        return taggedObject -> {
+            String tagValue = taggedObject.getTags().get(tagKey);
             if (tagValue == null) return false;
 
             for (String valueStr : tagValue.split(";")) {

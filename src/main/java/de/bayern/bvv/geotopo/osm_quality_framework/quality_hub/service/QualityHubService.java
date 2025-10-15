@@ -1,6 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.service;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.changeset_prepare.spi.ChangesetPrepareService;
+import de.bayern.bvv.geotopo.osm_quality_framework.changeset_prepare.api.ChangesetPrepareService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.dto.QualityHubResultDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.mapper.QualityHubResultMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.model.QualityHubResult;
@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
- * Quality Hub Service.
+ * Service to manage quality check requests.
  */
 @Service
 @RequiredArgsConstructor

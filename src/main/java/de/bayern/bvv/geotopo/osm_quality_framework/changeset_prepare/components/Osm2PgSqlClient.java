@@ -1,7 +1,7 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.changeset_prepare.components;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.dto.AppendChangesetDto;
-import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.spi.Osm2PgSqlService;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.api.Osm2PgSqlService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.OsmPrimitive;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Relation;

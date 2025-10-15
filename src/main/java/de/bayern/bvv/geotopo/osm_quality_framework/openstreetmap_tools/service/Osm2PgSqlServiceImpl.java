@@ -7,12 +7,11 @@ import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.dto.Creat
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.dto.SortOscDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.model.CommandRequest;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.model.Osm2PgSqlCommand;
-import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.spi.Osm2PgSqlService;
-import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.spi.OsmosisService;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.api.Osm2PgSqlService;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.api.OsmosisService;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.util.Osm2PgSqlCommandBuilder;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.util.ZipHelper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;

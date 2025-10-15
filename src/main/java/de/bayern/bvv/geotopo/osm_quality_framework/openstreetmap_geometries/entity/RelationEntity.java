@@ -11,7 +11,7 @@ import org.hibernate.annotations.Type;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
-@Entity(name = "GeometryRelation")
+@Entity(name = "RelationsOsmGeometry")
 @Table(name = "relations", schema = "openstreetmap_geometries")
 @Data
 public class RelationEntity extends OsmObjectEntity {

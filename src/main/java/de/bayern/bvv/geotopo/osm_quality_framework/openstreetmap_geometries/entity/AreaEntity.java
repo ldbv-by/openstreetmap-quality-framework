@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 import org.locationtech.jts.geom.Geometry;
 
 @EqualsAndHashCode(callSuper = true)
-@Entity
+@Entity(name = "AreasOsmGeometry")
 @Table(name = "areas", schema = "openstreetmap_geometries")
 @Data
 public class AreaEntity extends OsmObjectEntity {

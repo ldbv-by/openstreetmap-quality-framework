@@ -1,7 +1,7 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.test_core;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.dto.CreateSchemaDto;
-import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.spi.Osm2PgSqlService;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.api.Osm2PgSqlService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
@@ -137,12 +137,12 @@ public abstract class DatabaseIntegrationTest {
             CREATE TABLE IF NOT EXISTS changeset_data.changeset_objects (
               id                bigserial    PRIMARY KEY,
               osm_id            bigint       NOT NULL,
-              osm_geometry_type char(1)      NOT NULL,
+              geometry_type     text         NOT NULL,
               changeset_id      bigint       NOT NULL,
               operation_type    text         NOT NULL,
               created_at        timestamptz  NOT NULL DEFAULT now(),
               CONSTRAINT chk_changeset_objects_geom_type
-                CHECK (osm_geometry_type IN ('N','W','R','A')),
+                CHECK (geometry_type IN ('NODE','WAY','AREA', 'MULTIPOLYGON','RELATION')),
               CONSTRAINT chk_changeset_objects_op_type
                 CHECK (operation_type IN ('CREATE','MODIFY','DELETE'))
             );
@@ -151,10 +151,10 @@ public abstract class DatabaseIntegrationTest {
               ON changeset_data.changeset_objects (changeset_id);
 
             CREATE INDEX IF NOT EXISTS idx_changeset_objects_osm
-              ON changeset_data.changeset_objects (osm_geometry_type, osm_id);
+              ON changeset_data.changeset_objects (geometry_type, osm_id);
 
             CREATE UNIQUE INDEX IF NOT EXISTS uq_changeset_objects
-              ON changeset_data.changeset_objects (changeset_id, osm_geometry_type, osm_id, operation_type);
+              ON changeset_data.changeset_objects (changeset_id, geometry_type, osm_id, operation_type);
 
             ALTER TABLE IF EXISTS changeset_data.nodes             ADD COLUMN IF NOT EXISTS changeset_id bigint;
             ALTER TABLE IF EXISTS changeset_data.ways              ADD COLUMN IF NOT EXISTS changeset_id bigint;

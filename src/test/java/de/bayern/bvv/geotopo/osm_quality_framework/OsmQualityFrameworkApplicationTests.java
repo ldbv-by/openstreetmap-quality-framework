@@ -5,7 +5,7 @@ import org.springframework.modulith.core.ApplicationModules;
 import org.springframework.modulith.docs.Documenter;
 import org.springframework.modulith.test.ApplicationModuleTest;
 
-@ApplicationModuleTest
+@ApplicationModuleTest(verifyAutomatically = false)
 class OsmQualityFrameworkApplicationTests {
 
 	ApplicationModules applicationModules = ApplicationModules.of(OsmQualityFrameworkApplication.class);

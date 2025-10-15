@@ -1,6 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.spi.OsmGeometriesService;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.api.OsmGeometriesService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.FeatureDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
@@ -9,7 +9,6 @@ import de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.spi.Uni
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;

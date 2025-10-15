@@ -45,12 +45,12 @@ public class DateCompareExpressionFactory implements ExpressionFactory {
             throw new IllegalArgumentException("date_compare: 'compare_tag_key' and 'compare_value' together are not allowed");
         }
 
-        return feature -> {
-            String tagInstantStr = feature.getTags().get(tagKey);
+        return taggedObject -> {
+            String tagInstantStr = taggedObject.getTags().get(tagKey);
             Instant tagInstant =  toInstant(tagInstantStr)
                     .orElseThrow(() -> new IllegalArgumentException("date_compare: value '" + tagInstantStr + "' for 'tag_key' '" + tagKey + "' cannot be parsed"));
 
-            String compareInstantStr = hasCompareValue ? compareValue : feature.getTags().get(compareTagKey);
+            String compareInstantStr = hasCompareValue ? compareValue : taggedObject.getTags().get(compareTagKey);
             Instant compareInstant =  toInstant(compareInstantStr)
                     .orElseThrow(() -> new IllegalArgumentException("date_compare: value '" + compareInstantStr + "' for " +
                                                                     (hasCompareValue ? "'compare_value'" : "'compare_tag_key' '" + compareTagKey + "' cannot be parsed")));

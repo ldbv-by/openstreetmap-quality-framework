@@ -5,9 +5,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.ExpressionFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Evaluates whether a tag value is contained in a set of allowed values.
@@ -23,20 +21,24 @@ public class TagInExpressionFactory implements ExpressionFactory {
     @Override
     public Expression create(JsonNode json) {
         String tagKey = json.path("tag_key").asText();
-        String values = json.path("values").asText();
+        JsonNode values = json.path("values");
 
         if (tagKey == null || tagKey.isBlank()) {
             throw new IllegalArgumentException("tag_in: 'tag_key' is required");
         }
 
-        if (values == null || values.isBlank()) {
-            throw new IllegalArgumentException("tag_in: 'values' is required. (separation with ';')");
+        if (!values.isArray() || values.isEmpty()) {
+            throw new IllegalArgumentException("tag_in: 'values' must be a non-empty array");
         }
 
-        Set<String> allowedValues = new HashSet<>(Arrays.asList(values.split(";")));
+        Set<String> allowedValues = new HashSet<>();
+        for (JsonNode value : values) {
+            String v = value.asText(null);
+            if (v != null && !v.isBlank()) allowedValues.add(v);
+        }
 
-        return feature -> {
-            String tagValue = feature.getTags().get(tagKey);
+        return taggedObject -> {
+            String tagValue = taggedObject.getTags().get(tagKey);
             if (tagValue == null) return false;
 
             for (String value : allowedValues) {
@@ -45,4 +47,5 @@ public class TagInExpressionFactory implements ExpressionFactory {
             return false;
         };
     }
+
 }

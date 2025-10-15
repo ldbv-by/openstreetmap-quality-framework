@@ -1,7 +1,9 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.component;
 
+import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.api.ChangesetDataService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.ChangesetDataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.QualityPipeline;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.exception.QualityServiceException;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.model.QualityHubResult;
@@ -29,6 +31,7 @@ public class Orchestrator {
     private final QualityPipeline qualityPipeline;
     private final Map<String, QualityService> qualityServices;
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+    private final ChangesetDataService changesetDataService;
 
     /**
      * Starts the pipeline for the given {@link Changeset} and blocks until:
@@ -71,6 +74,9 @@ public class Orchestrator {
                                       AtomicInteger cntRemainingSteps,
                                       CompletableFuture<Void> allStepsDone) {
 
+        ChangesetDataSetDto changesetDataSetDto = this.changesetDataService.getDataSet(
+                changeset.getId(), null, null);
+
         Set<QualityPipeline.Step> runnableSteps = this.getRunnableSteps(publishedPipelineSteps);
 
         for (QualityPipeline.Step step : runnableSteps) {
@@ -95,7 +101,7 @@ public class Orchestrator {
                                     step.getId(),
                                     changeset.getId(),
                                     ChangesetMapper.toDto(changeset),
-                                    null); // todo: tagged objects laden
+                                    changesetDataSetDto);
 
                     return qualityServiceBean.checkChangesetQuality(qualityServiceRequestDto);
                 }, executor)

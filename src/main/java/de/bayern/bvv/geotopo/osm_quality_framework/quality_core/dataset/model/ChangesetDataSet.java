@@ -4,6 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * Represents all tagged objects.
  */
@@ -11,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class ChangesetDataSet {
-    private DataSet create;
-    private DataSet modify;
-    private DataSet delete;
+    private DataSet create = new DataSet();
+    private DataSet modify = new DataSet();
+    private DataSet delete = new DataSet();
 }

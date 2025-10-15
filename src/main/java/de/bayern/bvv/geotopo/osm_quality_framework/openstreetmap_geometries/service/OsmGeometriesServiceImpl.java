@@ -12,7 +12,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.repo
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.repository.NodeRepository;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.repository.RelationRepository;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.repository.WayRepository;
-import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.spi.OsmGeometriesService;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.api.OsmGeometriesService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSet;
@@ -58,7 +58,7 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
      */
     private List<Feature> getNodesByFeatureFilter(FeatureFilter featureFilter, String coordinateReferenceSystem) {
         List<Feature> nodes = new ArrayList<>();
-        List<NodeEntity> nodeEntities = this.nodeRepository.findByFeatureFilter(featureFilter);
+        List<NodeEntity> nodeEntities = this.nodeRepository.fetchByFeatureFilter(featureFilter);
 
         if (nodeEntities != null) {
             for (NodeEntity nodeEntity : nodeEntities) {
@@ -75,7 +75,7 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
      */
     private List<Feature> getWaysByFeatureFilter(FeatureFilter featureFilter, String coordinateReferenceSystem) {
         List<Feature> ways = new ArrayList<>();
-        List<WayEntity> wayEntities = this.wayRepository.findByFeatureFilter(featureFilter);
+        List<WayEntity> wayEntities = this.wayRepository.fetchByFeatureFilter(featureFilter);
 
         if (wayEntities != null) {
             for (WayEntity wayEntity : wayEntities) {
@@ -92,7 +92,7 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
      */
     private List<Feature> getAreasByFeatureFilter(FeatureFilter featureFilter, String coordinateReferenceSystem) {
         List<Feature> areas = new ArrayList<>();
-        List<AreaEntity> areaEntities = this.areaRepository.findByFeatureFilter(featureFilter);
+        List<AreaEntity> areaEntities = this.areaRepository.fetchByFeatureFilter(featureFilter);
 
         if (areaEntities != null) {
             for (AreaEntity areaEntity : areaEntities) {
@@ -109,7 +109,7 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
      */
     private List<Relation> getRelationsByFeatureFilter(FeatureFilter featureFilter) {
         List<Relation> relations = new ArrayList<>();
-        List<RelationEntity> relationEntities = this.relationRepository.findByFeatureFilter(featureFilter);
+        List<RelationEntity> relationEntities = this.relationRepository.fetchByFeatureFilter(featureFilter);
 
         if (relationEntities != null) {
             for (RelationEntity relationEntity : relationEntities) {

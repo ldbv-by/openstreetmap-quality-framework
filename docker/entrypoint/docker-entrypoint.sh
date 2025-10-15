@@ -85,12 +85,12 @@ if [ "$HAS_SCHEMA" != "1" ]; then
 CREATE TABLE IF NOT EXISTS changeset_data.changeset_objects (
   id                bigserial    PRIMARY KEY,
   osm_id            bigint       NOT NULL,
-  osm_geometry_type char(1)      NOT NULL,   -- 'N','W','R','A'
+  geometry_type     text         NOT NULL,
   changeset_id      bigint       NOT NULL,
   operation_type    text         NOT NULL,   -- 'CREATE','MODIFY','DELETE'
   created_at        timestamptz  NOT NULL DEFAULT now(),
   CONSTRAINT chk_changeset_objects_geom_type
-    CHECK (osm_geometry_type IN ('N','W','R','A')),
+    CHECK (geometry_type IN ('NODE','WAY','AREA', 'MULTIPOLYGON', 'RELATION')),
   CONSTRAINT chk_changeset_objects_op_type
     CHECK (operation_type IN ('CREATE','MODIFY','DELETE'))
 );
@@ -99,10 +99,10 @@ CREATE INDEX IF NOT EXISTS idx_changeset_objects_changeset_id
   ON changeset_data.changeset_objects (changeset_id);
 
 CREATE INDEX IF NOT EXISTS idx_changeset_objects_osm
-  ON changeset_data.changeset_objects (osm_geometry_type, osm_id);
+  ON changeset_data.changeset_objects (geometry_type, osm_id);
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_changeset_objects
-  ON changeset_data.changeset_objects (changeset_id, osm_geometry_type, osm_id, operation_type);
+  ON changeset_data.changeset_objects (changeset_id, geometry_type, osm_id, operation_type);
 
 ALTER TABLE IF EXISTS changeset_data.nodes             ADD COLUMN IF NOT EXISTS changeset_id bigint;
 ALTER TABLE IF EXISTS changeset_data.ways              ADD COLUMN IF NOT EXISTS changeset_id bigint;

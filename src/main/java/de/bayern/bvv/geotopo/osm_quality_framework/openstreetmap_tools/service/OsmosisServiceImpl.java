@@ -5,7 +5,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.dto.Comma
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.dto.SortOscDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.model.CommandRequest;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.model.OsmosisCommand;
-import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.spi.OsmosisService;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.api.OsmosisService;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.util.OsmosisCommandBuilder;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_tools.util.ZipHelper;
 import lombok.RequiredArgsConstructor;

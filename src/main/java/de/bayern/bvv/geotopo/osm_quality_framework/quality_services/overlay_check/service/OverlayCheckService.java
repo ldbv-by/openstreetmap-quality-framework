@@ -20,10 +20,10 @@ public class OverlayCheckService implements QualityService {
                 new QualityServiceResult(qualityServiceRequestDto.qualityServiceId(), qualityServiceRequestDto.changesetId());
 
         System.out.println("OverlayCheckService started");
-        try {
-            Thread.sleep(5_000);
-        } catch (InterruptedException e) {
-        }
+        //try {
+        //    Thread.sleep(5_000);
+        //} catch (InterruptedException e) {
+        //}
         System.out.println("OverlayCheckService finished");
 
         return QualityServiceResultMapper.toDto(qualityServiceResult);

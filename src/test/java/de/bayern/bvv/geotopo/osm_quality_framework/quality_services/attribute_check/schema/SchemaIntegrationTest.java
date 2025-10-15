@@ -1,9 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.attribute_check.schema;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.FeatureDto;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.MemberDto;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.RelationDto;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.attribute_check.service.AttributeCheckService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceErrorDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceRequestDto;
@@ -62,11 +59,13 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 new ArrayList<>()
         );
 
+        ChangesetDataSetDto changesetDataSetDto = new ChangesetDataSetDto(dataSetDto, null, null);
+
         QualityServiceRequestDto qualityServiceRequestDto = new QualityServiceRequestDto(
                 "attribute-check",
                 1L,
                 null,
-                dataSetDto
+                changesetDataSetDto
         );
 
         // Act
@@ -111,11 +110,13 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 new ArrayList<>()
         );
 
+        ChangesetDataSetDto changesetDataSetDto = new ChangesetDataSetDto(dataSetDto, null, null);
+
         QualityServiceRequestDto qualityServiceRequestDto = new QualityServiceRequestDto(
                 "attribute-check",
                 1L,
                 null,
-                dataSetDto
+                changesetDataSetDto
         );
 
         // Act
@@ -161,11 +162,13 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 new ArrayList<>()
         );
 
+        ChangesetDataSetDto changesetDataSetDto = new ChangesetDataSetDto(dataSetDto, null, null);
+
         QualityServiceRequestDto qualityServiceRequestDto = new QualityServiceRequestDto(
                 "attribute-check",
                 1L,
                 null,
-                dataSetDto
+                changesetDataSetDto
         );
 
         // Act
@@ -220,11 +223,13 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 new ArrayList<>()
         );
 
+        ChangesetDataSetDto changesetDataSetDto = new ChangesetDataSetDto(dataSetDto, null, null);
+
         QualityServiceRequestDto qualityServiceRequestDto = new QualityServiceRequestDto(
                 "attribute-check",
                 1L,
                 null,
-                dataSetDto
+                changesetDataSetDto
         );
 
         // Act
@@ -277,11 +282,13 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 new ArrayList<>()
         );
 
+        ChangesetDataSetDto changesetDataSetDto = new ChangesetDataSetDto(dataSetDto, null, null);
+
         QualityServiceRequestDto qualityServiceRequestDto = new QualityServiceRequestDto(
                 "attribute-check",
                 1L,
                 null,
-                dataSetDto
+                changesetDataSetDto
         );
 
         // Act
@@ -342,11 +349,13 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 new ArrayList<>()
         );
 
+        ChangesetDataSetDto changesetDataSetDto = new ChangesetDataSetDto(dataSetDto, null, null);
+
         QualityServiceRequestDto qualityServiceRequestDto = new QualityServiceRequestDto(
                 "attribute-check",
                 1L,
                 null,
-                dataSetDto
+                changesetDataSetDto
         );
 
         // Act
@@ -401,11 +410,13 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 new ArrayList<>()
         );
 
+        ChangesetDataSetDto changesetDataSetDto = new ChangesetDataSetDto(dataSetDto, null, null);
+
         QualityServiceRequestDto qualityServiceRequestDto = new QualityServiceRequestDto(
                 "attribute-check",
                 1L,
                 null,
-                dataSetDto
+                changesetDataSetDto
         );
 
         // Act
@@ -458,15 +469,17 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 new ArrayList<>()
         );
 
-        QualityServiceRequestDto req = new QualityServiceRequestDto(
+        ChangesetDataSetDto changesetDataSetDto = new ChangesetDataSetDto(dataSetDto, null, null);
+
+        QualityServiceRequestDto qualityServiceRequestDto = new QualityServiceRequestDto(
                 "attribute-check",
                 1L,
                 null,
-                dataSetDto
+                changesetDataSetDto
         );
 
         // Act
-        QualityServiceResultDto result = this.attributeCheckService.checkChangesetQuality(req);
+        QualityServiceResultDto result = this.attributeCheckService.checkChangesetQuality(qualityServiceRequestDto);
 
         // Assert
         String errorTexts = result.errors() == null ? "" :
