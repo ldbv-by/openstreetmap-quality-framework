@@ -87,6 +87,31 @@ public class ChangesetPrepareRepositoryImpl implements ChangesetPrepareRepositor
         Set<Long> wayIds = changeset.getAllPrimitives().stream().filter(Way.class::isInstance).map(OsmPrimitive::getId).collect(Collectors.toSet());
         Set<Long> relationIds = changeset.getAllPrimitives().stream().filter(Relation.class::isInstance).map(OsmPrimitive::getId).collect(Collectors.toSet());
 
+        for (OsmPrimitive createdPrimitives : changeset.getCreatePrimitives()) {
+            if (createdPrimitives instanceof Way way) {
+                nodeIds.addAll(way.getNodeRefs().stream()
+                        .map(Way.Nd::getRef)
+                        .filter(ref -> ref > 0)
+                        .collect(Collectors.toSet()));
+
+            } else if (createdPrimitives instanceof Relation relation) {
+                nodeIds.addAll(relation.getMembers().stream()
+                        .filter(m -> m.getType().equalsIgnoreCase("N") && m.getRef() > 0)
+                        .map(Relation.Member::getRef)
+                        .collect(Collectors.toSet()));
+
+                wayIds.addAll(relation.getMembers().stream()
+                        .filter(m -> m.getType().equalsIgnoreCase("W") && m.getRef() > 0)
+                        .map(Relation.Member::getRef)
+                        .collect(Collectors.toSet()));
+
+                relationIds.addAll(relation.getMembers().stream()
+                        .filter(m -> m.getType().equalsIgnoreCase("R") && m.getRef() > 0)
+                        .map(Relation.Member::getRef)
+                        .collect(Collectors.toSet()));
+            }
+        }
+
         try (InputStream inputStream = this.getClass().getClassLoader()
                 .getResourceAsStream("sql/changeset_prepare/insertDependingOsmObjects.sql")) {
 
