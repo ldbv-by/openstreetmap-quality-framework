@@ -6,5 +6,5 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
         "conditions" : { "type": "tag_exists", "tag_key": "lebenszeitintervall:endet" },
         "checks": { "type": "date_compare", "tag_key": "lebenszeitintervall:endet", "operator": ">", "compare_tag_key": "lebenszeitintervall:beginnt" }
     }',
-    'Das Tag lebenszeitintervall:endet muss zeitlich nach dem Tag lebenszeitintervall:beginnt liegen.')
+    'Das Tag ''lebenszeitintervall:endet'' muss zeitlich nach dem Tag ''lebenszeitintervall:beginnt'' liegen.')
 ON CONFLICT (id) DO NOTHING;
