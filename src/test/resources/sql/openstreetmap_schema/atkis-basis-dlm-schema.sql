@@ -5,6 +5,7 @@ INSERT INTO openstreetmap_schema.object_types (object_type, is_abstract, is_rela
     ('AX_gehoertZu', false, true),
     ('AX_zeigtAuf', false, true),
     ('AX_ist', false, true),
+    ('AX_RelativeHoehe', false, true),
 
     ('AX_Strasse', false, true),
     ('AX_Wasserlauf', false, true),
@@ -58,6 +59,7 @@ INSERT INTO openstreetmap_schema.object_types (object_type, is_abstract, is_rela
     ('AX_BauwerkeEinrichtungenUndSonstigeAngaben', true, false),
     ('AX_Turm', false, false),
     ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', false, false),
+    ('AX_RelativeHoehe', false, true), -- wird als Relation (eigener object_type) geführt
     ('AX_VorratsbehaelterSpeicherbauwerk', false, false),
     ('AX_Transportanlage', false, false),
     ('AX_Leitung', false, false),
@@ -314,7 +316,6 @@ INSERT INTO openstreetmap_schema.datatypes (datatype_id, datatype_type) VALUES
     ('Length', 'PRIMITIVE'),
     ('AX_Nutzung_Gebaeude', 'COMPLEX'),
     ('AX_Nutzung', 'DICTIONARY'),
-    ('AX_RelativeHoehe', 'COMPLEX'),
     ('AX_Dachform', 'DICTIONARY'),
     ('Volume', 'PRIMITIVE'),
     ('AX_LageZurErdoberflaeche_Gebaeude', 'DICTIONARY'),
@@ -511,9 +512,6 @@ INSERT INTO openstreetmap_schema.datatypes_complex (datatype_id, tag_key, multip
     ('AX_Lagebezeichnung', 'verschluesselt', '1', 'AX_VerschluesselteLagebezeichnung'),
     ('AX_Nutzung_Gebaeude', 'anteil', '0..1', 'Integer'),
     ('AX_Nutzung_Gebaeude', 'nutzung', '1', 'AX_Nutzung'),
-    ('AX_RelativeHoehe', 'hoehe', '1', 'Length'),
-    ('AX_RelativeHoehe', 'obererBezugspunkt', '0..1', 'AX_ObererBezugspunkt'),
-    ('AX_RelativeHoehe', 'untererBezugspunkt', '0..1', 'AX_UntererBezugspunkt'),
     ('AX_DQMitDatenerhebung', 'herkunft', '1', 'AX_LI_ProcessStep_MitDatenerhebung'),
     ('AX_LI_ProcessStep_MitDatenerhebung', 'description', '1', 'AX_LI_ProcessStep_MitDatenerhebung_Description'),
     ('AX_LI_ProcessStep_MitDatenerhebung', 'stepDateTime', '0..1', 'TM_Primitive'),
@@ -1843,7 +1841,7 @@ INSERT INTO openstreetmap_schema.tags (object_type, tag_key, multiplicity, tag_d
     ('AX_Bauteil', 'durchfahrtshoehe', '0..1', 'Length'),
     ('AX_Gebaeude_Kerndaten', 'anzahlDerOberirdischenGeschosse', '0..1', 'Integer'),
     ('AX_Gebaeude_Kerndaten', 'anzahlDerUnterirdischenGeschosse', '0..1', 'Integer'),
-    ('AX_Gebaeude_Kerndaten', 'objekthoehe', '0..*', 'AX_RelativeHoehe'),
+    /* ('AX_Gebaeude_Kerndaten', 'objekthoehe', '0..*', 'AX_RelativeHoehe'), -- wird als Relation (eigener object_type) geführt */
     ('AX_Gebaeude_Kerndaten', 'dachform', '0..1', 'AX_Dachform'),
     ('AX_Gebaeude_Kerndaten', 'umbauterRaum', '0..1', 'Volume'),
     ('AX_Gebaeude_Kerndaten', 'baujahr', '0..*', 'Integer'),
@@ -2009,18 +2007,22 @@ INSERT INTO openstreetmap_schema.tags (object_type, tag_key, multiplicity, tag_d
     ('AX_Meer', 'tidemerkmal', '0..1', 'AX_Tidemerkmal_Meer'),
     ('AX_Meer', 'zweitname', '0..*', 'CharacterString'),
     ('AX_Meer', 'regionalsprache', '0..2', 'CharacterString'),
+    ('AX_BauwerkeEinrichtungenUndSonstigeAngaben', 'ergebnisDerUeberpruefung', '0..1', 'AX_ErgebnisDerUeberpruefung_BauwerkeEinrichtungenUndSonstigeAngaben'),
     ('AX_Turm', 'dachform', '0..1', 'AX_Dachform'),
     ('AX_Turm', 'bauwerksfunktion', '1..2', 'AX_Bauwerksfunktion_Turm'),
-    ('AX_Turm', 'objekthoehe', '0..*', 'AX_RelativeHoehe'),
+    /* ('AX_Turm', 'objekthoehe', '0..*', 'AX_RelativeHoehe'), -- wird als Relation (eigener object_type) geführt */
     ('AX_Turm', 'name', '0..1', 'CharacterString'),
     ('AX_Turm', 'zustand', '0..1', 'AX_Zustand_Turm'),
     ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', 'bauwerksfunktion', '1', 'AX_Bauwerksfunktion_BauwerkOderAnlageFuerIndustrieUndGewerbe'),
     ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', 'name', '0..1', 'CharacterString'),
     ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', 'bezeichnung', '0..1', 'CharacterString'),
-    ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', 'objekthoehe', '0..*', 'AX_RelativeHoehe'),
+    /* ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', 'objekthoehe', '0..*', 'AX_RelativeHoehe'), -- wird als Relation (eigener object_type) geführt */
     ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', 'zustand', '0..1', 'AX_Zustand_BauwerkOderAnlageFuerIndustrieUndGewerbe'),
+    ('AX_RelativeHoehe', 'hoehe', '1', 'Length'),
+    ('AX_RelativeHoehe', 'obererBezugspunkt', '0..1', 'AX_ObererBezugspunkt'),
+    ('AX_RelativeHoehe', 'untererBezugspunkt', '0..1', 'AX_UntererBezugspunkt'),
     ('AX_VorratsbehaelterSpeicherbauwerk', 'bauwerksfunktion', '0..1', 'AX_Bauwerksfunktion_VorratsbehaelterSpeicherbauwerk'),
-    ('AX_VorratsbehaelterSpeicherbauwerk', 'objekthoehe', '0..*', 'AX_RelativeHoehe'),
+    /* ('AX_VorratsbehaelterSpeicherbauwerk', 'objekthoehe', '0..*', 'AX_RelativeHoehe'), -- wird als Relation (eigener object_type) geführt */
     ('AX_VorratsbehaelterSpeicherbauwerk', 'speicherinhalt', '0..1', 'AX_Speicherinhalt_VorratsbehaelterSpeicherbauwerk'),
     ('AX_VorratsbehaelterSpeicherbauwerk', 'lageZurErdoberflaeche', '0..1', 'AX_LageZurErdoberflaeche_VorratsbehaelterSpeicherbauwerk'),
     ('AX_Transportanlage', 'bauwerksfunktion', '1', 'AX_Bauwerksfunktion_Transportanlage'),
@@ -2034,13 +2036,13 @@ INSERT INTO openstreetmap_schema.tags (object_type, tag_key, multiplicity, tag_d
     ('AX_BauwerkOderAnlageFuerSportFreizeitUndErholung', 'sportart', '0..*', 'AX_Sportart_BauwerkOderAnlageFuerSportFreizeitUndErholung'),
     ('AX_BauwerkOderAnlageFuerSportFreizeitUndErholung', 'breiteDesObjekts', '0..1', 'Length'),
     ('AX_BauwerkOderAnlageFuerSportFreizeitUndErholung', 'zustand', '0..1', 'AX_Zustand_BauwerkOderAnlageFuerSportFreizeitUndErholung'),
-    ('AX_BauwerkOderAnlageFuerSportFreizeitUndErholung', 'objekthoehe', '0..*', 'AX_RelativeHoehe'),
+    /* ('AX_BauwerkOderAnlageFuerSportFreizeitUndErholung', 'objekthoehe', '0..*', 'AX_RelativeHoehe'), -- wird als Relation (eigener object_type) geführt */
     ('AX_HistorischesBauwerkOderHistorischeEinrichtung', 'archaeologischerTyp', '1', 'AX_ArchaeologischerTyp_HistorischesBauwerkOderHistorischeEinrichtung'),
     ('AX_HistorischesBauwerkOderHistorischeEinrichtung', 'name', '0..1', 'CharacterString'),
-    ('AX_HistorischesBauwerkOderHistorischeEinrichtung', 'objekthoehe', '0..*', 'AX_RelativeHoehe'),
+    /* ('AX_HistorischesBauwerkOderHistorischeEinrichtung', 'objekthoehe', '0..*', 'AX_RelativeHoehe'), -- wird als Relation (eigener object_type) geführt */
     ('AX_SonstigesBauwerkOderSonstigeEinrichtung', 'bauwerksfunktion', '1', 'AX_Bauwerksfunktion_SonstigesBauwerkOderSonstigeEinrichtung'),
     ('AX_SonstigesBauwerkOderSonstigeEinrichtung', 'name', '0..1', 'CharacterString'),
-    ('AX_SonstigesBauwerkOderSonstigeEinrichtung', 'objekthoehe', '0..*', 'AX_RelativeHoehe'),
+    /* ('AX_SonstigesBauwerkOderSonstigeEinrichtung', 'objekthoehe', '0..*', 'AX_RelativeHoehe'), -- wird als Relation (eigener object_type) geführt */
     ('AX_SonstigesBauwerkOderSonstigeEinrichtung', 'hydrologischesMerkmal', '0..1', 'AX_HydrologischesMerkmal_SonstigesBauwerkOderSonstigeEinrichtung'),
     ('AX_SonstigesBauwerkOderSonstigeEinrichtung', 'funktion', '0..1', 'AX_Funktion_Bauwerk'),
     ('AX_SonstigesBauwerkOderSonstigeEinrichtung', 'bezeichnung', '0..1', 'CharacterString'),
@@ -2057,7 +2059,7 @@ INSERT INTO openstreetmap_schema.tags (object_type, tag_key, multiplicity, tag_d
     ('AX_Schleuse', 'konstruktionsmerkmalBauart', '0..1', 'AX_KonstruktionsmerkmalBauart_Schleuse'),
     ('AX_Schleuse', 'name', '0..1', 'CharacterString'),
     ('AX_Schleuse', 'zustand', '0..1', 'AX_Zustand_Schleuse'),
-    ('AX_Schleuse', 'objekthoehe', '0..*', 'AX_RelativeHoehe'),
+    /* ('AX_Schleuse', 'objekthoehe', '0..*', 'AX_RelativeHoehe'), -- wird als Relation (eigener object_type) geführt */
     ('AX_Grenzuebergang', 'name', '0..1', 'CharacterString'),
     ('AX_Testgelaende', 'name', '0..1', 'CharacterString'),
     ('AX_BauwerkImVerkehrsbereich', 'bauwerksfunktion', '1', 'AX_Bauwerksfunktion_BauwerkImVerkehrsbereich'),
@@ -2066,7 +2068,7 @@ INSERT INTO openstreetmap_schema.tags (object_type, tag_key, multiplicity, tag_d
     ('AX_BauwerkImVerkehrsbereich', 'zustand', '0..1', 'AX_Zustand_BauwerkImVerkehrsbereich'),
     ('AX_BauwerkImVerkehrsbereich', 'durchfahrtshoehe', '0..1', 'Length'),
     ('AX_BauwerkImVerkehrsbereich', 'breiteDesObjekts', '0..1', 'Length'),
-    ('AX_BauwerkImVerkehrsbereich', 'objekthoehe', '0..1', 'AX_RelativeHoehe'),
+    /* ('AX_BauwerkImVerkehrsbereich', 'objekthoehe', '0..1', 'AX_RelativeHoehe'), -- wird als Relation (eigener object_type) geführt */
     ('AX_Strassenverkehrsanlage', 'art', '1', 'AX_Art_Strassenverkehrsanlage'),
     ('AX_Strassenverkehrsanlage', 'bezeichnung', '0..*', 'CharacterString'),
     ('AX_Strassenverkehrsanlage', 'name', '0..1', 'CharacterString'),
@@ -2098,13 +2100,13 @@ INSERT INTO openstreetmap_schema.tags (object_type, tag_key, multiplicity, tag_d
     ('AX_EinrichtungenFuerDenSchiffsverkehr', 'bezeichnung', '0..1', 'CharacterString'),
     ('AX_EinrichtungenFuerDenSchiffsverkehr', 'kilometerangabe', '0..1', 'Length'),
     ('AX_EinrichtungenFuerDenSchiffsverkehr', 'name', '0..1', 'CharacterString'),
-    ('AX_EinrichtungenFuerDenSchiffsverkehr', 'zustand', '1', 'AX_Zustand_EinrichtungenFuerDenSchiffsverkehr'),
+    ('AX_EinrichtungenFuerDenSchiffsverkehr', 'zustand', '0..1', 'AX_Zustand_EinrichtungenFuerDenSchiffsverkehr'),
     ('AX_BauwerkImGewaesserbereich', 'bauwerksfunktion', '1', 'AX_Bauwerksfunktion_BauwerkImGewaesserbereich'),
     ('AX_BauwerkImGewaesserbereich', 'name', '0..1', 'CharacterString'),
     ('AX_BauwerkImGewaesserbereich', 'bezeichnung', '0..1', 'CharacterString'),
     ('AX_BauwerkImGewaesserbereich', 'zustand', '0..1', 'AX_Zustand_BauwerkImGewaesserbereich'),
     ('AX_BauwerkImGewaesserbereich', 'regionalsprache', '0..2', 'CharacterString'),
-    ('AX_BauwerkImGewaesserbereich', 'objekthoehe', '0..*', 'AX_RelativeHoehe'),
+    /* ('AX_BauwerkImGewaesserbereich', 'objekthoehe', '0..*', 'AX_RelativeHoehe'), -- wird als Relation (eigener object_type) geführt */
     ('AX_Vegetationsmerkmal', 'bewuchs', '0..1', 'AX_Bewuchs_Vegetationsmerkmal'),
     ('AX_Vegetationsmerkmal', 'name', '0..1', 'CharacterString'),
     ('AX_Vegetationsmerkmal', 'bezeichnung', '0..1', 'CharacterString'),
@@ -2266,7 +2268,16 @@ INSERT INTO openstreetmap_schema.relations (object_type, relation_object_type, m
     ('AX_Benutzer', 'AX_ist', '1'),
     ('AX_Benutzer', 'AX_gehoertZu', '1'),
     ('AX_Strassenachse', 'AX_Strasse', '1..*'),
-    ('AX_Fahrbahnachse', 'AX_Strasse', '1..*')
+    ('AX_Fahrbahnachse', 'AX_Strasse', '1..*'),
+    ('AX_Gebaeude_Kerndaten', 'AX_RelativeHoehe', '0..*'),
+    ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', 'AX_RelativeHoehe', '0..*'),
+    ('AX_VorratsbehaelterSpeicherbauwerk', 'AX_RelativeHoehe', '0..*'),
+    ('AX_SonstigesBauwerkOderSonstigeEinrichtung', 'AX_RelativeHoehe', '0..*'),
+    ('AX_Turm', 'AX_RelativeHoehe', '0..*'),
+    ('AX_BauwerkOderAnlageFuerSportFreizeitUndErholung', 'AX_RelativeHoehe', '0..*'),
+    ('AX_HistorischesBauwerkOderHistorischeEinrichtung', 'AX_RelativeHoehe', '0..*'),
+    ('AX_Schleuse', 'AX_RelativeHoehe', '0..*'),
+    ('AX_BauwerkImVerkehrsbereich', 'AX_RelativeHoehe', '0..*')
 ON CONFLICT (object_type, relation_object_type) DO NOTHING;
 
 INSERT INTO openstreetmap_schema.relation_members (object_type, relation_object_type, type, role, multiplicity) VALUES
@@ -2284,5 +2295,14 @@ INSERT INTO openstreetmap_schema.relation_members (object_type, relation_object_
     ('AX_Dienststelle', 'AX_hat', '*', 'beziehtSichAuf', '1..*'),
     ('AX_Benutzer', 'AX_ist', '*', '', '1'),
     ('AX_Strassenachse', 'AX_Strasse', '*', '', '0..*'),
-    ('AX_Fahrbahnachse', 'AX_Strasse', '*', '', '0..*')
+    ('AX_Fahrbahnachse', 'AX_Strasse', '*', '', '0..*'),
+    ('AX_Gebaeude_Kerndaten', 'AX_RelativeHoehe', '*', '', '1'),
+    ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', 'AX_RelativeHoehe', '*', '', '1'),
+    ('AX_VorratsbehaelterSpeicherbauwerk', 'AX_RelativeHoehe', '*', '', '1'),
+    ('AX_SonstigesBauwerkOderSonstigeEinrichtung', 'AX_RelativeHoehe', '*', '', '1'),
+    ('AX_Turm', 'AX_RelativeHoehe', '*', '', '1'),
+    ('AX_BauwerkOderAnlageFuerSportFreizeitUndErholung', 'AX_RelativeHoehe', '*', '', '1'),
+    ('AX_HistorischesBauwerkOderHistorischeEinrichtung', 'AX_RelativeHoehe', '*', '', '1'),
+    ('AX_Schleuse', 'AX_RelativeHoehe', '*', '', '1'),
+    ('AX_BauwerkImVerkehrsbereich', 'AX_RelativeHoehe', '*', '', '1')
 ON CONFLICT (object_type, relation_object_type, role) DO NOTHING;
