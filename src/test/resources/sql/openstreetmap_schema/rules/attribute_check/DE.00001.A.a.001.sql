@@ -5,10 +5,10 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
     '{
         "checks": {
             "all": [
-                { "type": "regex_match", "tag_key": "lebenszeitintervall:beginnt", "pattern": "^20[0-9]{2}-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-5][0-9]Z" },
+                { "type": "tag_regex_match", "tag_key": "lebenszeitintervall:beginnt", "pattern": "^20[0-9]{2}-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-5][0-9]Z" },
                 { "any": [
 					{ "not": { "type": "tag_exists", "tag_key": "lebenszeitintervall:endet" } },
-					{ "type": "regex_match", "tag_key": "lebenszeitintervall:endet", "pattern": "^20[0-9]{2}-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-5][0-9]Z" }
+					{ "type": "tag_regex_match", "tag_key": "lebenszeitintervall:endet", "pattern": "^20[0-9]{2}-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-5][0-9]Z" }
 				]}
             ]
         }

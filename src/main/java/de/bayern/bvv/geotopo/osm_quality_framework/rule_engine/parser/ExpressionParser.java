@@ -38,7 +38,7 @@ public final class ExpressionParser {
             return taggedObject -> !expression.evaluate(taggedObject);
         }
 
-        // Parse leafs, e.g. "tag_exists", "regex_match", ...
+        // Parse leafs, e.g. "tag_exists", "tag_regex_match", ...
         return this.registry.fromLeaf(node);
     }
 

@@ -12,11 +12,11 @@ import java.util.regex.PatternSyntaxException;
  * Evaluates whether a tag value matches a regular expression.
  */
 @Component
-public class RegexMatchExpressionFactory implements ExpressionFactory {
+public class TagRegexMatchExpressionFactory implements ExpressionFactory {
 
     @Override
     public String type() {
-        return "regex_match";
+        return "tag_regex_match";
     }
 
     @Override
