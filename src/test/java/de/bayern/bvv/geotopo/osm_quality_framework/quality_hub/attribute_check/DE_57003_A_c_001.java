@@ -22,13 +22,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * AdV-Beschreibung:
- * Die Attributart 'Objekthöhe' kann nur im Zusammenhang mit der Attributart 'Bauwerksfunktion'
- * und den Wertearten 1220, 1250, 1251, 1260, 1270, 1280, 1290 und 1350 vorkommen.
+ * Eine Gewässerstationierungsachse mit AGA 2000, die (vollständig)
+ * in einem oder mehreren Fließgewässern mit FKT 8300 liegt, hat FLR 'FALSE'.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(JacksonConfiguration.class)
-class DE_51002_A_b_001 extends DatabaseIntegrationTest {
+class DE_57003_A_c_001 extends DatabaseIntegrationTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -37,28 +37,28 @@ class DE_51002_A_b_001 extends DatabaseIntegrationTest {
     ObjectMapper objectMapper;
 
     @Test
-    void createWindradMitObjekthoehe() throws Exception {
+    void createGewaesserstationierungsAchseMitArt() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
-                    <tag k='bauwerksfunktion' v='1220' />
+                  <node id='-25365' changeset='-1' lat='49.88318223722' lon='12.34785675027' />
+                  <node id='-25364' changeset='-1' lat='49.88324430282' lon='12.34855027693' />
+                  <way id='-665' changeset='-1'>
+                    <nd ref='-25364' />
+                    <nd ref='-25365' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_BauwerkOderAnlageFuerIndustrieUndGewerbe' />
-                  </node>
-                  <relation id='-63' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
+                    <tag k='object_type' v='AX_Gewaesserstationierungsachse' />
+                    <tag k='artDerGewaesserstationierungsachse' v='1000' />
+                    <tag k='fliessrichtung' v='true' />
+                  </way>
+                  <relation id='-62' changeset='-1'>
+                    <member type='way' ref='-665' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
-                  </relation>
-                  <relation id='-64' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
-                    <tag k='object_type' v='AX_RelativeHoehe' />
-                    <tag k='hoehe' v='50' />
                   </relation>
                 </create>
                 </osmChange>
@@ -81,28 +81,27 @@ class DE_51002_A_b_001 extends DatabaseIntegrationTest {
     }
 
     @Test
-    void createKlaerbeckenMitObjekthoehe() throws Exception {
+    void createGewaesserstationierungsAchseOhneArt() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
-                    <tag k='bauwerksfunktion' v='1210' />
+                  <node id='-25365' changeset='-1' lat='49.88318223722' lon='12.34785675027' />
+                  <node id='-25364' changeset='-1' lat='49.88324430282' lon='12.34855027693' />
+                  <way id='-665' changeset='-1'>
+                    <nd ref='-25364' />
+                    <nd ref='-25365' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_BauwerkOderAnlageFuerIndustrieUndGewerbe' />
-                  </node>
-                  <relation id='-63' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
+                    <tag k='object_type' v='AX_Gewaesserstationierungsachse' />
+                    <tag k='fliessrichtung' v='true' />
+                  </way>
+                  <relation id='-62' changeset='-1'>
+                    <member type='way' ref='-665' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
-                  </relation>
-                  <relation id='-64' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
-                    <tag k='object_type' v='AX_RelativeHoehe' />
-                    <tag k='hoehe' v='50' />
                   </relation>
                 </create>
                 </osmChange>
@@ -137,6 +136,6 @@ class DE_51002_A_b_001 extends DatabaseIntegrationTest {
         assertThat(attributeCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'attribut-check'")
-                .contains("Die Relation 'AX_RelativeHoehe' darf nur bei der 'bauwerksfunktion' 1220, 1250, 1251, 1260, 1270, 1280, 1290 und 1350 vorkommen.");
+                .contains("Das Tag 'artDerGewaesserstationierungsachse' ist nicht vorhanden.");
     }
 }

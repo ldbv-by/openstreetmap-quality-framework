@@ -119,7 +119,8 @@ INSERT INTO openstreetmap_schema.object_types_inheritance (object_type, extends_
     ('AU_Punktobjekt', 'AU_ObjektMitUnabhaengigerGeometrie'),
     ('AU_Objekt', 'AU_ObjektMitUnabhaengigerGeometrie'),
     ('AU_ObjektMitUnabhaengigerGeometrie_3D', 'AA_REO'),
-    ('AU_MehrfachFlaechenObjekt_3D', 'AA_REO')
+    ('AU_MehrfachFlaechenObjekt_3D', 'AA_REO'),
+    ('AU_Flaechenobjekt', 'AU_ObjektMitUnabhaengigerGeometrie')
     /* ('AU_GeometrieObjekt_3D', 'AU_ObjektMitUnabhaengigerGeometrie_3D'), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AU_KoerperObjekt_3D', 'AU_ObjektMitUnabhaengigerGeometrie_3D'), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AU_MehrfachLinienObjekt_3D', 'AU_ObjektMitUnabhaengigerGeometrie_3D'), -- wird nicht in ATKIS Basis-DLM benötigt */

@@ -22,13 +22,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * AdV-Beschreibung:
- * Die Attributart 'Objekthöhe' kann nur im Zusammenhang mit der Attributart 'Bauwerksfunktion'
- * und den Wertearten 1220, 1250, 1251, 1260, 1270, 1280, 1290 und 1350 vorkommen.
+ * Die Attributart 'Bewuchs' ist immer zu belegen,
+ * wenn die Attributart 'Zustand' mit Wert 5000 nicht belegt ist.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(JacksonConfiguration.class)
-class DE_51002_A_b_001 extends DatabaseIntegrationTest {
+class DE_54001_A_b_001_002 extends DatabaseIntegrationTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -37,28 +37,23 @@ class DE_51002_A_b_001 extends DatabaseIntegrationTest {
     ObjectMapper objectMapper;
 
     @Test
-    void createWindradMitObjekthoehe() throws Exception {
+    void createNadelbaumOhneZustand() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
-                    <tag k='bauwerksfunktion' v='1220' />
+                    <tag k='bewuchs' v='1011' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_BauwerkOderAnlageFuerIndustrieUndGewerbe' />
+                    <tag k='object_type' v='AX_Vegetationsmerkmal' />
                   </node>
                   <relation id='-63' changeset='-1'>
                     <member type='node' ref='-25402' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
-                  </relation>
-                  <relation id='-64' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
-                    <tag k='object_type' v='AX_RelativeHoehe' />
-                    <tag k='hoehe' v='50' />
                   </relation>
                 </create>
                 </osmChange>
@@ -81,28 +76,63 @@ class DE_51002_A_b_001 extends DatabaseIntegrationTest {
     }
 
     @Test
-    void createKlaerbeckenMitObjekthoehe() throws Exception {
+    void createNadelbaumMitZustandNass() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
-                    <tag k='bauwerksfunktion' v='1210' />
+                    <tag k='bewuchs' v='1011' />
+                    <tag k='zustand' v='5000' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_BauwerkOderAnlageFuerIndustrieUndGewerbe' />
+                    <tag k='object_type' v='AX_Vegetationsmerkmal' />
                   </node>
                   <relation id='-63' changeset='-1'>
                     <member type='node' ref='-25402' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
-                  <relation id='-64' changeset='-1'>
+                </create>
+                </osmChange>
+                """;
+
+        // Act
+        MvcResult mvcResult = this.mockMvc.perform(
+                        post("/osm-quality-framework/v1/quality-hub/check/changeset/{id}", CHANGESET_ID)
+                                .contentType(MediaType.APPLICATION_XML)
+                                .content(CHANGESET_XML))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        QualityHubResultDto qualityHubResultDto = this.objectMapper.readValue(mvcResult.getResponse().getContentAsByteArray(), QualityHubResultDto.class);
+
+        // Assert
+        assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
+        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result to be valid, but it was invalid.").isTrue();
+    }
+
+    @Test
+    void createNeuanpflanzungsflaecheOhneBewuchs() throws Exception {
+        // Arrange
+        final Long CHANGESET_ID = 1L;
+        final String CHANGESET_XML = """
+                <osmChange version="0.6" generator="JOSM">
+                <create>
+                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
+                    <tag k='zustand' v='6100' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_Vegetationsmerkmal' />
+                  </node>
+                  <relation id='-63' changeset='-1'>
                     <member type='node' ref='-25402' role='' />
-                    <tag k='object_type' v='AX_RelativeHoehe' />
-                    <tag k='hoehe' v='50' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
                   </relation>
                 </create>
                 </osmChange>
@@ -137,6 +167,60 @@ class DE_51002_A_b_001 extends DatabaseIntegrationTest {
         assertThat(attributeCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'attribut-check'")
-                .contains("Die Relation 'AX_RelativeHoehe' darf nur bei der 'bauwerksfunktion' 1220, 1250, 1251, 1260, 1270, 1280, 1290 und 1350 vorkommen.");
+                .contains("Das Tag 'bewuchs' ist immer zu belegen, wenn der 'zustand' nicht mit 5000 belegt ist.");
+    }
+
+    @Test
+    void createVegetationsmerkmalOhneBewuchsUndZustand() throws Exception {
+        // Arrange
+        final Long CHANGESET_ID = 1L;
+        final String CHANGESET_XML = """
+                <osmChange version="0.6" generator="JOSM">
+                <create>
+                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
+                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_Vegetationsmerkmal' />
+                  </node>
+                  <relation id='-63' changeset='-1'>
+                    <member type='node' ref='-25402' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
+                </create>
+                </osmChange>
+                """;
+
+        // Act
+        MvcResult mvcResult = this.mockMvc.perform(
+                        post("/osm-quality-framework/v1/quality-hub/check/changeset/{id}", CHANGESET_ID)
+                                .contentType(MediaType.APPLICATION_XML)
+                                .content(CHANGESET_XML))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        QualityHubResultDto qualityHubResultDto = this.objectMapper.readValue(mvcResult.getResponse().getContentAsByteArray(), QualityHubResultDto.class);
+
+        // Assert
+        assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
+        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        QualityServiceResultDto attributeCheck = qualityHubResultDto.qualityServiceResults().stream()
+                .filter(s -> "attribute-check".equals(s.qualityServiceId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("QualityService 'attribute-check' not found"));
+
+        assertThat(attributeCheck.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        assertThat(attributeCheck.errors())
+                .as("Errors of 'attribute-check' must not be empty")
+                .isNotEmpty();
+
+        assertThat(attributeCheck.errors())
+                .extracting(QualityServiceErrorDto::errorText)
+                .as("Error text of 'attribut-check'")
+                .contains("Das Tag 'bewuchs' ist immer zu belegen, wenn der 'zustand' nicht mit 5000 belegt ist.");
     }
 }

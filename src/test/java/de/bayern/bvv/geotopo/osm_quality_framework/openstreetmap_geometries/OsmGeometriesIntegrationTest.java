@@ -46,7 +46,7 @@ class OsmGeometriesIntegrationTest extends DatabaseIntegrationTest {
         FeatureDto featureDto = dataSetDto.areas().getFirst();
         assertThat(featureDto.osmId()).isEqualTo(10727L);
         assertThat(featureDto.objectType()).isEqualTo("AX_SportFreizeitUndErholungsflaeche");
-        assertThat(featureDto.tags().size()).isEqualTo(2);
+        assertThat(featureDto.tags().size()).isEqualTo(3);
         assertThat(featureDto.relations().size()).isEqualTo(0);
     }
 

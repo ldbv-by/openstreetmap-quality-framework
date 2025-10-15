@@ -22,13 +22,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * AdV-Beschreibung:
- * Die Attributart 'Objekthöhe' kann nur im Zusammenhang mit der Attributart 'Bauwerksfunktion'
- * und den Wertearten 1220, 1250, 1251, 1260, 1270, 1280, 1290 und 1350 vorkommen.
+ * Die Attributart 'Kilometerangabe' kann nur in Verbindung mit der
+ * Attributart 'Art' und der Werteart 1430 vorkommen.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(JacksonConfiguration.class)
-class DE_51002_A_b_001 extends DatabaseIntegrationTest {
+class DE_53008_A_b_001 extends DatabaseIntegrationTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -37,28 +37,24 @@ class DE_51002_A_b_001 extends DatabaseIntegrationTest {
     ObjectMapper objectMapper;
 
     @Test
-    void createWindradMitObjekthoehe() throws Exception {
+    void createKilometersteinMitKilometerangabe() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
-                    <tag k='bauwerksfunktion' v='1220' />
+                    <tag k='art' v='1430' />
+                    <tag k='kilometerangabe' v='10' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_BauwerkOderAnlageFuerIndustrieUndGewerbe' />
+                    <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
                   </node>
                   <relation id='-63' changeset='-1'>
                     <member type='node' ref='-25402' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
-                  </relation>
-                  <relation id='-64' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
-                    <tag k='object_type' v='AX_RelativeHoehe' />
-                    <tag k='hoehe' v='50' />
                   </relation>
                 </create>
                 </osmChange>
@@ -81,28 +77,24 @@ class DE_51002_A_b_001 extends DatabaseIntegrationTest {
     }
 
     @Test
-    void createKlaerbeckenMitObjekthoehe() throws Exception {
+    void createAnlegerMitKilometerangabe() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
-                    <tag k='bauwerksfunktion' v='1210' />
+                    <tag k='art' v='1460' />
+                    <tag k='kilometerangabe' v='10' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_BauwerkOderAnlageFuerIndustrieUndGewerbe' />
+                    <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
                   </node>
                   <relation id='-63' changeset='-1'>
                     <member type='node' ref='-25402' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
-                  </relation>
-                  <relation id='-64' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
-                    <tag k='object_type' v='AX_RelativeHoehe' />
-                    <tag k='hoehe' v='50' />
                   </relation>
                 </create>
                 </osmChange>
@@ -137,6 +129,6 @@ class DE_51002_A_b_001 extends DatabaseIntegrationTest {
         assertThat(attributeCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'attribut-check'")
-                .contains("Die Relation 'AX_RelativeHoehe' darf nur bei der 'bauwerksfunktion' 1220, 1250, 1251, 1260, 1270, 1280, 1290 und 1350 vorkommen.");
+                .contains("Das Tag 'kilometerangabe' darf nur bei der 'art' 1430 vorkommen.");
     }
 }

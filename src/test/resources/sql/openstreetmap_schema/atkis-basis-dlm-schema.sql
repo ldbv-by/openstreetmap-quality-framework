@@ -2130,7 +2130,7 @@ INSERT INTO openstreetmap_schema.tags (object_type, tag_key, multiplicity, tag_d
     ('AX_Wasserspiegelhoehe', 'hoeheDesWasserspiegels', '1', 'Length'),
     ('AX_SchifffahrtslinieFaehrverkehr', 'art', '1..*', 'AX_Art_SchifffahrtslinieFaehrverkehr'),
     ('AX_SchifffahrtslinieFaehrverkehr', 'name', '0..1', 'CharacterString'),
-    ('AX_Gewaesserstationierungsachse', 'artDerGewaesserstationierungsachse', '0..1', 'AX_ArtDerGewaesserstationierungsachse'),
+    ('AX_Gewaesserstationierungsachse', 'artDerGewaesserstationierungsachse', '1', 'AX_ArtDerGewaesserstationierungsachse'),
     ('AX_Gewaesserstationierungsachse', 'name', '0..1', 'CharacterString'),
     ('AX_Gewaesserstationierungsachse', 'gewaesserkennzahl', '0..1', 'CharacterString'),
     ('AX_Gewaesserstationierungsachse', 'zweitname', '0..*', 'CharacterString'),
