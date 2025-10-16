@@ -56,7 +56,7 @@ class DE_41002_A_b_005_006 extends DatabaseIntegrationTest {
                     <tag k='funktion' v='1740' />
                     <tag k='lagergut' v='4000' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_IndustrieUndGewerbeflaeche' />
                   </way>
@@ -105,7 +105,7 @@ class DE_41002_A_b_005_006 extends DatabaseIntegrationTest {
                     <tag k='funktion' v='1460' />
                     <tag k='lagergut' v='4000' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_IndustrieUndGewerbeflaeche' />
                   </way>

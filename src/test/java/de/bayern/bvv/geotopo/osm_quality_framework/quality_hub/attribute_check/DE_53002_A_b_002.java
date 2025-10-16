@@ -47,7 +47,7 @@ class DE_53002_A_b_002 extends DatabaseIntegrationTest {
                     <tag k='art' v='4000' />
                     <tag k='strassenschluessel' v='1234' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Strassenverkehrsanlage' />
                   </node>
@@ -87,7 +87,7 @@ class DE_53002_A_b_002 extends DatabaseIntegrationTest {
                     <tag k='art' v='2000' />
                     <tag k='strassenschluessel' v='1234' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Strassenverkehrsanlage' />
                   </node>

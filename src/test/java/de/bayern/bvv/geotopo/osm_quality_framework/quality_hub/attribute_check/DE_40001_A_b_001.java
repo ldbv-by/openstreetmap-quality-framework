@@ -56,7 +56,7 @@ class DE_40001_A_b_001 extends DatabaseIntegrationTest {
                     <tag k='funktion' v='1200' />
                     <tag k='istWeitereNutzung' v='1000' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Wohnbauflaeche' />
                   </way>
@@ -104,7 +104,7 @@ class DE_40001_A_b_001 extends DatabaseIntegrationTest {
                     <nd ref='-25358' />
                     <tag k='funktion' v='1200' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Wohnbauflaeche' />
                   </way>

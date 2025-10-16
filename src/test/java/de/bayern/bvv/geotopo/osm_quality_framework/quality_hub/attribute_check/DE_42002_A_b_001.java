@@ -49,7 +49,7 @@ class DE_42002_A_b_001 extends DatabaseIntegrationTest {
                     <nd ref='-25363' />
                     <nd ref='-25364' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Strassenachse' />
                   </way>
@@ -106,7 +106,7 @@ class DE_42002_A_b_001 extends DatabaseIntegrationTest {
                     <nd ref='-25363' />
                     <nd ref='-25364' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Strassenachse' />
                   </way>
@@ -121,7 +121,7 @@ class DE_42002_A_b_001 extends DatabaseIntegrationTest {
                     <tag k='object_type' v='AX_Strasse' />
                     <tag k='widmung' v='1303' />
                     <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM11111111_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                   </relation>
                   <relation id='-82' changeset='-1'>

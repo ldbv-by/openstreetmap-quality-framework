@@ -45,7 +45,7 @@ class DE_00001_A_a_004 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='bauwerksfunktion' v='1003' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Turm' />
                   </node>
@@ -84,7 +84,7 @@ class DE_00001_A_a_004 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='bauwerksfunktion' v='1003' />
                     <tag k='identifikator:UUID' v='DEBYBDLMJW0003s9' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLMJW0003s920251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-15T12:53:00Z' />
                     <tag k='object_type' v='AX_Turm' />
                   </node>
@@ -126,6 +126,6 @@ class DE_00001_A_a_004 extends DatabaseIntegrationTest {
         assertThat(attributeCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'attribut-check'")
-                .contains("Das Tag 'identifikator:UUID' muss global eindeutig sein.");
+                .contains("Es existiert bereits ein Objekt mit dem Tag 'identifikator:UUID'.");
     }
 }

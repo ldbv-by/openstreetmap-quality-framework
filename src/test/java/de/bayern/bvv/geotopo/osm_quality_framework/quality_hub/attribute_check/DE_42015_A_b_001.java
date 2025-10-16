@@ -54,7 +54,7 @@ class DE_42015_A_b_001 extends DatabaseIntegrationTest {
                     <nd ref='-25361' />
                     <nd ref='-25358' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Flugverkehr' />
                     <tag k='art' v='5511' />
@@ -103,7 +103,7 @@ class DE_42015_A_b_001 extends DatabaseIntegrationTest {
                     <nd ref='-25361' />
                     <nd ref='-25358' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Flugverkehr' />
                     <tag k='funktion' v='1200' />
@@ -152,7 +152,7 @@ class DE_42015_A_b_001 extends DatabaseIntegrationTest {
                     <nd ref='-25361' />
                     <nd ref='-25358' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Flugverkehr' />
                     <tag k='nutzung' v='1000' />

@@ -22,13 +22,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * AdV-Beschreibung:
- * Wenn ein Objekt 44004 'Gewässerachse' die Werteart 8300 bei der Attributart 'Funktion' führt,
- * darf die Attributart 'Hydrologisches Merkmal' nicht belegt sein.
+ * Der Objektidentifikator in @gml:id ist gemäß GeoInfoDok-Vorgaben aufgebaut.
+ * Betrachtet werden nur die ersten 16 Stellen, ein ggf. vorhandener Zeitstempel wird ignoriert.
+ * Erwartet wird ein Objektidentifikator, der entweder einem Bundesland bzw. dem BKG zugeordnet ist oder ein temporärer Objektidentifikator.
+ * @gml:id genügt folgendem regulären Ausdruck: (^DE(BW|BU|BY|...|TH)[A-Za-z0-9]{12})|(^DEBKG[A-Za-z0-9]{11})|(^DE_[A-Za-z0-9]{13}$)
  */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(JacksonConfiguration.class)
-class DE_44004_A_a_001 extends DatabaseIntegrationTest {
+class DE_00001_A_a_003_009 extends DatabaseIntegrationTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -37,32 +39,21 @@ class DE_44004_A_a_001 extends DatabaseIntegrationTest {
     ObjectMapper objectMapper;
 
     @Test
-    void createKanalOhneHydrologischesMerkmal() throws Exception {
+    void createAxTurmWithValidIdentifikator() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
-                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
-                  <node id='-25359' changeset='-1' lat='49.88413518675' lon='12.32447493031' />
-                  <node id='-25358' changeset='-1' lat='49.8841101097' lon='12.31855920723' />
-                  <way id='-663' changeset='-1'>
-                    <nd ref='-25358' />
-                    <nd ref='-25359' />
-                    <nd ref='-25360' />
-                    <nd ref='-25361' />
-                    <nd ref='-25358' />
+                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
+                    <tag k='bauwerksfunktion' v='1003' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_Gewaesserachse' />
-                    <tag k='funktion' v='8300' />
-                    <tag k='breiteDesGewaessers' v='10' />
-                    <tag k='fliessrichtung' v='TRUE' />
-                  </way>
-                  <relation id='-70' changeset='-1'>
-                    <member type='way' ref='-663' role='' />
+                    <tag k='object_type' v='AX_Turm' />
+                  </node>
+                  <relation id='-63' changeset='-1'>
+                    <member type='node' ref='-25402' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -87,33 +78,22 @@ class DE_44004_A_a_001 extends DatabaseIntegrationTest {
     }
 
     @Test
-    void createKanalMitHydrologischesMerkmal() throws Exception {
+    void createAxTurmWithInvalidFormatIdentifikator() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
-                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
-                  <node id='-25359' changeset='-1' lat='49.88413518675' lon='12.32447493031' />
-                  <node id='-25358' changeset='-1' lat='49.8841101097' lon='12.31855920723' />
-                  <way id='-663' changeset='-1'>
-                    <nd ref='-25358' />
-                    <nd ref='-25359' />
-                    <nd ref='-25360' />
-                    <nd ref='-25361' />
-                    <nd ref='-25358' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
+                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
+                    <tag k='bauwerksfunktion' v='1003' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM1234' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
-                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_Gewaesserachse' />
-                    <tag k='funktion' v='8300' />
-                    <tag k='hydrologischesMerkmal' v='2000' />
-                    <tag k='breiteDesGewaessers' v='10' />
-                    <tag k='fliessrichtung' v='TRUE' />
-                  </way>
-                  <relation id='-70' changeset='-1'>
-                    <member type='way' ref='-663' role='' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-15T12:53:00Z' />
+                    <tag k='lebenszeitintervall:endet' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_Turm' />
+                  </node>
+                  <relation id='-63' changeset='-1'>
+                    <member type='node' ref='-25402' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -150,6 +130,6 @@ class DE_44004_A_a_001 extends DatabaseIntegrationTest {
         assertThat(attributeCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'attribut-check'")
-                .contains("Das Tag 'hydrologischesMerkmal' darf nicht bei der 'funktion' 8300 vorkommen.");
+                .contains("Das Tag 'identifikator:UUID' muss dem regulären Ausdruck (^DE(BW|BU|BY|ST|SL|SH|NI|BE|BB|NW|RP|HE|MV|SN|HH|HB|TH)[A-Za-z0-9]{12})|(^DEBKG[A-Za-z0-9]{11})|(^DE_[A-Za-z0-9]{13}$) entsprechen.");
     }
 }

@@ -1,20 +1,25 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.factory;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSetFilter;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.FeatureFilter;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.TaggedObject;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.ExpressionFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Evaluates whether a tag value equals to a fixed value.
  */
 @Component
-public class TagEqualsExpressionFactory implements ExpressionFactory {
+public class TagStartsWithExpressionFactory implements ExpressionFactory {
 
     @Override
     public String type() {
-        return "tag_equals";
+        return "tag_starts_with";
     }
 
     @Override
@@ -23,18 +28,18 @@ public class TagEqualsExpressionFactory implements ExpressionFactory {
         String value = json.path("value").asText();
 
         if (tagKey == null || tagKey.isBlank()) {
-            throw new IllegalArgumentException("tag_exists: 'tag_key' is required");
+            throw new IllegalArgumentException("tag_starts_with: 'tag_key' is required");
         }
 
         if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException("tag_exists: 'value' is required");
+            throw new IllegalArgumentException("tag_starts_with: 'value' is required");
         }
 
         return taggedObject -> {
             String tagValue = taggedObject.getTags().get(tagKey);
             if (tagValue == null) return false;
 
-            return tagValue.equals(this.resolveCurrentPlaceholder(taggedObject, value));
+            return tagValue.startsWith(this.resolveCurrentPlaceholder(taggedObject, value));
         };
     }
 

@@ -50,7 +50,7 @@ class DE_57003_A_c_001 extends DatabaseIntegrationTest {
                     <tag k='artDerGewaesserstationierungsachse' v='2000' />
                     <tag k='fliessrichtung' v='TRUE' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Gewaesserstationierungsachse' />
                   </way>
@@ -93,7 +93,7 @@ class DE_57003_A_c_001 extends DatabaseIntegrationTest {
                     <tag k='artDerGewaesserstationierungsachse' v='2000' />
                     <tag k='fliessrichtung' v='FALSE' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Gewaesserstationierungsachse' />
                   </way>

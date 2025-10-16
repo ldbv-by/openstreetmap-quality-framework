@@ -1,5 +1,5 @@
 INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error_text) VALUES (
-    'DE.00001.A.a.003',
+    'DE.00001.A.a.003_009',
     'attribute-check',
     'AA_Objekt',
     '{

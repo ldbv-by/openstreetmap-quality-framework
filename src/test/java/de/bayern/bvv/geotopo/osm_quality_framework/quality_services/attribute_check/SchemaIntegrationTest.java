@@ -1,4 +1,4 @@
-package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.attribute_check.schema;
+package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.attribute_check;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.attribute_check.service.AttributeCheckService;
@@ -28,7 +28,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
         tags.put("zeigtAufExternes:fachdatenobjekt:uri", "Test-URI");
         tags.put("quellobjektID", "DEBYBDLMCI0001qd");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
-        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd_2021-03-12T11:48:42Z");
+        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd20210312T114842Z");
         tags.put("lebenszeitintervall:beginnt", "2021-03-12T11:48:42Z");
         tags.put("anlass", "000000");
         tags.put("datumDerLetztenUeberpruefung", "12.03.2021");
@@ -88,7 +88,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
         Map<String, String> tags = new HashMap<>();
         tags.put("object_type", "AX_Wohnbauflaeche");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
-        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd_2021-03-12T11:48:42Z");
+        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd20210312T114842Z");
         tags.put("lebenszeitintervall:beginnt", "2021-03-12T11:48:42Z");
 
         RelationDto modellart = new RelationDto(
@@ -139,7 +139,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
         Map<String, String> tags = new HashMap<>();
         tags.put("object_type", "AX_Wohnbauflaeche");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
-        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd_2021-03-12T11:48:42Z");
+        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd20210312T114842Z");
         tags.put("lebenszeitintervall:beginnt", "2021-03-12T11:48:42Z");
         tags.put("unknown", "12345");
 
@@ -200,7 +200,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
         Map<String, String> tags = new HashMap<>();
         tags.put("object_type", "AX_Wohnbauflaeche");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
-        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd_2021-03-12T11:48:42Z");
+        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd20210312T114842Z");
         tags.put("lebenszeitintervall:beginnt", "2021-03-12T11:48:42Z");
         tags.put("artDerBebauung", "12345");
 
@@ -261,7 +261,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
         Map<String, String> tags = new HashMap<>();
         tags.put("object_type", "AX_Wohnbauflaeche");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
-        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd_2021-03-12T11:48:42Z");
+        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd20210312T114842Z");
 
         RelationDto modellart = new RelationDto(
                 2L,
@@ -327,7 +327,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
         Map<String, String> tags = new HashMap<>();
         tags.put("object_type", "AX_Wohnbauflaeche");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
-        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd_2021-03-12T11:48:42Z");
+        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd20210312T114842Z");
         tags.put("lebenszeitintervall:endet", "2021-03-12T11:48:42Z");
 
         RelationDto modellart = new RelationDto(
@@ -388,7 +388,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
         Map<String, String> tags = new HashMap<>();
         tags.put("object_type", "AX_Wohnbauflaeche");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
-        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd_2021-03-12T11:48:42Z");
+        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd20210312T114842Z");
         tags.put("lebenszeitintervall", "2021-03-12T11:48:42Z");
 
         RelationDto modellart = new RelationDto(
@@ -455,7 +455,7 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
         Map<String, String> tags = new HashMap<>();
         tags.put("object_type", "AX_Wohnbauflaeche");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
-        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd_2021-03-12T11:48:42Z");
+        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd20210312T114842Z");
 
         // WICHTIG: unbekannter ObjectType
         FeatureDto feature = new FeatureDto(

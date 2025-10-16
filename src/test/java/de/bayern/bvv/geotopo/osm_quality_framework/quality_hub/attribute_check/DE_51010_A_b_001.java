@@ -47,7 +47,7 @@ class DE_51010_A_b_001 extends DatabaseIntegrationTest {
                     <tag k='art' v='1410' />
                     <tag k='kilometerangabe' v='5' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_EinrichtungInOeffentlichenBereichen' />
                   </node>
@@ -86,7 +86,7 @@ class DE_51010_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='art' v='1410' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_EinrichtungInOeffentlichenBereichen' />
                   </node>

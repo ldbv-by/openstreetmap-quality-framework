@@ -10,5 +10,5 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
             }
         }
     }',
-    'Das Tag ''identifikator:UUID'' muss global eindeutig sein.')
+    'Es existiert bereits ein Objekt mit dem Tag ''identifikator:UUID''.')
 ON CONFLICT (id) DO NOTHING;

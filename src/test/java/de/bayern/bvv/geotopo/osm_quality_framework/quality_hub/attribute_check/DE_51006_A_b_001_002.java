@@ -59,7 +59,7 @@ class DE_51006_A_b_001_002 extends DatabaseIntegrationTest {
                     <nd ref='-25362' />
                     <tag k='bauwerksfunktion' v='1410' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_BauwerkOderAnlageFuerSportFreizeitUndErholung' />
                     <tag k='sportart' v='1010;1011' />
@@ -108,7 +108,7 @@ class DE_51006_A_b_001_002 extends DatabaseIntegrationTest {
                     <nd ref='-25362' />
                     <tag k='bauwerksfunktion' v='1431' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_BauwerkOderAnlageFuerSportFreizeitUndErholung' />
                     <tag k='sportart' v='1010;1011' />

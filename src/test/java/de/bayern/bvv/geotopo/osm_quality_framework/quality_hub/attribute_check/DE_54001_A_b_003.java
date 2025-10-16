@@ -49,7 +49,7 @@ class DE_54001_A_b_003 extends DatabaseIntegrationTest {
                     <nd ref='-25364' />
                     <nd ref='-25365' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Vegetationsmerkmal' />
                     <tag k='bewuchs' v='1300' />
@@ -98,7 +98,7 @@ class DE_54001_A_b_003 extends DatabaseIntegrationTest {
                     <nd ref='-25365' />
                     <nd ref='-25362' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Vegetationsmerkmal' />
                     <tag k='bewuchs' v='1300' />
@@ -164,7 +164,7 @@ class DE_54001_A_b_003 extends DatabaseIntegrationTest {
                     <nd ref='-25365' />
                     <nd ref='-25362' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Vegetationsmerkmal' />
                     <tag k='bewuchs' v='1250' />

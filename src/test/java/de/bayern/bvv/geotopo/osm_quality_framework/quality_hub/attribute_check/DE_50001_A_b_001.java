@@ -41,7 +41,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='bauwerksfunktion' v='1480' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_BauwerkOderAnlageFuerSportFreizeitUndErholung' />
                   </node>
@@ -80,7 +80,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='bauwerksfunktion' v='1480' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_BauwerkOderAnlageFuerSportFreizeitUndErholung' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -120,7 +120,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='bauwerksfunktion' v='1410' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_BauwerkOderAnlageFuerSportFreizeitUndErholung' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -177,7 +177,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                     <tag k='bauwerksfunktion' v='1410' />
                     <tag k='sportart' v='1010' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_BauwerkOderAnlageFuerSportFreizeitUndErholung' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -218,7 +218,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                     <tag k='bauwerksfunktion' v='1700' />
                     <tag k='funktion' v='2000' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_SonstigesBauwerkOderSonstigeEinrichtung' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -258,7 +258,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='bauwerksfunktion' v='1700' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_SonstigesBauwerkOderSonstigeEinrichtung' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -314,7 +314,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='hafenkategorie' v='1010' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Hafen' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -354,7 +354,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='nutzung' v='1000' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Hafen' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -393,7 +393,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                 <create>
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Hafen' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -448,7 +448,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                 <create>
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Schleuse' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -488,7 +488,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='art' v='1110' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_WegPfadSteig' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -528,7 +528,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='art' v='1111' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_WegPfadSteig' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -584,7 +584,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='bahnhofskategorie' v='1010' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Bahnverkehrsanlage' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -624,7 +624,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='art' v='1320' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Flugverkehrsanlage' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -664,7 +664,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='art' v='5530' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Flugverkehrsanlage' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -720,7 +720,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='art' v='1460' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -760,7 +760,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='art' v='1420' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -816,7 +816,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='bauwerksfunktion' v='2020' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_BauwerkImGewaesserbereich' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -856,7 +856,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='bauwerksfunktion' v='2010' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_BauwerkImGewaesserbereich' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -912,7 +912,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='bewuchs' v='1300' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Vegetationsmerkmal' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -952,7 +952,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='bewuchs' v='1011' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Vegetationsmerkmal' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
@@ -1007,7 +1007,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                 <create>
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Polder' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
