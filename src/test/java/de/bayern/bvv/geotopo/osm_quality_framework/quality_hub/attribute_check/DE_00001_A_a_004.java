@@ -22,15 +22,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * AdV-Beschreibung:
- * Der Objektidentifikator in @gml:id ist gemäß GeoInfoDok-Vorgaben aufgebaut.
- * Betrachtet werden nur die ersten 16 Stellen, ein ggf. vorhandener Zeitstempel wird ignoriert.
- * Erwartet wird ein Objektidentifikator, der entweder einem Bundesland bzw. dem BKG zugeordnet ist oder ein temporärer Objektidentifikator.
- * @gml:id genügt folgendem regulären Ausdruck: (^DE(BW|BU|BY|...|TH)[A-Za-z0-9]{12})|(^DEBKG[A-Za-z0-9]{11})|(^DE_[A-Za-z0-9]{13}$)
+ * Der Objektidentifikator ist zu jedem Zeitpunkt eindeutig.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(JacksonConfiguration.class)
-class DE_00001_A_a_003 extends DatabaseIntegrationTest {
+class DE_00001_A_a_004 extends DatabaseIntegrationTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -39,7 +36,7 @@ class DE_00001_A_a_003 extends DatabaseIntegrationTest {
     ObjectMapper objectMapper;
 
     @Test
-    void createAxTurmWithValidIdentifikator() throws Exception {
+    void createAxTurmWithNewIdentifikator() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
@@ -50,7 +47,6 @@ class DE_00001_A_a_003 extends DatabaseIntegrationTest {
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='lebenszeitintervall:endet' v='2025-10-15T12:53:00Z' />
                     <tag k='object_type' v='AX_Turm' />
                   </node>
                   <relation id='-63' changeset='-1'>
@@ -79,7 +75,7 @@ class DE_00001_A_a_003 extends DatabaseIntegrationTest {
     }
 
     @Test
-    void createAxTurmWithInvalidFormatIdentifikator() throws Exception {
+    void createAxTurmWithExistingIdentifikator() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
@@ -87,10 +83,9 @@ class DE_00001_A_a_003 extends DatabaseIntegrationTest {
                 <create>
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='bauwerksfunktion' v='1003' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM1234' />
+                    <tag k='identifikator:UUID' v='DEBYBDLMJW0003s9' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234_2025-10-14T12:53:00Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-15T12:53:00Z' />
-                    <tag k='lebenszeitintervall:endet' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Turm' />
                   </node>
                   <relation id='-63' changeset='-1'>
@@ -131,6 +126,6 @@ class DE_00001_A_a_003 extends DatabaseIntegrationTest {
         assertThat(attributeCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'attribut-check'")
-                .contains("Das Tag 'identifikator:UUID' muss dem regulären Ausdruck (^DE(BW|BU|BY|ST|SL|SH|NI|BE|BB|NW|RP|HE|MV|SN|HH|HB|TH)[A-Za-z0-9]{12})|(^DEBKG[A-Za-z0-9]{11})|(^DE_[A-Za-z0-9]{13}$) entsprechen.");
+                .contains("Das Tag 'identifikator:UUID' muss global eindeutig sein.");
     }
 }

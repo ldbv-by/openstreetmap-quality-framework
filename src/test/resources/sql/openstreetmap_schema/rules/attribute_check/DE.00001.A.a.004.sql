@@ -3,7 +3,12 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
     'attribute-check',
     'AA_Objekt',
     '{
-        "checks": { "type": "unique_check", "tag_key": "identifikator:UUID", "scope": "global" }
+        "checks": {
+            "not": {
+                "type": "object_exists",
+                "data_set_filter": { "featureFilter": { "tags": { "identifikator:UUID": "current:identifikator:UUID" } } }
+            }
+        }
     }',
     'Das Tag ''identifikator:UUID'' muss global eindeutig sein.')
 ON CONFLICT (id) DO NOTHING;

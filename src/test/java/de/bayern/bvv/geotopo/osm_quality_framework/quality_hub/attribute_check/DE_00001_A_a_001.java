@@ -19,6 +19,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * AdV-Beschreibung:
+ * Die Zeitangabe für den Datentyp 'DateTime' entspricht den Festlegungen von ISO 8601,
+ * Kapitel 5.4.1 in Verbindung mit 5.3.3. Zeitgenauigkeit ist die volle Sekunde.
+ * Die Zeit wird immer in UTC (Universal Time Coordinated, Greenwich Mean Time) angegeben.
+ * Beispiel:
+ * 2004-02-29T10:15:30Z
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(JacksonConfiguration.class)
