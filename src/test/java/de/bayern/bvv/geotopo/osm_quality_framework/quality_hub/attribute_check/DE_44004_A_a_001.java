@@ -3,6 +3,8 @@ package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.attribute_check;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.JacksonConfiguration;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.dto.QualityHubResultDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceErrorDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceResultDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.test_core.DatabaseIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +22,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * AdV-Beschreibung:
- * Eine Gewässerstationierungsachse mit AGA 2000, die (vollständig)
- * in einem oder mehreren Fließgewässern mit FKT 8300 liegt, hat FLR 'FALSE'.
+ * Wenn ein Objekt 44004 'Gewässerachse' die Werteart 8300 bei der Attributart 'Funktion' führt,
+ * darf die Attributart 'Hydrologisches Merkmal' nicht belegt sein.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(JacksonConfiguration.class)
-class DE_57003_A_c_001 extends DatabaseIntegrationTest {
+class DE_44004_A_a_001 extends DatabaseIntegrationTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -34,28 +36,33 @@ class DE_57003_A_c_001 extends DatabaseIntegrationTest {
     @Autowired
     ObjectMapper objectMapper;
 
-/*
     @Test
-    void createGewaesserstationierungsachseVollstaendigInEinemGewaesser() throws Exception {
+    void createKanalOhneHydrologischesMerkmal() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25362' changeset='-1' lat='49.88726442037' lon='12.34853103036' />
-                  <node id='-25361' changeset='-1' lat='49.88719305086' lon='12.34836366889' />
-                  <way id='-799' changeset='-1'>
+                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
+                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
+                  <node id='-25359' changeset='-1' lat='49.88413518675' lon='12.32447493031' />
+                  <node id='-25358' changeset='-1' lat='49.8841101097' lon='12.31855920723' />
+                  <way id='-663' changeset='-1'>
+                    <nd ref='-25358' />
+                    <nd ref='-25359' />
+                    <nd ref='-25360' />
                     <nd ref='-25361' />
-                    <nd ref='-25362' />
-                    <tag k='artDerGewaesserstationierungsachse' v='2000' />
-                    <tag k='fliessrichtung' v='TRUE' />
+                    <nd ref='-25358' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_Gewaesserstationierungsachse' />
+                    <tag k='object_type' v='AX_Gewaesserachse' />
+                    <tag k='funktion' v='8300' />
+                    <tag k='breiteDesGewaessers' v='10' />
+                    <tag k='fliessrichtung' v='TRUE' />
                   </way>
-                  <relation id='-71' changeset='-1'>
-                    <member type='way' ref='-799' role='' />
+                  <relation id='-70' changeset='-1'>
+                    <member type='way' ref='-663' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -78,27 +85,35 @@ class DE_57003_A_c_001 extends DatabaseIntegrationTest {
         assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
         assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result to be valid, but it was invalid.").isTrue();
     }
-*/
 
     @Test
-    void createGewaesserstationierungsachseVollstaendigInEinemGewaesser() throws Exception {
+    void createKanalMitHydrologischesMerkmal() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <way id='-667' changeset='-1'>
-                    <nd ref='62151' />
-                    <nd ref='62158' />
-                    <tag k='artDerGewaesserstationierungsachse' v='2000' />
-                    <tag k='fliessrichtung' v='FALSE' />
+                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
+                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
+                  <node id='-25359' changeset='-1' lat='49.88413518675' lon='12.32447493031' />
+                  <node id='-25358' changeset='-1' lat='49.8841101097' lon='12.31855920723' />
+                  <way id='-663' changeset='-1'>
+                    <nd ref='-25358' />
+                    <nd ref='-25359' />
+                    <nd ref='-25360' />
+                    <nd ref='-25361' />
+                    <nd ref='-25358' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM12345678_2025-10-14T12:53:00Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_Gewaesserstationierungsachse' />
+                    <tag k='object_type' v='AX_Gewaesserachse' />
+                    <tag k='funktion' v='8300' />
+                    <tag k='hydrologischesMerkmal' v='2000' />
+                    <tag k='breiteDesGewaessers' v='10' />
+                    <tag k='fliessrichtung' v='TRUE' />
                   </way>
-                  <relation id='-65' changeset='-1'>
-                    <member type='way' ref='-667' role='' />
+                  <relation id='-70' changeset='-1'>
+                    <member type='way' ref='-663' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -119,6 +134,22 @@ class DE_57003_A_c_001 extends DatabaseIntegrationTest {
 
         // Assert
         assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
-        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result to be valid, but it was invalid.").isTrue();
+        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        QualityServiceResultDto attributeCheck = qualityHubResultDto.qualityServiceResults().stream()
+                .filter(s -> "attribute-check".equals(s.qualityServiceId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("QualityService 'attribute-check' not found"));
+
+        assertThat(attributeCheck.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        assertThat(attributeCheck.errors())
+                .as("Errors of 'attribute-check' must not be empty")
+                .isNotEmpty();
+
+        assertThat(attributeCheck.errors())
+                .extracting(QualityServiceErrorDto::errorText)
+                .as("Error text of 'attribut-check'")
+                .contains("Das Tag 'hydrologischesMerkmal' darf nicht bei der 'funktion' 8300 vorkommen.");
     }
 }
