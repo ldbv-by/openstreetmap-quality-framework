@@ -43,26 +43,40 @@ public class CommonRepositoryImpl<T> {
         // Set filter tags.
         if (featureFilter != null && featureFilter.tags() != null) {
             for (Map.Entry<String, String> tag : featureFilter.tags().entrySet()) {
-                if (tag.getValue().contains("|")) {
-                    CriteriaBuilder.In<String> in = criteriaBuilder.in(
-                            criteriaBuilder.function("jsonb_extract_path_text",
-                                    String.class, root.get("tags"), criteriaBuilder.literal(tag.getKey())));
 
-                    String[] tagValues = tag.getValue().split("\\|");
-                    for (String tagValue : tagValues) {
-                        if (!tagValue.trim().isEmpty()) {
-                            in.value(tagValue.trim());
+                Expression<String> tagValueExpr = criteriaBuilder.function(
+                        "jsonb_extract_path_text",
+                        String.class,
+                        root.get("tags"),
+                        criteriaBuilder.literal(tag.getKey())
+                );
+
+                String tagValue = tag.getValue().trim();
+
+                if (tagValue.contains("|")) {
+                    boolean allowNotExists = false;
+                    CriteriaBuilder.In<String> in = criteriaBuilder.in(tagValueExpr);
+
+                    String[] tagValues = tagValue.split("\\|");
+                    for (String val : tagValues) {
+                        if (val.equalsIgnoreCase("not_exists")) {
+                            allowNotExists = true;
+                        } else if (!val.trim().isEmpty()) {
+                            in.value(val.trim());
                         }
                     }
 
-                    predicates.add(in);
+                    if (allowNotExists) {
+                        predicates.add(criteriaBuilder.or(in, criteriaBuilder.isNull(tagValueExpr)));
+                    } else {
+                        predicates.add(in);
+                    }
                 } else {
-                    predicates.add(
-                            criteriaBuilder.equal(
-                                    criteriaBuilder.function("jsonb_extract_path_text",
-                                            String.class, root.get("tags"), criteriaBuilder.literal(tag.getKey())),
-                                    tag.getValue()
-                            ));
+                    if (tagValue.equalsIgnoreCase("not_exists")) {
+                        predicates.add(criteriaBuilder.isNull(tagValueExpr));
+                    } else {
+                        predicates.add(criteriaBuilder.equal(tagValueExpr, tagValue));
+                    }
                 }
             }
         }

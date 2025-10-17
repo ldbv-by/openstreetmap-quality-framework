@@ -42,6 +42,6 @@ public class RuleEntity {
     private JsonNode expression;
 
     @NotNull
-    @Column(name = "error_text")
+    @Column(name = "error_text", length = 4000)
     private String errorText;
 }
