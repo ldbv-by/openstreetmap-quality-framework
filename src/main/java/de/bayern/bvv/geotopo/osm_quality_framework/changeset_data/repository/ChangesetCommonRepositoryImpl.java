@@ -43,18 +43,33 @@ public class ChangesetCommonRepositoryImpl<T> {
         // Set filter tags.
         if (featureFilter != null && featureFilter.tags() != null) {
             for (Map.Entry<String, String> tag : featureFilter.tags().entrySet()) {
-                predicates.add(
-                        criteriaBuilder.equal(
-                                criteriaBuilder.function("jsonb_extract_path_text",
-                                        String.class, root.get("tags"), criteriaBuilder.literal(tag.getKey())),
-                                tag.getValue()
-                        ));
+                if (tag.getValue().contains("|")) {
+                    CriteriaBuilder.In<String> in = criteriaBuilder.in(
+                            criteriaBuilder.function("jsonb_extract_path_text",
+                                    String.class, root.get("tags"), criteriaBuilder.literal(tag.getKey())));
+
+                    String[] tagValues = tag.getValue().split("\\|");
+                    for (String tagValue : tagValues) {
+                        if (!tagValue.trim().isEmpty()) {
+                            in.value(tagValue.trim());
+                        }
+                    }
+
+                    predicates.add(in);
+                } else {
+                    predicates.add(
+                            criteriaBuilder.equal(
+                                    criteriaBuilder.function("jsonb_extract_path_text",
+                                            String.class, root.get("tags"), criteriaBuilder.literal(tag.getKey())),
+                                    tag.getValue()
+                            ));
+                }
             }
         }
 
         // Set filter bounding box.
         if (featureFilter != null && featureFilter.boundingBox() != null && !RelationEntity.class.isAssignableFrom(entityType)) {
-            Expression<Geometry> bboxEnvelope = criteriaBuilder.function("ST_MakeEnvelope", Geometry.class,
+            Expression<Geometry> bboxEnvelope= criteriaBuilder.function("ST_MakeEnvelope", Geometry.class,
                     criteriaBuilder.literal(featureFilter.boundingBox().minX()),
                     criteriaBuilder.literal(featureFilter.boundingBox().minY()),
                     criteriaBuilder.literal(featureFilter.boundingBox().maxX()),
@@ -65,9 +80,9 @@ public class ChangesetCommonRepositoryImpl<T> {
             Expression<Boolean> bboxOverlap = criteriaBuilder.function("ST_Intersects", Boolean.class,
                     geomEnvelope, bboxEnvelope);
 
-            Expression<Boolean> within    = criteriaBuilder.function("ST_Within",    Boolean.class, root.get("geom"), bboxEnvelope);
-            Expression<Boolean> contains  = criteriaBuilder.function("ST_Contains",  Boolean.class, root.get("geom"), bboxEnvelope);
-            Expression<Boolean> intersects= criteriaBuilder.function("ST_Intersects",Boolean.class, root.get("geom"), bboxEnvelope);
+            Expression<Boolean> within     = criteriaBuilder.function("ST_Within",    Boolean.class, root.get("geom"), bboxEnvelope);
+            Expression<Boolean> contains   = criteriaBuilder.function("ST_Contains",  Boolean.class, root.get("geom"), bboxEnvelope);
+            Expression<Boolean> intersects = criteriaBuilder.function("ST_Intersects",Boolean.class, root.get("geom"), bboxEnvelope);
 
             Predicate preciseSpatial = criteriaBuilder.or(
                     criteriaBuilder.isTrue(within),

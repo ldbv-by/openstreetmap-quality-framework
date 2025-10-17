@@ -20,5 +20,5 @@ quality:
       - id: "attribute-check"
         waitsFor: []
 
-      - id: "overlay-check"
-        waitsFor: ["attribute-check"]
+      - id: "geometry-check"
+        waitsFor: []

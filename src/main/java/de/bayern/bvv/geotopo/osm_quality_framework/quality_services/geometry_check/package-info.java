@@ -4,4 +4,4 @@
                 "quality_core::*"
         }
 )
-package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.overlay_check;
+package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.geometry_check;

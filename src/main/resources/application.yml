@@ -26,7 +26,7 @@ spring:
         - classpath:sql/openstreetmap_schema/aaa-basis-schema.sql
         - classpath:sql/openstreetmap_schema/atkis-basis-dlm-schema.sql
         - classpath:sql/openstreetmap_schema/openstreetmap-quality-framework-schema.sql
-        - classpath:sql/openstreetmap_schema/rules/attribute_check/*.sql
+        - classpath:sql/openstreetmap_schema/rules/**/*.sql
 
 quality:
   pipeline:
@@ -34,8 +34,8 @@ quality:
       - id: "attribute-check"
         waitsFor: []
 
-      - id: "overlay-check"
-        waitsFor: ["attribute-check"]
+      - id: "geometry-check"
+        waitsFor: []
 
 openstreetmap-tools:
   osm2pgsql: ${OSM2PGSQL_EXECUTABLE}

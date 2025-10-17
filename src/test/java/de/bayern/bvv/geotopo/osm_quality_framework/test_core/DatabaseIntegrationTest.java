@@ -190,7 +190,7 @@ public abstract class DatabaseIntegrationTest {
         try {
             ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
             Resource[] ruleScripts = resolver.getResources(
-                    "classpath*:sql/openstreetmap_schema/rules/attribute_check/*.sql" // oder **/*.sql
+                    "classpath*:sql/openstreetmap_schema/rules/**/*.sql" // oder **/*.sql
             );
 
             Arrays.sort(ruleScripts, Comparator.comparing(Resource::getFilename));

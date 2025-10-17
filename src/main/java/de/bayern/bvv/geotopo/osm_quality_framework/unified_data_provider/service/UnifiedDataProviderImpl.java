@@ -95,6 +95,7 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
         // Prepare candidate features.
         // If no search bounding box is provided, derive it from the reference feature’s geometry.
         Envelope referenceEnvelope = featureDto.geometry().getEnvelopeInternal();
+        referenceEnvelope.expandBy(1e-5);
 
         if (referenceEnvelope != null) {
             BoundingBox bbox = new BoundingBox(
@@ -125,9 +126,9 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
 
         // Evaluate spatial relations and collect matching candidates.
         if (candidateDataSet != null) {
-            if (candidateDataSet.getNodes() != null) getSpatialCandidates(candidateDataSet.getNodes(), resultDataSet.getNodes(), referenceFeature, referenceGeometry, operators);
-            if (candidateDataSet.getWays() != null)  getSpatialCandidates(candidateDataSet.getWays(), resultDataSet.getWays(), referenceFeature, referenceGeometry, operators);
-            if (candidateDataSet.getAreas() != null) getSpatialCandidates(candidateDataSet.getAreas(), resultDataSet.getAreas(), referenceFeature, referenceGeometry, operators);
+            if (candidateDataSet.getNodes() != null) getSpatialCandidates(candidateDataSet.getNodes(), resultDataSet.getNodes(), referenceFeature, referenceGeometry, referenceEnvelope, operators);
+            if (candidateDataSet.getWays() != null)  getSpatialCandidates(candidateDataSet.getWays(), resultDataSet.getWays(), referenceFeature, referenceGeometry, referenceEnvelope, operators);
+            if (candidateDataSet.getAreas() != null) getSpatialCandidates(candidateDataSet.getAreas(), resultDataSet.getAreas(), referenceFeature, referenceGeometry, referenceEnvelope, operators);
         }
 
         return DataSetMapper.toDto(resultDataSet);
@@ -137,7 +138,8 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
      * Populates {@code result} with features from {@code features} that match any of the
      * specified spatial operators relative to {@code referenceFeature}.
      */
-    private void getSpatialCandidates(List<Feature> features, List<Feature> result, Feature referenceFeature, PreparedGeometry referenceGeometry, Set<SpatialOperator> operators) {
+    private void getSpatialCandidates(List<Feature> features, List<Feature> result, Feature referenceFeature,
+                                      PreparedGeometry referenceGeometry, Envelope referenceEnvelope, Set<SpatialOperator> operators) {
         STRtree candidateDataSetTree = new STRtree();
 
         for (Feature candidate : features) {
@@ -149,7 +151,7 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
         }
 
         @SuppressWarnings("unchecked")
-        List<Feature> candidates = candidateDataSetTree.query(referenceGeometry.getGeometry().getEnvelopeInternal());
+        List<Feature> candidates = candidateDataSetTree.query(referenceEnvelope);
 
         // Apply the requested spatial predicates to each candidate.
         for (Feature candidate : candidates) {
@@ -160,6 +162,8 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
                 switch (operator) {
                     case CONTAINS -> match = referenceGeometry.contains(candidate.getGeometry());
                     case WITHIN -> match = referenceGeometry.within(candidate.getGeometry());
+                    case TOUCHES -> match = referenceGeometry.touches(candidate.getGeometry());
+                    case COVERED_BY ->  match = referenceGeometry.coveredBy(candidate.getGeometry());
                 }
 
                 if (match) {

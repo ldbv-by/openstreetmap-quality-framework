@@ -43,12 +43,27 @@ public class CommonRepositoryImpl<T> {
         // Set filter tags.
         if (featureFilter != null && featureFilter.tags() != null) {
             for (Map.Entry<String, String> tag : featureFilter.tags().entrySet()) {
-                predicates.add(
-                        criteriaBuilder.equal(
-                                criteriaBuilder.function("jsonb_extract_path_text",
-                                        String.class, root.get("tags"), criteriaBuilder.literal(tag.getKey())),
-                                tag.getValue()
-                        ));
+                if (tag.getValue().contains("|")) {
+                    CriteriaBuilder.In<String> in = criteriaBuilder.in(
+                            criteriaBuilder.function("jsonb_extract_path_text",
+                                    String.class, root.get("tags"), criteriaBuilder.literal(tag.getKey())));
+
+                    String[] tagValues = tag.getValue().split("\\|");
+                    for (String tagValue : tagValues) {
+                        if (!tagValue.trim().isEmpty()) {
+                            in.value(tagValue.trim());
+                        }
+                    }
+
+                    predicates.add(in);
+                } else {
+                    predicates.add(
+                            criteriaBuilder.equal(
+                                    criteriaBuilder.function("jsonb_extract_path_text",
+                                            String.class, root.get("tags"), criteriaBuilder.literal(tag.getKey())),
+                                    tag.getValue()
+                            ));
+                }
             }
         }
 
