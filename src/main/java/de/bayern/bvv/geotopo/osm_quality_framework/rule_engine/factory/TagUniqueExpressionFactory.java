@@ -7,50 +7,45 @@ import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.ExpressionFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Evaluates whether a tag–value pair is unique (globally or within the same object).
  */
 @Component
-public class UniqueCheckExpressionFactory implements ExpressionFactory {
+public class TagUniqueExpressionFactory implements ExpressionFactory {
 
     @Override
     public String type() {
-        return "unique_check";
+        return "tag_unique";
     }
 
     @Override
     public Expression create(JsonNode json) {
         String tagKey = json.path("tag_key").asText();
-        String scope = json.path("scope").asText();
 
         if (tagKey == null || tagKey.isBlank()) {
-            throw new IllegalArgumentException("unique_check: 'tag_key' is required");
+            throw new IllegalArgumentException("tag_unique: 'tag_key' is required");
         }
 
-        if (scope == null || scope.isBlank()) {
-            throw new IllegalArgumentException("unique_check: 'scope' is required. global or internal is possible.");
-        }
-
-        return taggedObject -> switch (scope) {
-            case "internal" -> this.compareTagsInternal(taggedObject, tagKey, taggedObject.getTags().get(tagKey));
-            case "global" -> true; // todo: db
-            default -> false;
-        };
+        return taggedObject -> this.compareTags(taggedObject, tagKey, new ArrayList<>());
     }
 
     /**
      * Recursively checks if a tag value appears more than once.
      */
-    private boolean compareTagsInternal(TaggedObject taggedObject, String compareTagKey, String compareTagValue) {
+    private boolean compareTags(TaggedObject taggedObject, String compareTagKey, List<String> currentValues) {
         for (Map.Entry<String, String> tag : taggedObject.getTags().entrySet()) {
-            if (tag.getKey().equals(compareTagKey)) continue;
-            if (tag.getValue().equals(compareTagValue)) return false;
+            if (tag.getKey().equals(compareTagKey)) {
+                if (currentValues.contains(tag.getValue())) return false;
+                currentValues.add(tag.getValue());
+            }
         }
 
         for (Relation relation : taggedObject.getRelations()) {
-            if (!this.compareTagsInternal(relation, compareTagKey, compareTagValue)) return false;
+            if (!this.compareTags(relation, compareTagKey, currentValues)) return false;
         }
 
         return true;
