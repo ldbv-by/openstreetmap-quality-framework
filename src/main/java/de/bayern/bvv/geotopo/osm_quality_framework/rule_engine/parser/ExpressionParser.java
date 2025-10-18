@@ -1,6 +1,7 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Relation;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.registry.ExpressionRegistry;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,21 @@ public final class ExpressionParser {
         if (node.has("not")) {
             Expression expression = parse(node.get("not"));
             return taggedObject -> !expression.evaluate(taggedObject);
+        }
+
+        if (node.has("relation")) {
+            Expression conditions = parse(node.get("relation").path("conditions"));
+            Expression checks = parse(node.get("relation").path("checks"));
+
+            return taggedObject -> {
+                for (Relation relation : taggedObject.getRelations()) {
+                    if (conditions.evaluate(relation)) {
+                        if (!checks.evaluate(relation)) return false;
+                    }
+                }
+
+                return true;
+            };
         }
 
         // Parse leafs, e.g. "tag_exists", "tag_regex_match", ...

@@ -5,7 +5,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.Data
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.FeatureDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.test_core.DatabaseIntegrationTest;
-import de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.spi.UnifiedDataProvider;
+import de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.api.UnifiedDataProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

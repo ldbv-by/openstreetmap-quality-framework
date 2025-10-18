@@ -7,5 +7,7 @@ public enum SpatialOperator {
     CONTAINS,
     WITHIN,
     TOUCHES,
-    COVERED_BY
+    COVERED_BY,
+    EQUALS,
+    EQUALS_TOPO
 }

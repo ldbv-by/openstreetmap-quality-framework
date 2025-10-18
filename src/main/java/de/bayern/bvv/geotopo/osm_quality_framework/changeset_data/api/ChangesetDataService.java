@@ -2,6 +2,7 @@ package de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.api;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.dto.ChangesetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.ChangesetDataSetDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.FeatureFilter;
 
 /**
@@ -19,4 +20,8 @@ public interface ChangesetDataService {
      */
     ChangesetDataSetDto getDataSet(Long changesetId, FeatureFilter featureFilter, String coordinateReferenceSystem);
 
+    /**
+     * Returns a data set of all relation members.
+     */
+    DataSetDto getRelationMembers(Long changesetId, Long relationId, String role, String coordinateReferenceSystem);
 }

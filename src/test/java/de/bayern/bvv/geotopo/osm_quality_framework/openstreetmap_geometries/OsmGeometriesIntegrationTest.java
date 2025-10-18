@@ -85,4 +85,33 @@ class OsmGeometriesIntegrationTest extends DatabaseIntegrationTest {
         assertThat(featureDto.relations().getFirst().objectType()).isEqualTo("AX_Strasse");
         assertThat(featureDto.relations().getFirst().tags().get("OID_identifikator")).isEqualTo("DEBYBDLMJW00045Y");
     }
+
+    @Test
+    void testGetRelationMembersByOsmId() {
+        // Act
+        DataSetDto dataSetDto = this.osmGeometriesService.getRelationMembers(1087L, "under", null);
+
+        // Assert
+        assertThat(dataSetDto.nodes().size())
+                .withFailMessage("Dataset composition: expected nodes=0 but was %d", dataSetDto.nodes().size())
+                .isEqualTo(0);
+
+        assertThat(dataSetDto.ways().size())
+                .withFailMessage("Dataset composition: expected ways=1 but was %d", dataSetDto.ways().size())
+                .isEqualTo(1);
+
+        assertThat(dataSetDto.areas().size())
+                .withFailMessage("Dataset composition: expected areas=0 but was %d", dataSetDto.areas().size())
+                .isEqualTo(0);
+
+        assertThat(dataSetDto.relations().size())
+                .withFailMessage("Dataset composition: expected relations=0 but was %d", dataSetDto.relations().size())
+                .isEqualTo(0);
+
+        FeatureDto featureDto = dataSetDto.ways().getFirst();
+        assertThat(featureDto.osmId()).isEqualTo(122L);
+        assertThat(featureDto.objectType()).isEqualTo("AX_BauwerkImGewaesserbereich");
+        assertThat(featureDto.tags().size()).isEqualTo(3);
+        assertThat(featureDto.relations().size()).isEqualTo(1);
+    }
 }

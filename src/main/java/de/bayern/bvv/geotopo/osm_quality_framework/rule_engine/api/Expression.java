@@ -5,7 +5,6 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Ta
 /**
  * Represent an expression for conditions or checks.
  */
-@FunctionalInterface
 public interface Expression {
     boolean evaluate(TaggedObject taggedObject);
 }

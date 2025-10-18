@@ -1,4 +1,4 @@
-package de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.spi;
+package de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.api;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSetFilter;
@@ -24,4 +24,9 @@ public interface UnifiedDataProvider {
     DataSetDto getDataSetBySpatialRelation(FeatureDto featureDto,
                                            Set<SpatialOperator> operators,
                                            DataSetFilter dataSetFilter);
+
+    /**
+     * Returns a data set of all relation members.
+     */
+    DataSetDto getRelationMembers(Long relationId, String role, String coordinateReferenceSystem);
 }

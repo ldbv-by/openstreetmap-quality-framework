@@ -48,6 +48,7 @@ tables.relation_members = osm2pgsql.define_table({
 	ids = { type = 'relation', id_column = 'relation_osm_id' },
 	columns = {
 		{ column = 'member_type', type = 'text' },
+		{ column = 'member_role', type = 'text' },
 		{ column = 'member_osm_id', type = 'bigint' },
 	},
 	indexes = {
@@ -148,6 +149,7 @@ function osm2pgsql.process_relation(object)
 		tables.relation_members:insert({
 			relation_osm_id = object.id,
 			member_type = member.type,
+			member_role = member.role,
 			member_osm_id = member.ref
 		})
 	end

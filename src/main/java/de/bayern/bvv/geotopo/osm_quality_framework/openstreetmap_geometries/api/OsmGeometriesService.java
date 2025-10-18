@@ -12,4 +12,9 @@ public interface OsmGeometriesService {
      * Returns the current tagged objects.
      */
     DataSetDto getDataSet(FeatureFilter featureFilter, String coordinateReferenceSystem);
+
+    /**
+     * Returns a data set of all relation members.
+     */
+    DataSetDto getRelationMembers(Long relationId, String role, String coordinateReferenceSystem);
 }

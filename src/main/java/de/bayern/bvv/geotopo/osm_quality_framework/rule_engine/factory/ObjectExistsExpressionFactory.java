@@ -7,7 +7,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.Data
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.ExpressionFactory;
-import de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.spi.UnifiedDataProvider;
+import de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.api.UnifiedDataProvider;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;

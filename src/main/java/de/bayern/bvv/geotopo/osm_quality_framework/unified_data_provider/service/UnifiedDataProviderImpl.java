@@ -5,7 +5,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.Data
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.ChangesetDataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
-import de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.spi.UnifiedDataProvider;
+import de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.api.UnifiedDataProvider;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.api.OsmGeometriesService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.FeatureDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.FeatureMapper;
@@ -95,9 +95,10 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
         // Prepare candidate features.
         // If no search bounding box is provided, derive it from the reference feature’s geometry.
         Envelope referenceEnvelope = featureDto.geometry().getEnvelopeInternal();
-        referenceEnvelope.expandBy(1e-5);
 
         if (referenceEnvelope != null) {
+            referenceEnvelope.expandBy(1e-5);
+
             BoundingBox bbox = new BoundingBox(
                     referenceEnvelope.getMinX(),
                     referenceEnvelope.getMinY(),
@@ -164,6 +165,7 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
                     case WITHIN -> match = referenceGeometry.within(candidate.getGeometry());
                     case TOUCHES -> match = referenceGeometry.touches(candidate.getGeometry());
                     case COVERED_BY ->  match = referenceGeometry.coveredBy(candidate.getGeometry());
+                    case EQUALS_TOPO ->  match = referenceGeometry.getGeometry().equalsTopo(candidate.getGeometry());
                 }
 
                 if (match) {
@@ -171,6 +173,21 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
                 }
             }
         }
+    }
+
+    /**
+     * Returns a data set of all relation members.
+     */
+    @Override
+    public DataSetDto getRelationMembers(Long relationId, String role, String coordinateReferenceSystem) {
+        DataSetDto relationMembers = this.changesetDataService.getRelationMembers(1L, relationId, role, coordinateReferenceSystem);
+
+        if (relationMembers.nodes().isEmpty() && relationMembers.ways().isEmpty() &&
+                relationMembers.areas().isEmpty() && relationMembers.relations().isEmpty()) {
+            relationMembers = this.osmGeometriesService.getRelationMembers(relationId, role, coordinateReferenceSystem);
+        }
+
+        return relationMembers;
     }
 
     /* ---------- Helpers ---------- */

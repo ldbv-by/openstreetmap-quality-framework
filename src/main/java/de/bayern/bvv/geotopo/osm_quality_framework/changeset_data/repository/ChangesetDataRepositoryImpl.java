@@ -48,7 +48,7 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
                 new PrepareTable("ways", "osm_id, version, object_type, tags, geom"),
                 new PrepareTable("areas", "osm_id, version, object_type, tags, geom, osm_geometry_type"),
                 new PrepareTable("relations", "osm_id, version, object_type, members, tags"),
-                new PrepareTable("relation_members", "relation_osm_id, member_type, member_osm_id")
+                new PrepareTable("relation_members", "relation_osm_id, member_type, member_osm_id, member_role")
         );
 
         for (PrepareTable tab : preparedTables) {
@@ -60,6 +60,25 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
                                 "CASE WHEN member_osm_id > 1e17 THEN -(member_osm_id - 1e17)::bigint ELSE member_osm_id END";
                         case "osm_id" ->
                                 "CASE WHEN osm_id > 1e17 THEN -(osm_id - 1e17)::bigint ELSE osm_id END";
+                        case "members" ->
+                                """
+                                (
+                                SELECT jsonb_agg(
+                                         jsonb_set(
+                                           m,
+                                           '{ref}',
+                                           to_jsonb(
+                                             CASE
+                                               WHEN (m->>'ref')::bigint > 1e17
+                                                 THEN -(((m->>'ref')::bigint - 1e17))::bigint
+                                               ELSE (m->>'ref')::bigint
+                                             END
+                                           ),
+                                           true
+                                         )
+                                       )
+                                FROM jsonb_array_elements(COALESCE(members, '[]'::jsonb)) AS m
+                              ) AS members""";
                         default -> col;
                     })
                     .collect(Collectors.joining(", "));
@@ -106,14 +125,33 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
         this.jdbcTemplate.update(upsertPlanetOsmWays);
 
         String upsertPlanetOsmRels = """
-        INSERT INTO changeset_data.planet_osm_rels (id, members, tags)
-        SELECT CASE WHEN id > 1e17 THEN -(id - 1e17)::bigint ELSE id END, members, tags
-        FROM %s.planet_osm_rels
-        ON CONFLICT (id) DO UPDATE
-        SET members = EXCLUDED.members,
-            tags  = EXCLUDED.tags
-        WHERE EXCLUDED.id >= 0
-        """.formatted(prepareSchema);
+            INSERT INTO changeset_data.planet_osm_rels (id, members, tags)
+            SELECT
+              CASE WHEN r.id > 1e17 THEN -(r.id - 1e17)::bigint ELSE r.id END AS id,
+              (
+                SELECT jsonb_agg(
+                         jsonb_set(
+                           m,
+                           '{ref}',
+                           to_jsonb(
+                             CASE
+                               WHEN (m->>'ref')::bigint > 1e17
+                                 THEN -(((m->>'ref')::bigint - 1e17))::bigint
+                               ELSE (m->>'ref')::bigint
+                             END
+                           ),
+                           true
+                         )
+                       )
+                FROM jsonb_array_elements(COALESCE(r.members, '[]'::jsonb)) AS m
+              ) AS members,
+              r.tags
+            FROM %s.planet_osm_rels r
+            ON CONFLICT (id) DO UPDATE
+            SET members = EXCLUDED.members,
+                tags    = EXCLUDED.tags
+            WHERE EXCLUDED.id >= 0
+            """.formatted(prepareSchema);
 
         this.jdbcTemplate.update(upsertPlanetOsmRels);
     }

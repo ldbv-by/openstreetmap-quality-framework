@@ -16,6 +16,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.dto.Ch
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.ChangesetDataSetDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.ChangesetDataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
@@ -132,11 +133,43 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
     }
 
     /**
+     * Returns a data set of all relation members.
+     */
+    @Override
+    public DataSetDto getRelationMembers(Long changesetId, Long relationId, String role, String coordinateReferenceSystem) {
+        DataSet resultDataSet = new DataSet();
+
+        resultDataSet.getNodes().addAll(this.getRelationMemberNodes(changesetId, relationId, role, coordinateReferenceSystem));
+        resultDataSet.getWays().addAll(this.getRelationMemberWays(changesetId, relationId, role, coordinateReferenceSystem));
+        resultDataSet.getAreas().addAll(this.getRelationMemberAreas(changesetId, relationId, role, coordinateReferenceSystem));
+        resultDataSet.getRelations().addAll(this.getRelationMemberRelations(changesetId, relationId, role));
+
+        return DataSetMapper.toDto(resultDataSet);
+    }
+
+    /**
      * Returns the current nodes by feature filter.
      */
     private List<Feature> getNodesByFeatureFilter(Long changesetId, FeatureFilter featureFilter, String coordinateReferenceSystem) {
         List<Feature> nodes = new ArrayList<>();
         List<NodeEntity> nodeEntities = this.nodeRepository.fetchByFeatureFilter(changesetId, featureFilter);
+
+        if (nodeEntities != null) {
+            for (NodeEntity nodeEntity : nodeEntities) {
+                List<Relation> relations = this.getRelationsForOsmObject(changesetId,"n", nodeEntity.getOsmId());
+                nodes.add(NodeEntityMapper.toFeature(nodeEntity, relations, coordinateReferenceSystem));
+            }
+        }
+
+        return nodes;
+    }
+
+    /**
+     * Returns the current relation member areas for a relation id.
+     */
+    private List<Feature> getRelationMemberNodes(Long changesetId, Long relationId, String role, String coordinateReferenceSystem) {
+        List<Feature> nodes = new ArrayList<>();
+        List<NodeEntity> nodeEntities = this.nodeRepository.fetchByRelationIdAndRole(changesetId, relationId, role);
 
         if (nodeEntities != null) {
             for (NodeEntity nodeEntity : nodeEntities) {
@@ -166,6 +199,23 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
     }
 
     /**
+     * Returns the current relation member areas for a relation id.
+     */
+    private List<Feature> getRelationMemberWays(Long changesetId, Long relationId, String role, String coordinateReferenceSystem) {
+        List<Feature> ways = new ArrayList<>();
+        List<WayEntity> wayEntities = this.wayRepository.fetchByRelationIdAndRole(changesetId, relationId, role);
+
+        if (wayEntities != null) {
+            for (WayEntity wayEntity : wayEntities) {
+                List<Relation> relations = this.getRelationsForOsmObject(changesetId,"w", wayEntity.getOsmId());
+                ways.add(WayEntityMapper.toFeature(wayEntity, relations, coordinateReferenceSystem));
+            }
+        }
+
+        return ways;
+    }
+
+    /**
      * Returns the current areas by feature filter.
      */
     private List<Feature> getAreasByFeatureFilter(Long changesetId, FeatureFilter featureFilter, String coordinateReferenceSystem) {
@@ -183,11 +233,45 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
     }
 
     /**
+     * Returns the current relation member areas for a relation id.
+     */
+    private List<Feature> getRelationMemberAreas(Long changesetId, Long relationId, String role, String coordinateReferenceSystem) {
+        List<Feature> areas = new ArrayList<>();
+        List<AreaEntity> areaEntities = this.areaRepository.fetchByRelationIdAndRole(changesetId, relationId, role);
+
+        if (areaEntities != null) {
+            for (AreaEntity areaEntity : areaEntities) {
+                List<Relation> relations = this.getRelationsForOsmObject(changesetId, areaEntity.getOsmGeometryType().toString(), areaEntity.getOsmId());
+                areas.add(AreaEntityMapper.toFeature(areaEntity, relations, coordinateReferenceSystem));
+            }
+        }
+
+        return areas;
+    }
+
+    /**
      * Returns the current relations by feature filter.
      */
     private List<Relation> getRelationsByFeatureFilter(Long changesetId, FeatureFilter featureFilter) {
         List<Relation> relations = new ArrayList<>();
         List<RelationEntity> relationEntities = this.relationRepository.fetchByFeatureFilter(changesetId, featureFilter);
+
+        if (relationEntities != null) {
+            for (RelationEntity relationEntity : relationEntities) {
+                List<Relation> rels = this.getRelationsForOsmObject(changesetId,"r", relationEntity.getOsmId());
+                relations.add(RelationEntityMapper.toRelation(relationEntity, rels));
+            }
+        }
+
+        return relations;
+    }
+
+    /**
+     * Returns the current relation member areas for a relation id.
+     */
+    private List<Relation> getRelationMemberRelations(Long changesetId, Long relationId, String role) {
+        List<Relation> relations = new ArrayList<>();
+        List<RelationEntity> relationEntities = this.relationRepository.fetchByRelationIdAndRole(changesetId, relationId, role);
 
         if (relationEntities != null) {
             for (RelationEntity relationEntity : relationEntities) {
