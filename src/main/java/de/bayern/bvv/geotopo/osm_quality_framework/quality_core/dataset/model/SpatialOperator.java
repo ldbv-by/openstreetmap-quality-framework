@@ -8,6 +8,8 @@ public enum SpatialOperator {
     WITHIN,
     TOUCHES,
     COVERED_BY,
+    COVERED_BY_BOUNDARY,
     EQUALS,
-    EQUALS_TOPO
+    EQUALS_TOPO,
+    INTERSECTS
 }

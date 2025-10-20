@@ -1,9 +1,9 @@
 INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error_text) VALUES (
-    'DE.53001.G.b.001',
+    'DE.53008.G.b.003',
     'geometry-check',
-    'AX_BauwerkImVerkehrsbereich',
+    'AX_EinrichtungenFuerDenSchiffsverkehr',
     '{
-        "conditions": { "type": "tag_between", "tag_key": "bauwerksfunktion", "from_value": "1800", "to_value": "1870" },
+        "conditions": { "type": "tag_equals", "tag_key": "art", "value": "1460" },
         "checks": {
             "any": [
                 {
@@ -17,7 +17,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                     "relation_master_role": "over",
                                     "operator": "equals_topo",
                                     "relation_compare_role": "under",
-                                    "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_Strassenachse|AX_Fahrwegachse|AX_Bahnstrecke|AX_Gewaesserachse|AX_WegPfadSteig|AX_Gleis" } } }
+                                    "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_Strassenachse|AX_Fahrwegachse|AX_Bahnstrecke|AX_WegPfadSteig|AX_Gleis" } } }
                                 }
                             }
                         }
@@ -42,5 +42,5 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
             ]
         }
     }',
-    'Bei ''bauwerksfunktion'' 1800 bis 1870 und linienförmiger Modellierung müssen die Geometrien der HDU Relations identisch sein. Bei flächenförmiger Modellierung müssen die ''over'' in ''under'' enthalten sein.')
+    'Bei ''art'' 1460 und linienförmiger Modellierung müssen die Geometrien der HDU Relations identisch sein. Bei flächenförmiger Modellierung müssen die ''over'' in ''under'' enthalten sein.')
 ON CONFLICT (id) DO NOTHING;

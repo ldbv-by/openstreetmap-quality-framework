@@ -165,7 +165,9 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
                     case WITHIN -> match = referenceGeometry.within(candidate.getGeometry());
                     case TOUCHES -> match = referenceGeometry.touches(candidate.getGeometry());
                     case COVERED_BY ->  match = referenceGeometry.coveredBy(candidate.getGeometry());
-                    case EQUALS_TOPO ->  match = referenceGeometry.getGeometry().equalsTopo(candidate.getGeometry());
+                    case COVERED_BY_BOUNDARY -> match = referenceGeometry.coveredBy(candidate.getGeometry().getBoundary());
+                    case EQUALS_TOPO -> match = referenceGeometry.getGeometry().equalsTopo(candidate.getGeometry());
+                    case INTERSECTS -> match = referenceGeometry.intersects(candidate.getGeometry());
                 }
 
                 if (match) {

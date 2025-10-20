@@ -1,0 +1,28 @@
+INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error_text) VALUES (
+    'DE.53008.G.b.001',
+    'geometry-check',
+    'AX_EinrichtungenFuerDenSchiffsverkehr',
+    '{
+        "conditions": {
+            "all": [
+                { "type": "geom_type", "value": "Point" },
+                { "type": "tag_equals", "tag_key": "art", "value": "1460" }
+            ]
+        },
+        "checks": {
+            "any": [
+                {
+                    "type": "spatial_compare",
+                    "operator": "covered_by_boundary",
+                    "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_Fliessgewaesser|AX_Hafenbecken|AX_StehendesGewaesser|AX_Meer" } } }
+                },
+                {
+                    "type": "spatial_compare",
+                    "operator": "covered_by",
+                    "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_BauwerkImGewaesserbereich", "bauwerksfunktion": "2133" } } }
+                }
+            ]
+        }
+    }',
+    'Ein Anleger liegt immer auf der Umrissgeometrie eines Objekts ''AX_Fliessgewaesser'', ''AX_Hafenbecken'', ''AX_StehendesGewaesser'' oder ''AX_Meer'' oder berühren ''AX_BauwerkImGewaesserbereich'' mit ''bauwerksfunktion'' 2133.')
+ON CONFLICT (id) DO NOTHING;

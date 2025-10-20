@@ -40,18 +40,36 @@ public final class ExpressionParser {
         }
 
         if (node.has("relation")) {
-            Expression conditions = parse(node.get("relation").path("conditions"));
-            Expression checks = parse(node.get("relation").path("checks"));
+            JsonNode relationNode = node.get("relation");
+            if (relationNode.has("conditions") || relationNode.has("checks")) {
+                Expression conditions = parse(node.get("relation").path("conditions"));
+                Expression checks = parse(node.get("relation").path("checks"));
 
-            return taggedObject -> {
-                for (Relation relation : taggedObject.getRelations()) {
-                    if (conditions.evaluate(relation)) {
-                        if (!checks.evaluate(relation)) return false;
+                return taggedObject -> {
+                    for (Relation relation : taggedObject.getRelations()) {
+                        if (conditions.evaluate(relation)) {
+                            if (!checks.evaluate(relation)) return false;
+                        }
                     }
-                }
 
-                return true;
-            };
+                    return true;
+                };
+            } else {
+                List<Expression> expressions = new ArrayList<>();
+                if (relationNode.isArray()) {
+                    relationNode.forEach(n -> expressions.add(parse(n)));
+                } else {
+                    expressions.add(parse(relationNode));
+                }
+                return taggedObject -> {
+                    for (Relation r : taggedObject.getRelations()) {
+                        for (Expression e : expressions) {
+                            if (!e.evaluate(r)) return false;
+                        }
+                    }
+                    return true;
+                };
+            }
         }
 
         // Parse leafs, e.g. "tag_exists", "tag_regex_match", ...

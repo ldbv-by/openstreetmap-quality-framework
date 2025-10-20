@@ -86,6 +86,7 @@ INSERT INTO openstreetmap_schema.object_types_inheritance (object_type, extends_
     ('AG_Flaechenobjekt', 'AG_ObjektMitGemeinsamerGeometrie'),
     ('AA_Benutzergruppe', 'AA_NREO'),
     ('AA_Benutzer', 'AA_NREO'),
+    ('AU_Linienobjekt', 'AU_ObjektMitUnabhaengigerGeometrie'),
     /* ('AP_PPO', 'AP_GPO'), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AP_PPO', 'AU_Punkthaufenobjekt'), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AU_Punkthaufenobjekt', 'AU_ObjektMitUnabhaengigerGeometrie'), -- wird nicht in ATKIS Basis-DLM benötigt */
