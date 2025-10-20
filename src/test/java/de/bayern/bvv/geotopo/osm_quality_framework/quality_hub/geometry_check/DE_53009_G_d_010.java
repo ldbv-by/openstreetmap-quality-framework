@@ -22,13 +22,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * AdV-Beschreibung:
- * 53008 'EinrichtungFuerDenSchiffsverkehr' mit ART 1470 'Wasserliegeplatz' darf nicht in 44005 AX_Hafenbecken oder
- * 71011 AX_SonstigesRecht ADF 9450 Hafenbecken liegen oder schneiden.
+ * Die Attributart 'Bauwerksfunktion' mit den Wertearten 2131 'Wellenbrecher, Buhne', 2132 'Lahnung' oder 2133 'Hafendamm, Mole' muss bei
+ * linienförmiger Modellierung innerhalb eines 44001 'Fließgewässer', 44005 'Hafenbecken', 44006 'Stehendes Gewässer' oder
+ * 44007 'Meer' liegen oder deren Umrissgeometrie berühren bzw. kreuzen.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(JacksonConfiguration.class)
-class DE_53008_G_b_004 extends DatabaseIntegrationTest {
+class DE_53009_G_d_010 extends DatabaseIntegrationTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -37,7 +38,7 @@ class DE_53008_G_b_004 extends DatabaseIntegrationTest {
     ObjectMapper objectMapper;
 
     @Test
-    void createWasserliegeplatzAufHochwasserdeich() throws Exception {
+    void createWellenbrecherAufHochwasserdeich() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
@@ -55,13 +56,11 @@ class DE_53008_G_b_004 extends DatabaseIntegrationTest {
                     <nd ref='-25363' />
                     <nd ref='-25364' />
                     <nd ref='-25365' />
-                    <nd ref='-25366' />
-                    <nd ref='-25363' />
                     <tag k='identifikator:UUID' v='DEBYBDLM00000000' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM0000000020251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
-                    <tag k='art' v='1470' />
+                    <tag k='object_type' v='AX_BauwerkImGewaesserbereich' />
+                    <tag k='bauwerksfunktion' v='2131' />
                   </way>
                   <way id='-663' changeset='-1'>
                     <nd ref='-25358' />
@@ -72,8 +71,7 @@ class DE_53008_G_b_004 extends DatabaseIntegrationTest {
                     <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_SonstigesRecht' />
-                    <tag k='artDerFestlegung' v='5700' />
+                    <tag k='object_type' v='AX_Fliessgewaesser' />
                   </way>
                   <relation id='-70' changeset='-1'>
                     <member type='way' ref='-663' role='' />
@@ -106,7 +104,7 @@ class DE_53008_G_b_004 extends DatabaseIntegrationTest {
     }
 
     @Test
-    void createWasserliegeplatzAufHafenbecken() throws Exception {
+    void createWellenbrecherAufHafenbecken() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
@@ -124,12 +122,11 @@ class DE_53008_G_b_004 extends DatabaseIntegrationTest {
                     <nd ref='-25363' />
                     <nd ref='-25364' />
                     <nd ref='-25365' />
-                    <nd ref='-25366' />
-                    <nd ref='-25363' />
                     <tag k='identifikator:UUID' v='DEBYBDLM00000000' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM0000000020251014T125300Z' />
-                    <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
-                    <tag k='art' v='1470' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_BauwerkImGewaesserbereich' />
+                    <tag k='bauwerksfunktion' v='2131' />
                   </way>
                   <way id='-663' changeset='-1'>
                     <nd ref='-25358' />
@@ -139,7 +136,6 @@ class DE_53008_G_b_004 extends DatabaseIntegrationTest {
                     <nd ref='-25358' />
                     <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
-                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Hafenbecken' />
                   </way>
@@ -170,69 +166,29 @@ class DE_53008_G_b_004 extends DatabaseIntegrationTest {
 
         // Assert
         assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
-        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
-
-        QualityServiceResultDto geometryCheck = qualityHubResultDto.qualityServiceResults().stream()
-                .filter(s -> "geometry-check".equals(s.qualityServiceId()))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("QualityService 'geometry-check' not found"));
-
-        assertThat(geometryCheck.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
-
-        assertThat(geometryCheck.errors())
-                .as("Errors of 'geometry-check' must not be empty")
-                .isNotEmpty();
-
-        assertThat(geometryCheck.errors())
-                .extracting(QualityServiceErrorDto::errorText)
-                .as("Error text of 'geometry-check'")
-                .contains("Ein Wasserliegeplatz darf nicht in 'AX_Hafenbecken' oder 'AX_SonstigesRecht' mit 'artDerFestlegung' 9450 liegen oder schneiden.");
+        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result to be valid, but it was invalid.").isTrue();
     }
 
     @Test
-    void createWasserliegeplatzSchneidetHafenbecken() throws Exception {
+    void createWellenbrecherOhneHafenbecken() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25366' changeset='-1' lat='49.88140713973' lon='12.32570240736' />
                   <node id='-25365' changeset='-1' lat='49.88001679828' lon='12.32562534885' />
                   <node id='-25364' changeset='-1' lat='49.88004162616' lon='12.3236218274' />
                   <node id='-25363' changeset='-1' lat='49.88138231255' lon='12.32377594444' />
-                  <node id='-25361' changeset='-1' lat='49.88083611148' lon='12.31946066748' />
-                  <node id='-25360' changeset='-1' lat='49.8806126638' lon='12.32512446848' />
-                  <node id='-25359' changeset='-1' lat='49.88565239886' lon='12.32481623442' />
-                  <node id='-25358' changeset='-1' lat='49.88585099833' lon='12.31976890155' />
                   <way id='-667' changeset='-1'>
                     <nd ref='-25363' />
                     <nd ref='-25364' />
                     <nd ref='-25365' />
-                    <nd ref='-25366' />
-                    <nd ref='-25363' />
                     <tag k='identifikator:UUID' v='DEBYBDLM00000000' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM0000000020251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
-                    <tag k='art' v='1470' />
+                    <tag k='object_type' v='AX_BauwerkImGewaesserbereich' />
+                    <tag k='bauwerksfunktion' v='2131' />
                   </way>
-                  <way id='-663' changeset='-1'>
-                    <nd ref='-25358' />
-                    <nd ref='-25359' />
-                    <nd ref='-25360' />
-                    <nd ref='-25361' />
-                    <nd ref='-25358' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
-                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_SonstigesRecht' />
-                    <tag k='artDerFestlegung' v='9450' />
-                  </way>
-                  <relation id='-70' changeset='-1'>
-                    <member type='way' ref='-663' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
                   <relation id='-60' changeset='-1'>
                     <member type='way' ref='-667' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
@@ -271,6 +227,6 @@ class DE_53008_G_b_004 extends DatabaseIntegrationTest {
         assertThat(geometryCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'geometry-check'")
-                .contains("Ein Wasserliegeplatz darf nicht in 'AX_Hafenbecken' oder 'AX_SonstigesRecht' mit 'artDerFestlegung' 9450 liegen oder schneiden.");
+                .contains("Ein Objekt mit der 'bauwerksfunktion' 2131, 2132 oder 2133 muss bei linienförmiger Modellierung innerhalb eines Objekts 'AX_Fliessgewaesser', 'AX_Hafenbecken', 'AX_StehendesGewaesser' oder 'AX_Meer' liegen, berühren oder kreuzen.");
     }
 }

@@ -22,13 +22,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * AdV-Beschreibung:
- * 53008 'EinrichtungFuerDenSchiffsverkehr' mit ART 1470 'Wasserliegeplatz' darf nicht in 44005 AX_Hafenbecken oder
- * 71011 AX_SonstigesRecht ADF 9450 Hafenbecken liegen oder schneiden.
+ * 54001 'Vegetationsmerkmal' mit BWS 1210 'Baumreihe, Laubholz', BWS 1220 'Baumreihe, Nadelholz' oder
+ * 1230 'Baumreihe, Laub- und Nadelholz' darf nur linienförmig modelliert werden.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(JacksonConfiguration.class)
-class DE_53008_G_b_004 extends DatabaseIntegrationTest {
+class DE_54001_G_a_001 extends DatabaseIntegrationTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -37,51 +37,25 @@ class DE_53008_G_b_004 extends DatabaseIntegrationTest {
     ObjectMapper objectMapper;
 
     @Test
-    void createWasserliegeplatzAufHochwasserdeich() throws Exception {
+    void createBaumreiheNadelholzAsWay() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25366' changeset='-1' lat='49.88418770251' lon='12.32312094704' />
-                  <node id='-25365' changeset='-1' lat='49.88279744114' lon='12.32304388852' />
-                  <node id='-25364' changeset='-1' lat='49.88282226758' lon='12.32104036708' />
-                  <node id='-25363' changeset='-1' lat='49.88416287676' lon='12.32119448412' />
-                  <node id='-25361' changeset='-1' lat='49.88083611148' lon='12.31946066748' />
-                  <node id='-25360' changeset='-1' lat='49.8806126638' lon='12.32512446848' />
-                  <node id='-25359' changeset='-1' lat='49.88565239886' lon='12.32481623442' />
-                  <node id='-25358' changeset='-1' lat='49.88585099833' lon='12.31976890155' />
-                  <way id='-667' changeset='-1'>
-                    <nd ref='-25363' />
-                    <nd ref='-25364' />
-                    <nd ref='-25365' />
-                    <nd ref='-25366' />
-                    <nd ref='-25363' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM00000000' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM0000000020251014T125300Z' />
-                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
-                    <tag k='art' v='1470' />
-                  </way>
+                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
+                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
                   <way id='-663' changeset='-1'>
-                    <nd ref='-25358' />
-                    <nd ref='-25359' />
                     <nd ref='-25360' />
                     <nd ref='-25361' />
-                    <nd ref='-25358' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_SonstigesRecht' />
-                    <tag k='artDerFestlegung' v='5700' />
+                    <tag k='object_type' v='AX_Vegetationsmerkmal' />
+                    <tag k='bewuchs' v='1220' />
                   </way>
-                  <relation id='-70' changeset='-1'>
+                  <relation id='-63' changeset='-1'>
                     <member type='way' ref='-663' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
-                  <relation id='-60' changeset='-1'>
-                    <member type='way' ref='-667' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -106,50 +80,30 @@ class DE_53008_G_b_004 extends DatabaseIntegrationTest {
     }
 
     @Test
-    void createWasserliegeplatzAufHafenbecken() throws Exception {
+    void createBaumreiheNadelholzAsArea() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25366' changeset='-1' lat='49.88418770251' lon='12.32312094704' />
-                  <node id='-25365' changeset='-1' lat='49.88279744114' lon='12.32304388852' />
-                  <node id='-25364' changeset='-1' lat='49.88282226758' lon='12.32104036708' />
-                  <node id='-25363' changeset='-1' lat='49.88416287676' lon='12.32119448412' />
-                  <node id='-25361' changeset='-1' lat='49.88083611148' lon='12.31946066748' />
-                  <node id='-25360' changeset='-1' lat='49.8806126638' lon='12.32512446848' />
-                  <node id='-25359' changeset='-1' lat='49.88565239886' lon='12.32481623442' />
-                  <node id='-25358' changeset='-1' lat='49.88585099833' lon='12.31976890155' />
-                  <way id='-667' changeset='-1'>
-                    <nd ref='-25363' />
-                    <nd ref='-25364' />
-                    <nd ref='-25365' />
-                    <nd ref='-25366' />
-                    <nd ref='-25363' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM00000000' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM0000000020251014T125300Z' />
-                    <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
-                    <tag k='art' v='1470' />
-                  </way>
+                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
+                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
+                  <node id='-25359' changeset='-1' lat='49.88413518675' lon='12.32447493031' />
+                  <node id='-25358' changeset='-1' lat='49.8841101097' lon='12.31855920723' />
                   <way id='-663' changeset='-1'>
                     <nd ref='-25358' />
                     <nd ref='-25359' />
                     <nd ref='-25360' />
                     <nd ref='-25361' />
                     <nd ref='-25358' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_Hafenbecken' />
+                    <tag k='object_type' v='AX_Vegetationsmerkmal' />
+                    <tag k='bewuchs' v='1220' />
                   </way>
-                  <relation id='-70' changeset='-1'>
+                  <relation id='-63' changeset='-1'>
                     <member type='way' ref='-663' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
-                  <relation id='-60' changeset='-1'>
-                    <member type='way' ref='-667' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -186,55 +140,25 @@ class DE_53008_G_b_004 extends DatabaseIntegrationTest {
         assertThat(geometryCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'geometry-check'")
-                .contains("Ein Wasserliegeplatz darf nicht in 'AX_Hafenbecken' oder 'AX_SonstigesRecht' mit 'artDerFestlegung' 9450 liegen oder schneiden.");
+                .contains("Ein 'AX_Vegetationsmerkmal' mit 'bewuchs' 1210, 1220 oder 1230 darf nur linienförmig modelliert werden.");
     }
 
     @Test
-    void createWasserliegeplatzSchneidetHafenbecken() throws Exception {
+    void createBaumreiheNadelholzAsNode() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25366' changeset='-1' lat='49.88140713973' lon='12.32570240736' />
-                  <node id='-25365' changeset='-1' lat='49.88001679828' lon='12.32562534885' />
-                  <node id='-25364' changeset='-1' lat='49.88004162616' lon='12.3236218274' />
-                  <node id='-25363' changeset='-1' lat='49.88138231255' lon='12.32377594444' />
-                  <node id='-25361' changeset='-1' lat='49.88083611148' lon='12.31946066748' />
-                  <node id='-25360' changeset='-1' lat='49.8806126638' lon='12.32512446848' />
-                  <node id='-25359' changeset='-1' lat='49.88565239886' lon='12.32481623442' />
-                  <node id='-25358' changeset='-1' lat='49.88585099833' lon='12.31976890155' />
-                  <way id='-667' changeset='-1'>
-                    <nd ref='-25363' />
-                    <nd ref='-25364' />
-                    <nd ref='-25365' />
-                    <nd ref='-25366' />
-                    <nd ref='-25363' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM00000000' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM0000000020251014T125300Z' />
+                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
+                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
-                    <tag k='art' v='1470' />
-                  </way>
-                  <way id='-663' changeset='-1'>
-                    <nd ref='-25358' />
-                    <nd ref='-25359' />
-                    <nd ref='-25360' />
-                    <nd ref='-25361' />
-                    <nd ref='-25358' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
-                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_SonstigesRecht' />
-                    <tag k='artDerFestlegung' v='9450' />
-                  </way>
-                  <relation id='-70' changeset='-1'>
-                    <member type='way' ref='-663' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
-                  <relation id='-60' changeset='-1'>
-                    <member type='way' ref='-667' role='' />
+                    <tag k='object_type' v='AX_Vegetationsmerkmal' />
+                    <tag k='bewuchs' v='1220' />
+                  </node>
+                  <relation id='-63' changeset='-1'>
+                    <member type='node' ref='-25402' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -271,6 +195,6 @@ class DE_53008_G_b_004 extends DatabaseIntegrationTest {
         assertThat(geometryCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'geometry-check'")
-                .contains("Ein Wasserliegeplatz darf nicht in 'AX_Hafenbecken' oder 'AX_SonstigesRecht' mit 'artDerFestlegung' 9450 liegen oder schneiden.");
+                .contains("Ein 'AX_Vegetationsmerkmal' mit 'bewuchs' 1210, 1220 oder 1230 darf nur linienförmig modelliert werden.");
     }
 }
