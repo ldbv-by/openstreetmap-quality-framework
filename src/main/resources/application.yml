@@ -16,7 +16,7 @@ spring:
   cache:
     cache-names: "cacheObjectTypeInfo"
     caffeine:
-      spec: "maximumSize=100,expireAfterAccess=600s"
+      spec: "maximumSize=100,expireAfterAccess=1d"
 
   jpa:
 #    show-sql: true
