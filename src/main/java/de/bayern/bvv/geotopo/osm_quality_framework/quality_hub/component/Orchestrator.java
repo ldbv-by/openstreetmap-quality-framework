@@ -8,6 +8,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.QualityPip
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.exception.QualityServiceException;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.model.QualityHubResult;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceRequestDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceResultDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.spi.QualityService;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
@@ -96,6 +97,7 @@ public class Orchestrator {
             // Send changeset to quality service asynchronous
             CompletableFuture
                 .supplyAsync(() -> {
+                    long qualityServiceStartTime = System.currentTimeMillis();
                     QualityServiceRequestDto qualityServiceRequestDto =
                             new QualityServiceRequestDto(
                                     step.getId(),
@@ -103,7 +105,13 @@ public class Orchestrator {
                                     ChangesetMapper.toDto(changeset),
                                     changesetDataSetDto);
 
-                    return qualityServiceBean.checkChangesetQuality(qualityServiceRequestDto);
+                    QualityServiceResultDto qualityServiceResultDto =
+                            qualityServiceBean.checkChangesetQuality(qualityServiceRequestDto);
+
+                    log.info("quality-service-check({}): id={}, time={} ms",
+                            qualityServiceRequestDto.changesetId(), step.getId(), System.currentTimeMillis() - qualityServiceStartTime);
+
+                    return qualityServiceResultDto;
                 }, executor)
                 .orTimeout(5, TimeUnit.MINUTES)
                 .whenComplete((qualityServiceResultDto, throwable) -> {

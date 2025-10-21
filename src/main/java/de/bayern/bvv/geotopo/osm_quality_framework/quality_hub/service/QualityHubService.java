@@ -9,6 +9,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.dto.Ch
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class QualityHubService {
 
     private final Orchestrator orchestrator;
@@ -25,10 +27,16 @@ public class QualityHubService {
      * Persists the changeset and publishes it to the configured quality services.
      */
     public QualityHubResultDto checkChangesetQuality(Long changesetId, ChangesetDto changesetDto) {
+        long startTime = System.currentTimeMillis();
         this.changesetPrepareService.prepareChangeset(changesetId, changesetDto);
+        long prepareTime = System.currentTimeMillis() - startTime;
 
         Changeset changeset = ChangesetMapper.toDomain(changesetId, changesetDto);
         QualityHubResult qualityHubResult = this.orchestrator.start(changeset);
+
+        long totalTime = System.currentTimeMillis() - startTime;
+        log.info("checkChangesetQuality({}): prepareTime={} ms, orchestratorTime={} ms, totalTime={} ms",
+                changesetId, prepareTime, (totalTime - prepareTime), totalTime);
 
         return QualityHubResultMapper.toDto(qualityHubResult);
     }

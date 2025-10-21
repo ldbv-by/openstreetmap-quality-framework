@@ -18,6 +18,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.spi.QualityS
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.ExpressionParser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -28,6 +29,7 @@ import java.util.stream.Stream;
 
 @Service("geometry-check")
 @RequiredArgsConstructor
+@Slf4j
 public class GeometryCheckService implements QualityService {
 
     private final OsmSchemaService osmSchemaService;
@@ -66,6 +68,7 @@ public class GeometryCheckService implements QualityService {
             if (objectType != null) {
                 // ----- Check schema rules "geometry-check" for tagged object.
                 for (Rule rule : objectType.getRules().stream().filter(r -> r.getType().equals("geometry-check")).toList()) {
+                    long ruleStartTime = System.currentTimeMillis();
                     Expression conditions = this.expressionParser.parse(rule.getExpression().path("conditions"));
                     Expression checks = this.expressionParser.parse(rule.getExpression().path("checks"));
 
@@ -74,6 +77,9 @@ public class GeometryCheckService implements QualityService {
                             this.setError(taggedObject, rule.getErrorText());
                         }
                     }
+
+                    log.info("geometry-check({}): rule={}, time={} ms",
+                            qualityServiceRequestDto.changesetId(), rule.getId(), System.currentTimeMillis() - ruleStartTime);
                 }
             }
         }

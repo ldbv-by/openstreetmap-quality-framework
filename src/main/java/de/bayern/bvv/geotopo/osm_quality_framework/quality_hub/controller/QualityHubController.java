@@ -31,12 +31,8 @@ public class QualityHubController {
             @PathVariable Long changesetId,
             @RequestBody ChangesetDto changesetDto) {
 
-        log.info("Check changeset {}: {}", changesetId, changesetDto);
-
         QualityHubResultDto qualityHubResultDto =
                 this.qualityHubService.checkChangesetQuality(changesetId, changesetDto);
-
-        log.info("Result for changeset {}: {}", changesetId, qualityHubResultDto);
 
         return ResponseEntity.ok(qualityHubResultDto);
     }

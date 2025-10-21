@@ -19,6 +19,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.model.Qualit
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.model.QualityServiceResult;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.spi.QualityService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -27,6 +28,7 @@ import java.util.stream.Stream;
 
 @Service("attribute-check")
 @RequiredArgsConstructor
+@Slf4j
 public class AttributeCheckService implements QualityService {
 
     private final OsmSchemaService osmSchemaService;
@@ -39,6 +41,7 @@ public class AttributeCheckService implements QualityService {
      */
     @Override
     public QualityServiceResultDto checkChangesetQuality(QualityServiceRequestDto qualityServiceRequestDto) {
+        long startTime = System.currentTimeMillis();
 
         // ----- Initialize result of quality service.
         this.qualityServiceResult = new QualityServiceResult(qualityServiceRequestDto.qualityServiceId(), qualityServiceRequestDto.changesetId());
@@ -58,6 +61,7 @@ public class AttributeCheckService implements QualityService {
         ) {
 
             // ----- Get schema configuration for tagged object.
+            long checkSchemaStartTime = System.currentTimeMillis();
             ObjectType objectType = Optional.ofNullable(this.osmSchemaService.getObjectTypeInfo(taggedObject.getObjectType()))
                     .map(ObjectTypeMapper::toDomain)
                     .orElse(null);
@@ -65,11 +69,16 @@ public class AttributeCheckService implements QualityService {
             if (objectType != null) {
 
                 // ----- Check schema for tagged object.
+
                 this.checkSchema(taggedObject, objectType);
+
+                log.info("attribute-check({}): object-type={}, checkSchemaTime={} ms",
+                        qualityServiceRequestDto.changesetId(), objectType.getName(), System.currentTimeMillis() - checkSchemaStartTime);
 
                 // ----- Check schema rules "attribute-check" for tagged object.
                 if (this.qualityServiceResult.getErrors().isEmpty()) {
                     for (Rule rule : objectType.getRules().stream().filter(r -> r.getType().equals("attribute-check")).toList()) {
+                        long ruleStartTime = System.currentTimeMillis();
                         Expression conditions = this.expressionParser.parse(rule.getExpression().path("conditions"));
                         Expression checks = this.expressionParser.parse(rule.getExpression().path("checks"));
 
@@ -78,6 +87,9 @@ public class AttributeCheckService implements QualityService {
                                 this.setError(taggedObject, rule.getErrorText());
                             }
                         }
+
+                        log.info("attribute-check({}): rule={}, time={} ms",
+                                qualityServiceRequestDto.changesetId(), rule.getId(), System.currentTimeMillis() - ruleStartTime);
                     }
                 }
 
@@ -86,6 +98,11 @@ public class AttributeCheckService implements QualityService {
                 this.setError(taggedObject,"Keine Schemaeinträge für '" + taggedObject.getObjectType() + "' gefunden.");
             }
         }
+
+        long totalTime = System.currentTimeMillis() - startTime;
+
+        log.info("attribute-check({}): totalTime={} ms",
+                qualityServiceRequestDto.changesetId(), totalTime);
 
         return QualityServiceResultMapper.toDto(this.qualityServiceResult);
     }
