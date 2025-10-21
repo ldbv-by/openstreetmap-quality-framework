@@ -1,6 +1,7 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.service;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.api.ChangesetDataService;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.ChangesetState;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.ChangesetDataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
@@ -45,8 +46,8 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
                 .orElse(new DataSet());
 
         // Optionally load features from specified changesets and merge them into the current dataset.
-        if (dataSetFilter.includedChangesetIds() != null) {
-            for (Long changesetId : dataSetFilter.includedChangesetIds()) {
+        if (dataSetFilter.ignoreChangesetData() == null || !dataSetFilter.ignoreChangesetData()) {
+            for (Long changesetId : this.changesetDataService.getChangesetIds(Set.of(ChangesetState.OPEN, ChangesetState.CHECKED))) {
 
                 ChangesetDataSet cs = Optional.ofNullable(this.changesetDataService.getDataSet(
                                 changesetId,
@@ -115,7 +116,7 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
             ) : featureFilter;
 
             dataSetFilter = new DataSetFilter(
-                    (dataSetFilter != null) ? dataSetFilter.includedChangesetIds() : null,
+                    (dataSetFilter != null) ? dataSetFilter.ignoreChangesetData() : null,
                     modifiedFeatureFilter,
                     (dataSetFilter != null) ? dataSetFilter.coordinateReferenceSystem() : null
             );

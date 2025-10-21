@@ -132,15 +132,23 @@ public abstract class DatabaseIntegrationTest {
                 this.jdbcTemplate.execute(def.replace(srcSchemaName, dstSchemaName));
             }
 
-            // create changeset_objects table and add changeset_id to object tables
+            // create changesets and changeset_objects table and add changeset_id to object tables
             String ddl = """
+            CREATE TABLE IF NOT EXISTS changeset_data.changesets (
+              id                bigint       PRIMARY KEY,
+              state             text         NOT NULL,
+              created_at        timestamptz  NOT NULL,
+              closed_at         timestamptz,
+              CONSTRAINT chk_changeset_state
+                CHECK (state IN ('OPEN','CHECKED','FINISHED', 'CANCELLED'))
+            );
+
             CREATE TABLE IF NOT EXISTS changeset_data.changeset_objects (
               id                bigserial    PRIMARY KEY,
               osm_id            bigint       NOT NULL,
               geometry_type     text         NOT NULL,
               changeset_id      bigint       NOT NULL,
               operation_type    text         NOT NULL,
-              created_at        timestamptz  NOT NULL DEFAULT now(),
               CONSTRAINT chk_changeset_objects_geom_type
                 CHECK (geometry_type IN ('NODE','WAY','AREA', 'MULTIPOLYGON','RELATION')),
               CONSTRAINT chk_changeset_objects_op_type

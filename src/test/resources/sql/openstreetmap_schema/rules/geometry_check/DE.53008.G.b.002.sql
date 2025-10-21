@@ -14,17 +14,17 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                 {
                     "type": "spatial_compare",
                     "operator": "touches",
-                    "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_Fliessgewaesser|AX_Hafenbecken|AX_StehendesGewaesser|AX_Meer" } } }
+                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Fliessgewaesser|AX_Hafenbecken|AX_StehendesGewaesser|AX_Meer" } } }
                 },
                 {
                     "type": "spatial_compare",
                     "operator": "intersects",
-                    "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_EinrichtungenFuerDenSchiffsverkehr", "art": "1460" } } }
+                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_EinrichtungenFuerDenSchiffsverkehr", "art": "1460" } } }
                 },
                 {
                     "type": "spatial_compare",
                     "operator": "intersects",
-                    "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_BauwerkImGewaesserbereich", "art": "2133" } } }
+                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_BauwerkImGewaesserbereich", "art": "2133" } } }
                 }
             ]
         }

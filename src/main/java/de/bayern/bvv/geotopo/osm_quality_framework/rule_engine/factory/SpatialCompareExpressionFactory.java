@@ -61,7 +61,7 @@ public class SpatialCompareExpressionFactory implements ExpressionFactory {
                             if (compareDataSet == null) return false;
 
                             relationDataSetFilter = new DataSetFilter(
-                                    List.of(1L),
+                                    null,
                                     new FeatureFilter(
                                             new OsmIds(compareDataSet.getNodes() == null ? null : compareDataSet.getNodes().stream().map(Feature::getOsmId).collect(Collectors.toSet()),
                                                        compareDataSet.getWays()  == null ? null : compareDataSet.getWays().stream().map(Feature::getOsmId).collect(Collectors.toSet()),

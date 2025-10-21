@@ -7,7 +7,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
         "checks": {
             "type": "spatial_compare",
             "operator": "covered_by",
-            "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_FlaecheBesondererFunktionalerPraegung|AX_SportFreizeitUndErholungsflaeche" } } }
+            "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_FlaecheBesondererFunktionalerPraegung|AX_SportFreizeitUndErholungsflaeche" } } }
         }
     }',
     'Die Wertearten mit der ''bauwerksfunktion'' 1431 und 1432 müssen ''AX_FlaecheBesondererFunktionalerPraegung'' oder ''AX_SportFreizeitUndErholungsflaeche'' überlagern.')

@@ -17,7 +17,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                     "relation_master_role": "over",
                                     "operator": "equals_topo",
                                     "relation_compare_role": "under",
-                                    "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_Strassenachse|AX_Fahrwegachse|AX_Bahnstrecke|AX_Gewaesserachse|AX_WegPfadSteig|AX_Gleis" } } }
+                                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Strassenachse|AX_Fahrwegachse|AX_Bahnstrecke|AX_Gewaesserachse|AX_WegPfadSteig|AX_Gleis" } } }
                                 }
                             }
                         }

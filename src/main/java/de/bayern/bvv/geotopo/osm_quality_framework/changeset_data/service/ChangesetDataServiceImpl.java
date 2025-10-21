@@ -1,12 +1,8 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.service;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.ChangesetObjectEntity;
+import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.repository.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.api.ChangesetDataService;
-import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.AreaEntity;
-import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.NodeEntity;
-import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.RelationEntity;
-import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.WayEntity;
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.mapper.AreaEntityMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.mapper.NodeEntityMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.mapper.RelationEntityMapper;
@@ -15,6 +11,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.api.
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.dto.ChangesetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.ChangesetState;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.ChangesetDataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.ChangesetDataSetMapper;
@@ -22,7 +19,9 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.D
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +37,7 @@ import java.util.stream.Collectors;
 public class ChangesetDataServiceImpl implements ChangesetDataService {
 
     private final ChangesetDataRepository changesetDataRepository;
+    private final ChangesetRepository changesetRepository;
     private final ChangesetObjectRepository changesetObjectRepository;
 
     private final ChangesetNodeRepository nodeRepository;
@@ -55,6 +55,7 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
         Changeset changeset = ChangesetMapper.toDomain(changesetId, changesetDto);
 
         this.changesetDataRepository.deleteChangesetData(changesetId);
+        this.changesetDataRepository.initChangeset(changeset);
         this.changesetDataRepository.copyPreparedData(changesetId);
         this.changesetDataRepository.insertChangesetObjects(changeset);
     }
@@ -296,5 +297,32 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
         }
 
         return relations;
+    }
+
+    /**
+     * Set state on changeset.
+     */
+    @Override
+    @Transactional
+    public void setChangesetState(Long changesetId, ChangesetState state) {
+        ChangesetEntity cs = this.changesetRepository.findById(changesetId)
+                .orElseThrow(() -> new IllegalArgumentException("Changeset %d not found".formatted(changesetId)));
+
+        cs.setState(state);
+        if (state == ChangesetState.FINISHED || state == ChangesetState.CANCELLED) {
+            cs.setClosedAt(Instant.now());
+        } else {
+            cs.setClosedAt(null);
+        }
+
+        this.changesetRepository.save(cs);
+    }
+
+    /**
+     * Get not finished changeset ids.
+     */
+    @Override
+    public List<Long> getChangesetIds(Set<ChangesetState> states) {
+        return this.changesetRepository.findIdsByStatesOrderByCreatedAtAsc(states);
     }
 }

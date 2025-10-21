@@ -12,7 +12,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
         "checks": {
             "type": "spatial_compare",
             "operator": "equals_topo",
-            "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_Gewaesserachse" } } }
+            "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Gewaesserachse" } } }
         }
     }',
     'Ein linienförmiges Objekt ''AX_BauwerkImGewaesserbereich'' mit ''bauwerksfunktion'' 2010 bis 2013, 2070 und 2090 überlagern ein Objekt ''AX_Gewaesserachse'' mit identischer Geometrie.')

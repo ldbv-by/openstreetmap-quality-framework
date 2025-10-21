@@ -1,8 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -19,8 +17,13 @@ public abstract class OsmObjectEntity {
     @Column(name = "version")
     private Integer version;
 
-    @Column(name = "changeset_id")
-    private Long changesetId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "changeset_id",
+            referencedColumnName = "id",
+            foreignKey = @ForeignKey(name = "fk_changeset_id")
+    )
+    private ChangesetEntity changeset;
 
     @Column(name = "object_type")
     private String objectType;

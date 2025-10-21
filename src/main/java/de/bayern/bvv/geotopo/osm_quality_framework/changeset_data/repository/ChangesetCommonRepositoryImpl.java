@@ -114,7 +114,7 @@ public class ChangesetCommonRepositoryImpl<T> {
 
         // Set filter changeset id.
         if (changesetId != null && changesetId > 0) {
-            predicates.add(criteriaBuilder.equal(root.get("changesetId"), changesetId));
+            predicates.add(criteriaBuilder.equal(root.get("changeset").get("id"), changesetId));
         }
 
         // Combine predicates with AND logic

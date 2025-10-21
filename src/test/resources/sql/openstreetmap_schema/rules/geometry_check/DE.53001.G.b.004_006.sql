@@ -8,7 +8,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
             "all": [
                 { "type": "spatial_compare",
                   "operator": "covered_by",
-                  "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_Schleuse" } } }
+                  "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Schleuse" } } }
                 },
                 {
                     "any": [
@@ -17,7 +17,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                 { "type": "geom_type", "value": "LineString" },
                                 { "type": "spatial_compare",
                                   "operator": "equals_topo",
-                                  "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_Gewaesserachse" } } }
+                                  "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Gewaesserachse" } } }
                                 }
                             ]
                         },
@@ -26,7 +26,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                 { "type": "geom_type", "value": "Point" },
                                 { "type": "spatial_compare",
                                   "operator": "covered_by",
-                                  "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_Gewaesserachse" } } }
+                                  "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Gewaesserachse" } } }
                                 }
                             ]
                         },
@@ -35,7 +35,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                 { "type": "geom_type", "value": "Polygon" },
                                 { "type": "spatial_compare",
                                   "operator": "covered_by",
-                                  "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_Fliessgewaesser" } } }
+                                  "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Fliessgewaesser" } } }
                                 }
                             ]
                         }

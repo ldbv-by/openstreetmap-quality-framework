@@ -32,6 +32,9 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
             this.jdbcTemplate.update("DELETE FROM changeset_data." + tableName +
                                          " WHERE changeset_id = ?", changesetId);
         }
+
+        this.jdbcTemplate.update("DELETE FROM changeset_data.changesets" +
+                " WHERE id = ?", changesetId);
     }
 
     /**
@@ -162,13 +165,33 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
     ){}
 
     /**
+     * Init changeset.
+     */
+    @Override
+    @Transactional
+    public void initChangeset(Changeset changeset) {
+        // Create changeset
+        String upsertChangeset = """
+            INSERT INTO changeset_data.changesets (id, state, created_at, closed_at)
+            VALUES (?, ?, CURRENT_TIMESTAMP, NULL)
+            ON CONFLICT (id) DO UPDATE
+            SET state = EXCLUDED.state,
+                closed_at = NULL
+        """;
+
+        this.jdbcTemplate.update(upsertChangeset, ps -> {
+            ps.setLong(1, changeset.getId());
+            ps.setString(2, ChangesetState.OPEN.name());
+        });
+    }
+
+    /**
      * Inserts all changeset objects with operation type (CREATE, MODIFY, DELETE).
      */
     @Override
     @Transactional
     public void insertChangesetObjects(Changeset changeset) {
-
-        // Created and modified changeset objects
+                // Created and modified changeset objects
         String createdAndModifiedChangesetObjects = """
                 WITH v_changeset AS (SELECT ?::bigint AS changeset_id)
         

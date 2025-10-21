@@ -6,7 +6,7 @@ import java.util.List;
  * Data Transfer Object that specifies the dataset scope and criteria used for searches.
  */
 public record DataSetFilter(
-        List<Long> includedChangesetIds,
+        Boolean ignoreChangesetData,
         FeatureFilter featureFilter,
         String coordinateReferenceSystem
 ) {}

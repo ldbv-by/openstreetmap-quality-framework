@@ -5,8 +5,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
     '{
         "checks": {
             "type": "object_exists",
-            "data_set_filter": { "includedChangesetIds": [1],
-                                 "featureFilter": { "tags": { "gemeindekennzeichen:land": "current:kennzeichen:land",
+            "data_set_filter": { "featureFilter": { "tags": { "gemeindekennzeichen:land": "current:kennzeichen:land",
                                                               "gemeindekennzeichen:regierungsbezirk": "current:kennzeichen:regierungsbezirk",
                                                               "gemeindekennzeichen:kreis": "current:kennzeichen:kreis",
                                                               "gemeindekennzeichen:gemeinde": "current:kennzeichen:gemeinde",

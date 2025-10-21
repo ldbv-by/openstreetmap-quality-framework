@@ -1,15 +1,21 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.id.RelationMemberId;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity(name = "RelationMembersChangesetData")
 @Table(name = "relation_members", schema = "changeset_data")
 public class RelationMemberEntity {
     @EmbeddedId
     private RelationMemberId memberId;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "changeset_id",
+            referencedColumnName = "id",
+            foreignKey = @ForeignKey(name = "fk_changeset_id")
+    )
+    private ChangesetEntity changeset;
 
     /*
     -- Add in osm2pgsql version 2.1.0. Add to lua create_indes='primary_key'

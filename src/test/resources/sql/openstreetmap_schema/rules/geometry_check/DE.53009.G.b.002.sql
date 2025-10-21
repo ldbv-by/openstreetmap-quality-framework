@@ -14,12 +14,12 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                 {
                     "type": "spatial_compare",
                     "operator": "covered_by",
-                    "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_UnlandVegetationsloseFlaeche", "funktion": "1100" } } }
+                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_UnlandVegetationsloseFlaeche", "funktion": "1100" } } }
                 },
                 {
                     "type": "spatial_compare",
                     "operator": "covered_by",
-                    "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_IndustrieUndGewerbeflaeche", "funktion": "2530" } } }
+                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_IndustrieUndGewerbeflaeche", "funktion": "2530" } } }
                 }
             ]
         }

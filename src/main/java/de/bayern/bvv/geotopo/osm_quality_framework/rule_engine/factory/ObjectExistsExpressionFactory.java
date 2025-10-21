@@ -118,7 +118,7 @@ public class ObjectExistsExpressionFactory implements ExpressionFactory {
             }
 
             return new DataSetFilter(
-                    dataSetFilter.includedChangesetIds(),
+                    dataSetFilter.ignoreChangesetData(),
                     new FeatureFilter(dataSetFilter.featureFilter().osmIds(), resolvedTags, dataSetFilter.featureFilter().boundingBox()),
                     dataSetFilter.coordinateReferenceSystem()
             );

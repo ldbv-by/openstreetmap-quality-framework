@@ -7,7 +7,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
         "checks": {
             "type": "spatial_compare",
             "operator": "covered_by",
-            "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_Leitung" } } }
+            "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Leitung" } } }
         }
     }',
     'Ein Freileitungsmast muss immer auf einer Leitung liegen.')

@@ -9,19 +9,19 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                 {
                     "type": "spatial_compare",
                     "operator": "covered_by",
-                    "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_FlaecheBesondererFunktionalerPraegung",
+                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_FlaecheBesondererFunktionalerPraegung",
                                                                       "funktion": "1170|not_exists" } } }
                 },
                 {
                     "type": "spatial_compare",
                     "operator": "covered_by",
-                    "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_SportFreizeitUndErholungsflaeche",
+                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_SportFreizeitUndErholungsflaeche",
                                                                       "funktion": "4100" } } }
                 },
                 {
                     "type": "spatial_compare",
                     "operator": "covered_by",
-                    "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_SonstigesRecht",
+                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_SonstigesRecht",
                                                                       "artDerFestlegung": "4720" } } }
                 }
             ]

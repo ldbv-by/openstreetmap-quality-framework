@@ -20,6 +20,11 @@ public interface ChangesetDataRepository {
     void copyPreparedData(Long changesetId);
 
     /**
+     * Init changeset.
+     */
+    void initChangeset(Changeset changeset);
+
+    /**
      * Inserts all changeset objects with operation type (CREATE, MODIFY, DELETE).
      */
     void insertChangesetObjects(Changeset changeset);

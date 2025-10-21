@@ -7,7 +7,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
         "checks": {
             "type": "spatial_compare",
             "operator": "covered_by",
-            "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_Strassenachse|AX_Bahnstrecke" } } }
+            "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Strassenachse|AX_Bahnstrecke" } } }
         }
     }',
     'Ein Objekt mit der ''art'' 1410 liegt immer auf einem Objekt ''AX_Strassenachse'' oder ''AX_Bahnstrecke''.')

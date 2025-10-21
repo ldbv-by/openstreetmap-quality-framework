@@ -16,12 +16,12 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                         {
                             "type": "spatial_compare",
                             "operator": "equals_topo",
-                            "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_Strassenachse|AX_Fahrwegachse" } } }
+                            "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Strassenachse|AX_Fahrwegachse" } } }
                         },
                         {
                             "type": "spatial_compare",
                             "operator": "covered_by_boundary",
-                            "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_Fliessgewaesser" } } }
+                            "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Fliessgewaesser" } } }
                         }
                     ]
                 },
@@ -30,12 +30,12 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                         {
                             "type": "spatial_compare",
                             "operator": "equals_topo",
-                            "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_WegPfadSteig" } } }
+                            "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_WegPfadSteig" } } }
                         },
                         {
                             "type": "spatial_compare",
                             "operator": "covered_by",
-                            "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_Fliessgewaesser" } } }
+                            "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Fliessgewaesser" } } }
                         }
                     ]
                 }

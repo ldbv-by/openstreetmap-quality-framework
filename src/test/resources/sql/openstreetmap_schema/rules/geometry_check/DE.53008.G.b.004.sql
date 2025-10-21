@@ -10,14 +10,14 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                     "not": {
                         "type": "spatial_compare",
                         "operators": ["covered_by", "intersects"],
-                        "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_Hafenbecken" } } }
+                        "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Hafenbecken" } } }
                     }
                 },
                 {
                     "not": {
                         "type": "spatial_compare",
                         "operators": ["covered_by", "intersects"],
-                        "data_set_filter": { "includedChangesetIds": [1], "featureFilter": { "tags": { "object_type": "AX_SonstigesRecht", "artDerFestlegung": "9450" } } }
+                        "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_SonstigesRecht", "artDerFestlegung": "9450" } } }
                     }
                 }
             ]

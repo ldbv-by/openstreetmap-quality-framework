@@ -23,13 +23,15 @@ public class ChangesetObjectEntity {
     @Column(name = "geometry_type", nullable = false)
     private GeometryType geometryType;
 
-    @Column(name = "changeset_id", nullable = false)
-    private Long changesetId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "changeset_id",
+            referencedColumnName = "id",
+            foreignKey = @ForeignKey(name = "fk_changeset_id")
+    )
+    private ChangesetEntity changeset;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "operation_type", nullable = false)
     private OperationType operationType;
-
-    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
-    private Instant createdAt;
 }

@@ -1,6 +1,8 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.service;
 
+import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.api.ChangesetDataService;
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_prepare.api.ChangesetPrepareService;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.ChangesetState;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.dto.QualityHubResultDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.mapper.QualityHubResultMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.model.QualityHubResult;
@@ -22,6 +24,7 @@ public class QualityHubService {
 
     private final Orchestrator orchestrator;
     private final ChangesetPrepareService changesetPrepareService;
+    private final ChangesetDataService changesetDataService;
 
     /**
      * Persists the changeset and publishes it to the configured quality services.
@@ -33,6 +36,12 @@ public class QualityHubService {
 
         Changeset changeset = ChangesetMapper.toDomain(changesetId, changesetDto);
         QualityHubResult qualityHubResult = this.orchestrator.start(changeset);
+
+        if (qualityHubResult.isValid()) {
+            this.changesetDataService.setChangesetState(changesetId, ChangesetState.CHECKED);
+        } else {
+            this.changesetDataService.setChangesetState(changesetId, ChangesetState.CANCELLED);
+        }
 
         long totalTime = System.currentTimeMillis() - startTime;
         log.info("checkChangesetQuality({}): prepareTime={} ms, orchestratorTime={} ms, totalTime={} ms",
