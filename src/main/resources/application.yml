@@ -13,8 +13,13 @@ spring:
     hikari:
       connection-init-sql: CREATE SCHEMA IF NOT EXISTS openstreetmap_schema;
 
+  cache:
+    cache-names: "cacheObjectTypeInfo"
+    caffeine:
+      spec: "maximumSize=100,expireAfterAccess=600s"
+
   jpa:
-    show-sql: true
+#    show-sql: true
     defer-datasource-initialization: true
     hibernate:
       ddl-auto: update
