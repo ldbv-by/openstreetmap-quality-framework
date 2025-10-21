@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y \
     maven \
     postgresql-client \
     curl ca-certificates tar gzip \
+    dos2unix \
  && rm -rf /var/lib/apt/lists/*
 
 # ---- Copy pgdump ----
@@ -64,4 +65,4 @@ COPY docker/entrypoint/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 8080
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT [ "/bin/sh", "-c", "dos2unix /usr/local/bin/docker-entrypoint.sh && /usr/local/bin/docker-entrypoint.sh"]
