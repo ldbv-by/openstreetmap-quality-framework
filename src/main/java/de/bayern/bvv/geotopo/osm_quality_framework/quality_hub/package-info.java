@@ -3,7 +3,8 @@
                 "quality_core::*",
                 "quality_services::*",
                 "changeset_prepare::*",
-                "changeset_data::*"
+                "changeset_data::*",
+                "openstreetmap_tools::*"
         }
 )
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub;

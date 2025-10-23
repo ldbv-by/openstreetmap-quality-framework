@@ -5,6 +5,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.dto.QualityHubRes
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.service.QualityHubService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,5 +36,17 @@ public class QualityHubController {
                 this.qualityHubService.checkChangesetQuality(changesetId, changesetDto);
 
         return ResponseEntity.ok(qualityHubResultDto);
+    }
+
+
+    /**
+     * Updates OpenStreetMap geometries with the finalized changeset.
+     * Sets the changeset state to "finished".
+     */
+    @PutMapping("/finish/changeset/{changesetId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> finishChangeset(@PathVariable Long changesetId) {
+        this.qualityHubService.finishChangeset(changesetId);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -6,6 +6,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.OsmPrimitive;
 import lombok.experimental.UtilityClass;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -28,9 +29,9 @@ public class ChangesetMapper {
         domain.setVersion(changesetDto.getVersion());
         domain.setGenerator(changesetDto.getGenerator());
 
-        domain.setCreatePrimitives(mapOsmPrimitivesToDomain(changesetDto.getCreatePrimitives()));
-        domain.setModifyPrimitives(mapOsmPrimitivesToDomain(changesetDto.getModifyPrimitives()));
-        domain.setDeletePrimitives(mapOsmPrimitivesToDomain(changesetDto.getDeletePrimitives()));
+        domain.setCreatePrimitives(mapOsmPrimitivesToDomain(changesetDto.getCreateBlocks()));
+        domain.setModifyPrimitives(mapOsmPrimitivesToDomain(changesetDto.getModifyBlocks()));
+        domain.setDeletePrimitives(mapOsmPrimitivesToDomain(changesetDto.getDeleteBlocks()));
 
         return domain;
     }
@@ -45,9 +46,9 @@ public class ChangesetMapper {
         dto.setVersion(changeset.getVersion());
         dto.setGenerator(changeset.getGenerator());
 
-        dto.setCreatePrimitives(mapOsmPrimitivesToDto(changeset.getCreatePrimitives()));
-        dto.setModifyPrimitives(mapOsmPrimitivesToDto(changeset.getModifyPrimitives()));
-        dto.setDeletePrimitives(mapOsmPrimitivesToDto(changeset.getDeletePrimitives()));
+        dto.setCreateBlocks(mapOsmPrimitivesToDto(changeset.getCreatePrimitives()));
+        dto.setModifyBlocks(mapOsmPrimitivesToDto(changeset.getModifyPrimitives()));
+        dto.setDeleteBlocks(mapOsmPrimitivesToDto(changeset.getDeletePrimitives()));
 
         return dto;
     }
@@ -55,22 +56,37 @@ public class ChangesetMapper {
     /**
      * Map OsmPrimitive List domain to dto.
      */
-    private List<OsmPrimitiveDto> mapOsmPrimitivesToDto(List<OsmPrimitive> list) {
-        if (list == null || list.isEmpty()) return Collections.emptyList();
-        return list.stream()
-                .filter(Objects::nonNull)
-                .map(OsmPrimitiveMapper::toDto)
-                .collect(Collectors.toList());
+    private List<ChangesetDto.OsmPrimitiveBlockDto> mapOsmPrimitivesToDto(List<OsmPrimitive> primitives) {
+        if (primitives == null || primitives.isEmpty()) return Collections.emptyList();
+
+        List<ChangesetDto.OsmPrimitiveBlockDto> block = new ArrayList<>();
+
+        block.add(new ChangesetDto.OsmPrimitiveBlockDto(
+                primitives.stream()
+                        .filter(Objects::nonNull)
+                        .map(OsmPrimitiveMapper::toDto)
+                        .toList()
+        ));
+
+        return block;
     }
 
     /**
      * Map OsmPrimitive List dto to domain.
      */
-    private List<OsmPrimitive> mapOsmPrimitivesToDomain(List<OsmPrimitiveDto> list) {
-        if (list == null || list.isEmpty()) return Collections.emptyList();
-        return list.stream()
-                .filter(Objects::nonNull)
-                .map(OsmPrimitiveMapper::toDomain)
-                .collect(Collectors.toList());
+    private List<OsmPrimitive> mapOsmPrimitivesToDomain(List<ChangesetDto.OsmPrimitiveBlockDto> blocks) {
+        if (blocks == null || blocks.isEmpty()) return Collections.emptyList();
+
+        List<OsmPrimitive> primitives = new ArrayList<>();
+        for (ChangesetDto.OsmPrimitiveBlockDto block : blocks) {
+            primitives.addAll(
+                    block.getPrimitives().stream()
+                            .filter(Objects::nonNull)
+                            .map(OsmPrimitiveMapper::toDomain)
+                            .toList()
+            );
+        }
+
+        return primitives;
     }
 }

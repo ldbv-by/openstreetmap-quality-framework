@@ -13,7 +13,7 @@ import java.util.List;
  */
 @XmlRootElement(name = "osmChange")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = {"version", "generator", "createPrimitives", "modifyPrimitives", "deletePrimitives"})
+@XmlType(propOrder = {"version", "generator", "createBlocks", "modifyBlocks", "deleteBlocks"})
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -33,33 +33,32 @@ public class ChangesetDto {
     /**
      * OSM primitives created in this changeset.
      */
-    @XmlElementWrapper(name = "create")
-    @XmlElements({
-            @XmlElement(name = "node", type = NodeDto.class),
-            @XmlElement(name = "way",  type = WayDto.class),
-            @XmlElement(name = "relation", type = RelationDto.class)
-    })
-    private List<OsmPrimitiveDto> createPrimitives = new ArrayList<>();
+    @XmlElement(name = "create")
+    private List<OsmPrimitiveBlockDto> createBlocks = new ArrayList<>();
 
     /**
      * OSM primitives modified in this changeset.
      */
-    @XmlElementWrapper(name = "modify")
-    @XmlElements({
-            @XmlElement(name = "node", type = NodeDto.class),
-            @XmlElement(name = "way",  type = WayDto.class),
-            @XmlElement(name = "relation", type = RelationDto.class)
-    })
-    private List<OsmPrimitiveDto> modifyPrimitives = new ArrayList<>();
+    @XmlElement(name = "modify")
+    private List<OsmPrimitiveBlockDto> modifyBlocks = new ArrayList<>();
 
     /**
      * OSM primitives deleted in this changeset.
      */
-    @XmlElementWrapper(name = "delete")
-    @XmlElements({
-            @XmlElement(name = "node", type = NodeDto.class),
-            @XmlElement(name = "way",  type = WayDto.class),
-            @XmlElement(name = "relation", type = RelationDto.class)
-    })
-    private List<OsmPrimitiveDto> deletePrimitives = new ArrayList<>();
+    @XmlElement(name = "delete")
+    private List<OsmPrimitiveBlockDto> deleteBlocks = new ArrayList<>();
+
+
+    @Data
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class OsmPrimitiveBlockDto {
+        @XmlElements({
+                @XmlElement(name = "node", type = NodeDto.class),
+                @XmlElement(name = "way", type = WayDto.class),
+                @XmlElement(name = "relation", type = RelationDto.class)
+        })
+        private List<OsmPrimitiveDto> primitives = new ArrayList<>();
+    }
 }
