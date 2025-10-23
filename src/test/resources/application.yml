@@ -22,3 +22,5 @@ quality:
 
       - id: "geometry-check"
         waitsFor: []
+
+openstreetmap-api: ${OSM_API_URL:https://api.openstreetmap.org/}

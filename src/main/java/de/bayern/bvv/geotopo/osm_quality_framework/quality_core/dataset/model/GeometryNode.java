@@ -13,6 +13,7 @@ import org.locationtech.jts.geom.Point;
 @Data
 public class GeometryNode {
     private Long osmId;
+    private Long memberOsmId;
     private Point geometry;
     private Point geometryTransformed;
     private Integer sequence;

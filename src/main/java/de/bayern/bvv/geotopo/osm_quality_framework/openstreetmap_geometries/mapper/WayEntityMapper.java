@@ -3,6 +3,7 @@ package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.map
 
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.entity.WayEntity;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Feature;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.GeometryNode;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Relation;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.util.CoordinateTransformer;
 import lombok.experimental.UtilityClass;
@@ -19,7 +20,7 @@ public class WayEntityMapper {
     /**
      * Map node entity to feature.
      */
-    public Feature toFeature(WayEntity wayEntity, List<Relation> relations, String coordinateReferenceSystem) {
+    public Feature toFeature(WayEntity wayEntity, List<GeometryNode> geometryNodes, List<Relation> relations, String coordinateReferenceSystem) {
         if (wayEntity == null) return null;
 
         Feature feature = new Feature();
@@ -29,7 +30,7 @@ public class WayEntityMapper {
         feature.setRelations(relations);
         feature.setGeometry(wayEntity.getGeom());
         feature.setGeometryTransformed(CoordinateTransformer.transform(wayEntity.getGeom(), coordinateReferenceSystem));
-        feature.setGeometryNodes(Collections.emptyList()); // Todo
+        feature.setGeometryNodes(geometryNodes);
 
         return feature;
     }

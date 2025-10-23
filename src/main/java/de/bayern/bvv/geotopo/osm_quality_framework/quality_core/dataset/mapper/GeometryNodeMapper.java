@@ -18,6 +18,7 @@ public class GeometryNodeMapper {
 
         GeometryNode geometryNode = new GeometryNode();
         geometryNode.setOsmId(geometryNodeDto.osmId());
+        geometryNode.setMemberOsmId(geometryNodeDto.memberOsmId());
         geometryNode.setGeometry(geometryNodeDto.geometry());
         geometryNode.setGeometryTransformed(geometryNodeDto.geometryTransformed());
         geometryNode.setSequence(geometryNodeDto.sequence());
@@ -33,6 +34,7 @@ public class GeometryNodeMapper {
 
         return new GeometryNodeDto(
                 geometryNode.getOsmId(),
+                geometryNode.getMemberOsmId(),
                 geometryNode.getGeometry(),
                 geometryNode.getGeometryTransformed(),
                 geometryNode.getSequence());

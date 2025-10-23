@@ -1,12 +1,9 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.service;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.*;
+import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.mapper.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.repository.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.api.ChangesetDataService;
-import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.mapper.AreaEntityMapper;
-import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.mapper.NodeEntityMapper;
-import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.mapper.RelationEntityMapper;
-import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.mapper.WayEntityMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.api.OsmGeometriesService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.dto.ChangesetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
@@ -44,6 +41,9 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
     private final ChangesetWayRepository wayRepository;
     private final ChangesetAreaRepository areaRepository;
     private final ChangesetRelationRepository relationRepository;
+
+    private final ChangesetAreaNodeRepository areaNodeRepository;
+    private final ChangesetWayNodeRepository wayNodeRepository;
 
     private final OsmGeometriesService osmGeometriesService;
 
@@ -192,7 +192,8 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
         if (wayEntities != null) {
             for (WayEntity wayEntity : wayEntities) {
                 List<Relation> relations = this.getRelationsForOsmObject(changesetId,"w", wayEntity.getOsmId());
-                ways.add(WayEntityMapper.toFeature(wayEntity, relations, coordinateReferenceSystem));
+                List<GeometryNode> geometryNodes = this.getGeometryNodes(wayEntity, coordinateReferenceSystem);
+                ways.add(WayEntityMapper.toFeature(wayEntity, geometryNodes, relations, coordinateReferenceSystem));
             }
         }
 
@@ -209,7 +210,8 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
         if (wayEntities != null) {
             for (WayEntity wayEntity : wayEntities) {
                 List<Relation> relations = this.getRelationsForOsmObject(changesetId,"w", wayEntity.getOsmId());
-                ways.add(WayEntityMapper.toFeature(wayEntity, relations, coordinateReferenceSystem));
+                List<GeometryNode> geometryNodes = this.getGeometryNodes(wayEntity, coordinateReferenceSystem);
+                ways.add(WayEntityMapper.toFeature(wayEntity, geometryNodes, relations, coordinateReferenceSystem));
             }
         }
 
@@ -226,7 +228,8 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
         if (areaEntities != null) {
             for (AreaEntity areaEntity : areaEntities) {
                 List<Relation> relations = this.getRelationsForOsmObject(changesetId, areaEntity.getOsmGeometryType().toString(), areaEntity.getOsmId());
-                areas.add(AreaEntityMapper.toFeature(areaEntity, relations, coordinateReferenceSystem));
+                List<GeometryNode> geometryNodes = this.getGeometryNodes(areaEntity, coordinateReferenceSystem);
+                areas.add(AreaEntityMapper.toFeature(areaEntity, geometryNodes, relations, coordinateReferenceSystem));
             }
         }
 
@@ -243,7 +246,8 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
         if (areaEntities != null) {
             for (AreaEntity areaEntity : areaEntities) {
                 List<Relation> relations = this.getRelationsForOsmObject(changesetId, areaEntity.getOsmGeometryType().toString(), areaEntity.getOsmId());
-                areas.add(AreaEntityMapper.toFeature(areaEntity, relations, coordinateReferenceSystem));
+                List<GeometryNode> geometryNodes = this.getGeometryNodes(areaEntity, coordinateReferenceSystem);
+                areas.add(AreaEntityMapper.toFeature(areaEntity, geometryNodes, relations, coordinateReferenceSystem));
             }
         }
 
@@ -324,5 +328,23 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
     @Override
     public List<Long> getChangesetIds(Set<ChangesetState> states) {
         return this.changesetRepository.findIdsByStatesOrderByCreatedAtAsc(states);
+    }
+
+    /**
+     * Get Geometry Nodes for Area Entity.
+     */
+    private List<GeometryNode> getGeometryNodes(AreaEntity areaEntity, String coordinateReferenceSystem) {
+        return this.areaNodeRepository.findById_AreaOsmIdOrderById_Seq(areaEntity.getOsmId())
+                .stream().map(n  -> AreaNodeEntityMapper.toGeometryNode(n, coordinateReferenceSystem))
+                .toList();
+    }
+
+    /**
+     * Get Geometry Nodes for Way Entity.
+     */
+    private List<GeometryNode> getGeometryNodes(WayEntity wayEntity, String coordinateReferenceSystem) {
+        return this.wayNodeRepository.findById_WayOsmIdOrderById_Seq(wayEntity.getOsmId())
+                .stream().map(n  -> WayNodeEntityMapper.toGeometryNode(n, coordinateReferenceSystem))
+                .toList();
     }
 }

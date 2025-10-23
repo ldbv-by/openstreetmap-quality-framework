@@ -117,7 +117,14 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
 
         String upsertPlanetOsmWays = """
         INSERT INTO changeset_data.planet_osm_ways (id, nodes, tags)
-        SELECT CASE WHEN id > 1e17 THEN -(id - 1e17)::bigint ELSE id END, nodes, tags
+        SELECT CASE WHEN id > 1e17 THEN -(id - 1e17)::bigint ELSE id END,
+               (
+                   SELECT array_agg(
+                            CASE WHEN n > 1e17 THEN -(n - 1e17)::bigint ELSE n END ORDER BY ord
+                          )
+                   FROM unnest(nodes) WITH ORDINALITY AS u(n, ord)
+               ) AS nodes,
+               tags
         FROM %s.planet_osm_ways
         ON CONFLICT (id) DO UPDATE
         SET nodes = EXCLUDED.nodes,

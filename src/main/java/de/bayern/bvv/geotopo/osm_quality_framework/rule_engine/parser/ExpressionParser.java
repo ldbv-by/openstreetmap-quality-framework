@@ -1,19 +1,24 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Relation;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Way;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.registry.ExpressionRegistry;
+import de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.api.UnifiedDataProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public final class ExpressionParser {
     private final ExpressionRegistry registry;
+    private final UnifiedDataProvider unifiedDataProvider;
 
     /**
      * Parse Condition.
@@ -72,8 +77,89 @@ public final class ExpressionParser {
             }
         }
 
+        if (node.has("way_nodes")) {
+            JsonNode jsonNode = node.get("way_nodes");
+
+            if (jsonNode.has("conditions") || jsonNode.has("checks")) {
+                Expression conditions = parse(node.get("relation").path("conditions"));
+                Expression checks = parse(node.get("relation").path("checks"));
+
+                return taggedObject -> {
+                    List<Feature> wayNodes = this.getWayNodesAsFeature(taggedObject);
+                    if (wayNodes.isEmpty()) return false;
+
+                    for (Feature wayNode : wayNodes) {
+                        if (conditions.evaluate(wayNode)) {
+                            if (!checks.evaluate(wayNode)) return false;
+                        }
+                    }
+
+                    return true;
+                };
+            } else {
+                List<Expression> expressions = new ArrayList<>();
+                if (jsonNode.isArray()) {
+                    jsonNode.forEach(n -> expressions.add(parse(n)));
+                } else {
+                    expressions.add(parse(jsonNode));
+                }
+                return taggedObject -> {
+                    List<Feature> wayNodes = this.getWayNodesAsFeature(taggedObject);
+                    if (wayNodes.isEmpty()) return false;
+
+                    for (Feature wayNode : wayNodes) {
+                        for (Expression e : expressions) {
+                            if (!e.evaluate(wayNode)) return false;
+                        }
+                    }
+
+                    return true;
+                };
+            }
+        }
+
         // Parse leafs, e.g. "tag_exists", "tag_regex_match", ...
         return this.registry.fromLeaf(node);
     }
 
+    /**
+     * Get way nodes as feature list.
+     */
+    private List<Feature> getWayNodesAsFeature(TaggedObject taggedObject) {
+        List<Feature> wayNodeFeatures = new ArrayList<>();
+
+        if (taggedObject instanceof Feature way) {
+            if (way.getGeometryNodes() != null && !way.getGeometryNodes().isEmpty()) {
+                Set<Long> osmIds = way.getGeometryNodes().stream().map(GeometryNode::getOsmId).collect(Collectors.toSet());
+
+                DataSet wayNodeTaggedFeatures = Optional.ofNullable(
+                                this.unifiedDataProvider.getDataSet(new DataSetFilter(
+                                        null,
+                                        new FeatureFilter(new OsmIds(osmIds, null, null, null), null, null),
+                                        null)))
+                        .map(DataSetMapper::toDomain)
+                        .orElse(null);
+
+                for (GeometryNode geometryNode : way.getGeometryNodes()) {
+                    Feature wayNodeFeature = null;
+                    if (wayNodeTaggedFeatures != null && wayNodeTaggedFeatures.getNodes() != null) {
+                        wayNodeFeature = wayNodeTaggedFeatures.getNodes()
+                                .stream().filter(n -> n.getOsmId().equals(geometryNode.getOsmId())).findFirst().orElse(null);
+                    }
+
+                    if (wayNodeFeature == null) {
+                        wayNodeFeature = new Feature(
+                                geometryNode.getGeometry(),
+                                geometryNode.getGeometryTransformed(),
+                                List.of(geometryNode)
+                        );
+                    }
+
+                    wayNodeFeatures.add(wayNodeFeature);
+                }
+            }
+        }
+
+        return wayNodeFeatures;
+    }
 }

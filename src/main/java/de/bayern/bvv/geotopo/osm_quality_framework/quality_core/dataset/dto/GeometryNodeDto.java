@@ -7,6 +7,7 @@ import org.locationtech.jts.geom.Point;
  */
 public record GeometryNodeDto(
         Long osmId,
+        Long memberOsmId,
         Point geometry,
         Point geometryTransformed,
         Integer sequence
