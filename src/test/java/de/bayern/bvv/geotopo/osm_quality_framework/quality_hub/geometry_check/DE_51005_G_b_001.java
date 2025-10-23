@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * AdV-Beschreibung:
- * Als Geometrietypen sind nur Punkt- und Flächengeometrie zugelassen.
+ * 51005 'Leitung' mit BWF 1110 Freileitung hat an einem Knickpunkt stets einen Freileitungsmast.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
