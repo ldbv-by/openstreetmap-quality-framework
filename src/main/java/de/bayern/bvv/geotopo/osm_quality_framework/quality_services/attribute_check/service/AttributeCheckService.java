@@ -2,10 +2,7 @@ package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.attribute_c
 
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.api.OsmSchemaService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.ChangesetDataSetMapper;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.ChangesetDataSet;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSet;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Feature;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.TaggedObject;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.mapper.ObjectTypeMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.ObjectType;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Rule;
@@ -124,8 +121,8 @@ public class AttributeCheckService implements QualityService {
             }
         }
 
-        // Todo: Prüfen, dass die Relations lt. Schema enthalten sind
-
+        // Check relations
+        validateRelation(taggedObject, objectType);
     }
 
     /**
@@ -218,6 +215,68 @@ public class AttributeCheckService implements QualityService {
             );
         } else {
             this.qualityServiceResult.addError(new QualityServiceError(errorText));
+        }
+    }
+
+    /**
+     * Validation of a relation.
+     */
+    private void validateRelation(TaggedObject taggedObject, ObjectType objectType) {
+
+        // Checks whether required relations with valid values are set.
+        for (de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Relation relation :
+                objectType.getRelations()) {
+
+            List<Relation> relationsOfTaggedObject = taggedObject.getRelations()
+                    .stream().filter(r -> r.getObjectType().equals(relation.getObjectType().getName())).toList();
+
+            if (relationsOfTaggedObject.size() < relation.getMultiplicity().min()) {
+                this.setError(taggedObject, "Die Objektart '" + taggedObject.getObjectType() + "' erwartet mindestens " + relation.getMultiplicity().min() + " Relation/en '" + relation.getObjectType().getName() + "'.");
+            }
+
+            if (relationsOfTaggedObject.size() > relation.getMultiplicity().max()) {
+                this.setError(taggedObject, "Die Objektart '" + taggedObject.getObjectType() + "' darf maximal " + relation.getMultiplicity().max() + " Relation/en '" + relation.getObjectType().getName() + "' haben.");
+            }
+
+            for (de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Relation.Member member : relation.getMembers()) {
+                for (Relation relationOfTaggedObject : relationsOfTaggedObject) {
+                    List<Relation.Member> memberOfTaggedObject = relationOfTaggedObject.getMembers()
+                            .stream().filter(m -> m.getRole().equals(member.getRole()) &&
+                                    (member.getType().equals("*") || m.getType().equalsIgnoreCase(member.getType())))
+                            .toList();
+
+                    if (memberOfTaggedObject.size() < member.getMultiplicity().min()) {
+                        this.setError(taggedObject, "Die Relation '" + relationOfTaggedObject.getObjectType() + "' erwartet mindestens " + member.getMultiplicity().min() + " Members mit der Rolle '" + member.getRole() + "'.");
+                    }
+
+                    if (memberOfTaggedObject.size() > member.getMultiplicity().max()) {
+                        this.setError(taggedObject, "Die Relation '" + relationOfTaggedObject.getObjectType() + "' darf maximal " + member.getMultiplicity().max() + " Members mit der Rolle '" + member.getRole() + "' haben.");
+                    }
+                }
+            }
+        }
+
+        // Check whether unknown relations are set.
+        for (Relation relationOfTaggedObject : taggedObject.getRelations()) {
+            if (relationOfTaggedObject.getObjectType() == null || relationOfTaggedObject.getObjectType().isEmpty()) {
+                this.setError(taggedObject, "Relation ohne Tag 'object_type' ist nicht erlaubt.");
+            }
+
+            if (objectType.getRelations().stream()
+                    .noneMatch(r -> r.getObjectType().getName()
+                            .equals(relationOfTaggedObject.getObjectType()))) {
+                this.setError(taggedObject, "Die Objektart '" + taggedObject.getObjectType() + "' darf keine Relation '" + relationOfTaggedObject.getObjectType() + "' haben.");
+            }
+
+            for (Relation.Member memberOfTaggedObject : relationOfTaggedObject.getMembers()) {
+                if (objectType.getRelations().stream().filter(r -> r.getObjectType().getName()
+                        .equals(relationOfTaggedObject.getObjectType())).findFirst()
+                        .stream().noneMatch(r -> r.getMembers().stream()
+                                .anyMatch(m -> memberOfTaggedObject.getRole().equals(m.getRole()) &&
+                                        (m.getType().equals("*") || memberOfTaggedObject.getType().equalsIgnoreCase(m.getType()))))) {
+                    this.setError(taggedObject, "Die Relation '" + relationOfTaggedObject.getObjectType() + "' darf keine Members mit der Rolle '" + memberOfTaggedObject.getRole() + "' haben.");
+                }
+            }
         }
     }
 }

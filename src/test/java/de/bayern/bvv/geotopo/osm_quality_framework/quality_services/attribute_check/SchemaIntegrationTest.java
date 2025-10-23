@@ -23,9 +23,6 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
         // Arrange
         Map<String, String> tags = new HashMap<>();
         tags.put("object_type", "AX_Wohnbauflaeche");
-        tags.put("zeigtAufExternes:art", "https://www.adv-online.de/AdV-Produkte/Geotopographie/Digitale-Landschaftsmodelle/Basis-DLM/");
-        tags.put("zeigtAufExternes:fachdatenobjekt:name", "Test");
-        tags.put("zeigtAufExternes:fachdatenobjekt:uri", "Test-URI");
         tags.put("quellobjektID", "DEBYBDLMCI0001qd");
         tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
         tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd20210312T114842Z");
@@ -48,8 +45,18 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 new ArrayList<>()
         );
 
+        RelationDto zeigtAufExternes = new RelationDto(
+                3L,
+                "AA_zeigtAufExternes",
+                Map.of("art", "https://www.adv-online.de/AdV-Produkte/Geotopographie/Digitale-Landschaftsmodelle/Basis-DLM/",
+                        "fachdatenobjekt:name", "Test",
+                        "fachdatenobjekt:uri", "Test-URI"),
+                List.of(new MemberDto("*", 1L, "")),
+                new ArrayList<>()
+        );
+
         FeatureDto feature = new FeatureDto(
-                1L, "AX_Wohnbauflaeche", tags, List.of(modellart), null, null, new ArrayList<>()
+                1L, "AX_Wohnbauflaeche", tags, List.of(modellart, zeigtAufExternes), null, null, new ArrayList<>()
         );
 
         DataSetDto dataSetDto = new DataSetDto(
@@ -495,6 +502,246 @@ public class SchemaIntegrationTest extends DatabaseIntegrationTest {
                 .extracting(QualityServiceErrorDto::errorText)
                 .withFailMessage("Expected an error about missing schema for object type, but got: %s", errorTexts)
                 .containsExactly("Keine Schemaeinträge für 'AX_Unbekannt' gefunden.");
+
+        assertThat(result.errors())
+                .withFailMessage("Expected exactly one error, but found %d: %s", result.errors().size(), errorTexts)
+                .hasSize(1);
+    }
+
+    @Test
+    void testTaggedObjectWithMissingRelation() {
+        // Arrange
+        Map<String, String> tags = new HashMap<>();
+        tags.put("object_type", "AX_Wohnbauflaeche");
+        tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
+        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd20210312T114842Z");
+        tags.put("lebenszeitintervall:beginnt", "2021-03-12T11:48:42Z");
+
+        FeatureDto feature = new FeatureDto(
+                1L, "AX_Wohnbauflaeche", tags, List.of(), null, null, new ArrayList<>()
+        );
+
+        DataSetDto dataSetDto = new DataSetDto(
+                new ArrayList<>(),
+                new ArrayList<>(),
+                List.of(feature),
+                new ArrayList<>()
+        );
+
+        ChangesetDataSetDto changesetDataSetDto = new ChangesetDataSetDto(dataSetDto, null, null);
+
+        QualityServiceRequestDto qualityServiceRequestDto = new QualityServiceRequestDto(
+                "attribute-check",
+                1L,
+                null,
+                changesetDataSetDto
+        );
+
+        // Act
+        QualityServiceResultDto result = this.attributeCheckService.checkChangesetQuality(qualityServiceRequestDto);
+
+        // Assert
+        String errorTexts = result.errors() == null ? "" :
+                result.errors().stream()
+                        .map(QualityServiceErrorDto::errorText)
+                        .collect(java.util.stream.Collectors.joining(" | "));
+
+        assertThat(result).as("QualityServiceResult must not be null").isNotNull();
+        assertThat(result.isValid()).withFailMessage("Expected the result to be invalid due to missing schema, but it was valid.").isFalse();
+        assertThat(result.errors()).withFailMessage("Expected at least one error, but found none.").isNotEmpty();
+
+        assertThat(result.errors())
+                .extracting(QualityServiceErrorDto::errorText)
+                .withFailMessage("Expected an error about missing schema for object type, but got: %s", errorTexts)
+                .containsExactly("Die Objektart 'AX_Wohnbauflaeche' erwartet mindestens 1 Relation/en 'AA_modellart'.");
+
+        assertThat(result.errors())
+                .withFailMessage("Expected exactly one error, but found %d: %s", result.errors().size(), errorTexts)
+                .hasSize(1);
+    }
+
+    @Test
+    void testTaggedObjectWithUnknownRelation() {
+        // Arrange
+        Map<String, String> tags = new HashMap<>();
+        tags.put("object_type", "AX_Wohnbauflaeche");
+        tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
+        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd20210312T114842Z");
+        tags.put("lebenszeitintervall:beginnt", "2021-03-12T11:48:42Z");
+
+        RelationDto modellart = new RelationDto(
+                2L,
+                "AA_modellart",
+                Map.of("advStandardModell", "Basis-DLM"),
+                List.of(new MemberDto("*", 1L, "")),
+                new ArrayList<>()
+        );
+
+        RelationDto unknown = new RelationDto(
+                3L,
+                "unknown",
+                Map.of(),
+                List.of(),
+                new ArrayList<>()
+        );
+
+        FeatureDto feature = new FeatureDto(
+                1L, "AX_Wohnbauflaeche", tags, List.of(modellart, unknown), null, null, new ArrayList<>()
+        );
+
+        DataSetDto dataSetDto = new DataSetDto(
+                new ArrayList<>(),
+                new ArrayList<>(),
+                List.of(feature),
+                new ArrayList<>()
+        );
+
+        ChangesetDataSetDto changesetDataSetDto = new ChangesetDataSetDto(dataSetDto, null, null);
+
+        QualityServiceRequestDto qualityServiceRequestDto = new QualityServiceRequestDto(
+                "attribute-check",
+                1L,
+                null,
+                changesetDataSetDto
+        );
+
+        // Act
+        QualityServiceResultDto result = this.attributeCheckService.checkChangesetQuality(qualityServiceRequestDto);
+
+        // Assert
+        String errorTexts = result.errors() == null ? "" :
+                result.errors().stream()
+                        .map(QualityServiceErrorDto::errorText)
+                        .collect(java.util.stream.Collectors.joining(" | "));
+
+        assertThat(result).as("QualityServiceResult must not be null").isNotNull();
+        assertThat(result.isValid()).withFailMessage("Expected the result to be invalid due to missing schema, but it was valid.").isFalse();
+        assertThat(result.errors()).withFailMessage("Expected at least one error, but found none.").isNotEmpty();
+
+        assertThat(result.errors())
+                .extracting(QualityServiceErrorDto::errorText)
+                .withFailMessage("Expected an error about missing schema for object type, but got: %s", errorTexts)
+                .containsExactly("Die Objektart 'AX_Wohnbauflaeche' darf keine Relation 'unknown' haben.");
+
+        assertThat(result.errors())
+                .withFailMessage("Expected exactly one error, but found %d: %s", result.errors().size(), errorTexts)
+                .hasSize(1);
+    }
+
+    @Test
+    void testTaggedObjectWithUnknownRelationMember() {
+        // Arrange
+        Map<String, String> tags = new HashMap<>();
+        tags.put("object_type", "AX_Wohnbauflaeche");
+        tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
+        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd20210312T114842Z");
+        tags.put("lebenszeitintervall:beginnt", "2021-03-12T11:48:42Z");
+
+        RelationDto modellart = new RelationDto(
+                2L,
+                "AA_modellart",
+                Map.of("advStandardModell", "Basis-DLM"),
+                List.of(new MemberDto("*", 1L, "unknown"), new MemberDto("*", 1L, "")),
+                new ArrayList<>()
+        );
+
+        FeatureDto feature = new FeatureDto(
+                1L, "AX_Wohnbauflaeche", tags, List.of(modellart), null, null, new ArrayList<>()
+        );
+
+        DataSetDto dataSetDto = new DataSetDto(
+                new ArrayList<>(),
+                new ArrayList<>(),
+                List.of(feature),
+                new ArrayList<>()
+        );
+
+        ChangesetDataSetDto changesetDataSetDto = new ChangesetDataSetDto(dataSetDto, null, null);
+
+        QualityServiceRequestDto qualityServiceRequestDto = new QualityServiceRequestDto(
+                "attribute-check",
+                1L,
+                null,
+                changesetDataSetDto
+        );
+
+        // Act
+        QualityServiceResultDto result = this.attributeCheckService.checkChangesetQuality(qualityServiceRequestDto);
+
+        // Assert
+        String errorTexts = result.errors() == null ? "" :
+                result.errors().stream()
+                        .map(QualityServiceErrorDto::errorText)
+                        .collect(java.util.stream.Collectors.joining(" | "));
+
+        assertThat(result).as("QualityServiceResult must not be null").isNotNull();
+        assertThat(result.isValid()).withFailMessage("Expected the result to be invalid due to missing schema, but it was valid.").isFalse();
+        assertThat(result.errors()).withFailMessage("Expected at least one error, but found none.").isNotEmpty();
+
+        assertThat(result.errors())
+                .extracting(QualityServiceErrorDto::errorText)
+                .withFailMessage("Expected an error about missing schema for object type, but got: %s", errorTexts)
+                .containsExactly("Die Relation 'AA_modellart' darf keine Members mit der Rolle 'unknown' haben.");
+
+        assertThat(result.errors())
+                .withFailMessage("Expected exactly one error, but found %d: %s", result.errors().size(), errorTexts)
+                .hasSize(1);
+    }
+
+    @Test
+    void testTaggedObjectWithToManyRelationMembers() {
+        // Arrange
+        Map<String, String> tags = new HashMap<>();
+        tags.put("object_type", "AX_Wohnbauflaeche");
+        tags.put("identifikator:UUID", "DEBYBDLMCI0001qd");
+        tags.put("identifikator:UUIDundZeit", "DEBYBDLMCI0001qd20210312T114842Z");
+        tags.put("lebenszeitintervall:beginnt", "2021-03-12T11:48:42Z");
+
+        RelationDto modellart = new RelationDto(
+                2L,
+                "AA_modellart",
+                Map.of("advStandardModell", "Basis-DLM"),
+                List.of(new MemberDto("*", 1L, ""), new MemberDto("*", 1L, "")),
+                new ArrayList<>()
+        );
+
+        FeatureDto feature = new FeatureDto(
+                1L, "AX_Wohnbauflaeche", tags, List.of(modellart), null, null, new ArrayList<>()
+        );
+
+        DataSetDto dataSetDto = new DataSetDto(
+                new ArrayList<>(),
+                new ArrayList<>(),
+                List.of(feature),
+                new ArrayList<>()
+        );
+
+        ChangesetDataSetDto changesetDataSetDto = new ChangesetDataSetDto(dataSetDto, null, null);
+
+        QualityServiceRequestDto qualityServiceRequestDto = new QualityServiceRequestDto(
+                "attribute-check",
+                1L,
+                null,
+                changesetDataSetDto
+        );
+
+        // Act
+        QualityServiceResultDto result = this.attributeCheckService.checkChangesetQuality(qualityServiceRequestDto);
+
+        // Assert
+        String errorTexts = result.errors() == null ? "" :
+                result.errors().stream()
+                        .map(QualityServiceErrorDto::errorText)
+                        .collect(java.util.stream.Collectors.joining(" | "));
+
+        assertThat(result).as("QualityServiceResult must not be null").isNotNull();
+        assertThat(result.isValid()).withFailMessage("Expected the result to be invalid due to missing schema, but it was valid.").isFalse();
+        assertThat(result.errors()).withFailMessage("Expected at least one error, but found none.").isNotEmpty();
+
+        assertThat(result.errors())
+                .extracting(QualityServiceErrorDto::errorText)
+                .withFailMessage("Expected an error about missing schema for object type, but got: %s", errorTexts)
+                .containsExactly("Die Relation 'AA_modellart' darf maximal 1 Members mit der Rolle '' haben.");
 
         assertThat(result.errors())
                 .withFailMessage("Expected exactly one error, but found %d: %s", result.errors().size(), errorTexts)
