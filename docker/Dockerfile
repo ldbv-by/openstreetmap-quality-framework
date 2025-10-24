@@ -6,37 +6,42 @@ ARG OSM2PGSQL_REPO_URL
 ARG OSM2PGSQL_REPO_BRANCH
 ARG OSMOSIS_REPO_TAR
 
-# Build dependencies
-RUN apt-get update && apt-get install -y \
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+
+# Build dependencies (Lua 5.4, kein LuaJIT)
+RUN apt-get update && apt-get install -y --no-install-recommends \
     make cmake g++ libboost-dev \
     libexpat1-dev zlib1g-dev libpotrace-dev \
-    libopencv-dev libbz2-dev libpq-dev libproj-dev lua5.3 liblua5.3-dev \
+    libopencv-dev libbz2-dev libpq-dev libproj-dev \
+    lua5.4 liblua5.4-0 liblua5.4-dev \
     pandoc nlohmann-json3-dev pyosmium \
-    libluajit-5.1-dev \
-    git \
-    maven \
-    postgresql-client \
-    curl ca-certificates tar gzip \
-    dos2unix \
+    git maven postgresql-client \
+    curl ca-certificates tar gzip dos2unix \
  && rm -rf /var/lib/apt/lists/*
 
 # ---- Copy pgdump ----
 COPY --from=pgtools /usr/lib/postgresql/17/bin/pg_dump /usr/local/bin/pg_dump
 COPY --from=pgtools /usr/lib/postgresql/17/bin/pg_restore /usr/local/bin/pg_restore
 
-# ---- Build osm2pgsql ----
+# ---- Build osm2pgsql (mit Lua 5.4) ----
 WORKDIR /src
-RUN git clone --branch $OSM2PGSQL_REPO_BRANCH $OSM2PGSQL_REPO_URL
+RUN git clone --branch "$OSM2PGSQL_REPO_BRANCH" "$OSM2PGSQL_REPO_URL"
 
 WORKDIR /src/osm2pgsql/build
-RUN cmake -D WITH_LUAJIT=ON -D CMAKE_BUILD_TYPE=RelWithDebInfo ..
-RUN make
-RUN make install
+# Wichtig: KEIN WITH_LUAJIT, stattdessen explizit Lua 5.4
+RUN cmake -DWITH_LUA=lua5.4 -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+RUN make -j"$(nproc)" && make install
+
+# Sanity-Checks: Versionen & Integer-Genauigkeit
+RUN osm2pgsql --version && \
+    lua5.4 -e "assert(math.type(100000000000000000)=='integer')" && \
+    lua5.4 -e "local a=(1<<53); assert(a+1~=a, 'Lua numbers not precise')" || true
 
 ENV OSM2PGSQL_EXECUTABLE=/usr/local/bin/osm2pgsql
 
 # ---- Add osmosis ----
-RUN curl -OL $OSMOSIS_REPO_TAR \
+RUN curl -OL "$OSMOSIS_REPO_TAR" \
  && tar -C /usr/local -xvf osmosis-0.49.2.tar
 
 ENV OSMOSIS_EXECUTABLE=/usr/local/osmosis-0.49.2/bin/osmosis
@@ -65,4 +70,4 @@ COPY docker/entrypoint/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 8080
-ENTRYPOINT [ "/bin/sh", "-c", "dos2unix /usr/local/bin/docker-entrypoint.sh && /usr/local/bin/docker-entrypoint.sh"]
+ENTRYPOINT [ "/bin/sh", "-c", "dos2unix /usr/local/bin/docker-entrypoint.sh && /usr/local/bin/docker-entrypoint.sh" ]
