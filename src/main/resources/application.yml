@@ -33,6 +33,10 @@ spring:
         - classpath:sql/openstreetmap_schema/openstreetmap-quality-framework-schema.sql
         - classpath:sql/openstreetmap_schema/rules/**/*.sql
 
+  http:
+    codecs:
+      max-in-memory-size: 1GB
+
 quality:
   pipeline:
     steps:
