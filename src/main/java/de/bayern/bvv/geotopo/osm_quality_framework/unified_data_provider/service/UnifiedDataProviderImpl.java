@@ -169,6 +169,8 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
                     case COVERED_BY_BOUNDARY -> match = referenceGeometry.coveredBy(candidate.getGeometry().getBoundary());
                     case EQUALS_TOPO -> match = referenceGeometry.getGeometry().equalsTopo(candidate.getGeometry());
                     case INTERSECTS -> match = referenceGeometry.intersects(candidate.getGeometry());
+                    case OVERLAPS -> match = referenceGeometry.overlaps(candidate.getGeometry());
+                    case CROSSES -> match = referenceGeometry.crosses(candidate.getGeometry());
                 }
 
                 if (match) {

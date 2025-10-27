@@ -43,16 +43,46 @@ class DE_53002_A_b_001_003 extends DatabaseIntegrationTest {
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
-                    <tag k='art' v='3001' />
-                    <tag k='bezeichnung' v='Bezeichnung1;Bezeichnung2' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
+                  <node id='-25433' changeset='-1' lat='49.88559042534' lon='12.32353483847'>
+                    <tag k='identifikator:UUID' v='DEBYBDLM00000000' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM0000000020251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Strassenverkehrsanlage' />
+                    <tag k='art' v='3001' />
+                    <tag k='bezeichnung' v='Test1;Test2' />
+                    <tag k='name' v='Kreuz' />
                   </node>
-                  <relation id='-63' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
+                  <node id='-25434' changeset='-1' lat='49.88561514895' lon='12.32092479857' />
+                  <node id='-25432' changeset='-1' lat='49.8855530864' lon='12.32664639346' />
+                  <way id='-802' changeset='-1'>
+                    <nd ref='-25432' />
+                    <nd ref='-25433' />
+                    <nd ref='-25434' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM44444444' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM4444444420251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_Strassenachse' />
+                  </way>
+                  <relation id='-80' changeset='-1'>
+                    <member type='way' ref='-802' role='' />
+                    <tag k='widmung' v='1301' />
+                    <tag k='object_type' v='AX_Strasse' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM11112222' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111222220251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                  </relation>
+                  <relation id='-79' changeset='-1'>
+                    <member type='relation' ref='-80' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
+                  <relation id='-60' changeset='-1'>
+                    <member type='node' ref='-25433' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
+                  <relation id='-70' changeset='-1'>
+                    <member type='way' ref='-802' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>

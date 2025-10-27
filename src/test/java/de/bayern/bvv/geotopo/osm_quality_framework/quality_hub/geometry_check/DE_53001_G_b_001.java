@@ -71,7 +71,7 @@ class DE_53001_G_b_001 extends DatabaseIntegrationTest {
                     <tag k='bauwerksfunktion' v='1800' />
                   </way>
                   <relation id='-60' changeset='-1'>
-                    <member type='node' ref='-663' role='' />
+                    <member type='way' ref='-663' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>

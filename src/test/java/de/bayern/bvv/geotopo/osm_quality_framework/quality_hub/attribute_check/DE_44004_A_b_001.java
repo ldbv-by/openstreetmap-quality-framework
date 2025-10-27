@@ -57,7 +57,7 @@ class DE_44004_A_b_001 extends DatabaseIntegrationTest {
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Gewaesserachse' />
                     <tag k='funktion' v='8300' />
-                    <tag k='breiteDesGewaessers' v='10' />
+                    <tag k='breiteDesGewaessers' v='12' />
                     <tag k='fliessrichtung' v='TRUE' />
                     <tag k='zustand' v='4000' />
                   </way>
@@ -107,7 +107,7 @@ class DE_44004_A_b_001 extends DatabaseIntegrationTest {
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Gewaesserachse' />
-                    <tag k='breiteDesGewaessers' v='10' />
+                    <tag k='breiteDesGewaessers' v='12' />
                     <tag k='fliessrichtung' v='TRUE' />
                     <tag k='zustand' v='4000' />
                   </way>

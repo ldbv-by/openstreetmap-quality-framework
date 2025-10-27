@@ -65,7 +65,7 @@ class DE_42002_A_b_001 extends DatabaseIntegrationTest {
                     <tag k='object_type' v='AX_Strasse' />
                     <tag k='widmung' v='1303' />
                     <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM11111111_2025-10-14T12:53:00Z' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                   </relation>
                   <relation id='-82' changeset='-1'>

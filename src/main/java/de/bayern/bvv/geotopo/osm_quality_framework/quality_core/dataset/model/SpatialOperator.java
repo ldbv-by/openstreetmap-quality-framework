@@ -11,5 +11,7 @@ public enum SpatialOperator {
     COVERED_BY_BOUNDARY,
     EQUALS,
     EQUALS_TOPO,
-    INTERSECTS
+    INTERSECTS,
+    OVERLAPS,
+    CROSSES
 }

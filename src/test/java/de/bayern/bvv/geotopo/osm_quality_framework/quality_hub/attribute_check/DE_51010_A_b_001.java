@@ -43,16 +43,36 @@ class DE_51010_A_b_001 extends DatabaseIntegrationTest {
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
+                  <node id='-25364' changeset='-1' lat='49.88488281818' lon='12.32196506929'>
                     <tag k='art' v='1410' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM22222222' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM2222222220251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_EinrichtungInOeffentlichenBereichen' />
                     <tag k='kilometerangabe' v='5' />
+                  </node>
+                  <node id='-25362' changeset='-1' lat='49.88064989274' lon='12.32196506929' />
+                  <node id='-25361' changeset='-1' lat='49.88237537717' lon='12.32196506929' />
+                  <way id='-663' changeset='-1'>
+                    <nd ref='-25364' />
+                    <nd ref='-25361' />
+                    <nd ref='-25362' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_EinrichtungInOeffentlichenBereichen' />
-                  </node>
-                  <relation id='-63' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
+                    <tag k='object_type' v='AX_Bahnstrecke' />
+                    <tag k='bahnkategorie' v='1100' />
+                    <tag k='elektrifizierung' v='2000' />
+                    <tag k='anzahlDerStreckengleise' v='1000' />
+                    <tag k='spurweite' v='1000' />
+                  </way>
+                  <relation id='-60' changeset='-1'>
+                    <member type='node' ref='-25364' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
+                  <relation id='-80' changeset='-1'>
+                    <member type='way' ref='-663' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -83,15 +103,35 @@ class DE_51010_A_b_001 extends DatabaseIntegrationTest {
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
+                  <node id='-25364' changeset='-1' lat='49.88488281818' lon='12.32196506929'>
                     <tag k='art' v='1410' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM22222222' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM2222222220251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_EinrichtungInOeffentlichenBereichen' />
                   </node>
-                  <relation id='-63' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
+                  <node id='-25362' changeset='-1' lat='49.88064989274' lon='12.32196506929' />
+                  <node id='-25361' changeset='-1' lat='49.88237537717' lon='12.32196506929' />
+                  <way id='-663' changeset='-1'>
+                    <nd ref='-25364' />
+                    <nd ref='-25361' />
+                    <nd ref='-25362' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_Bahnstrecke' />
+                    <tag k='bahnkategorie' v='1100' />
+                    <tag k='elektrifizierung' v='2000' />
+                    <tag k='anzahlDerStreckengleise' v='1000' />
+                    <tag k='spurweite' v='1000' />
+                  </way>
+                  <relation id='-60' changeset='-1'>
+                    <member type='node' ref='-25364' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
+                  <relation id='-80' changeset='-1'>
+                    <member type='way' ref='-663' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>

@@ -38,15 +38,49 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
+                  <node id='-25478' changeset='-1' lat='49.88153975261' lon='12.32642548413' />
+                  <node id='-25477' changeset='-1' lat='49.8799252856' lon='12.3234923098' />
+                  <node id='-25476' changeset='-1' lat='49.88647982036' lon='12.32394954016' />
+                  <node id='-25475' changeset='-1' lat='49.88546423895' lon='12.32398845939' />
+                  <node id='-25474' changeset='-1' lat='49.88543916259' lon='12.320972219' />
+                  <node id='-25473' changeset='-1' lat='49.88642966869' lon='12.32095275939' />
+                  <node id='-25471' changeset='-1' lat='49.87989698123' lon='12.3196489457' />
+                  <node id='-25470' changeset='-1' lat='49.87994713968' lon='12.32645981108' />
+                  <node id='-25469' changeset='-1' lat='49.88716941303' lon='12.32630413416' />
+                  <node id='-25468' changeset='-1' lat='49.88711926208' lon='12.31949326877' />
+                  <way id='-809' changeset='-1'>
+                    <nd ref='-25473' />
+                    <nd ref='-25474' />
+                    <nd ref='-25475' />
+                    <nd ref='-25476' />
+                    <nd ref='-25473' />
                     <tag k='bauwerksfunktion' v='1480' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM22222222' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM2222222220251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_BauwerkOderAnlageFuerSportFreizeitUndErholung' />
-                  </node>
-                  <relation id='-63' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
+                  </way>
+                  <way id='-741' changeset='-1'>
+                    <nd ref='-25468' />
+                    <nd ref='-25469' />
+                    <nd ref='-25478' />
+                    <nd ref='-25470' />
+                    <nd ref='-25477' />
+                    <nd ref='-25471' />
+                    <nd ref='-25468' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_FlaecheBesondererFunktionalerPraegung' />
+                    <tag k='funktion' v='1170' />
+                  </way>
+                  <relation id='-50' changeset='-1'>
+                    <member type='way' ref='-741' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
+                  <relation id='-60' changeset='-1'>
+                    <member type='way' ref='-809' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -77,16 +111,50 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
+                  <node id='-25478' changeset='-1' lat='49.88153975261' lon='12.32642548413' />
+                  <node id='-25477' changeset='-1' lat='49.8799252856' lon='12.3234923098' />
+                  <node id='-25476' changeset='-1' lat='49.88647982036' lon='12.32394954016' />
+                  <node id='-25475' changeset='-1' lat='49.88546423895' lon='12.32398845939' />
+                  <node id='-25474' changeset='-1' lat='49.88543916259' lon='12.320972219' />
+                  <node id='-25473' changeset='-1' lat='49.88642966869' lon='12.32095275939' />
+                  <node id='-25471' changeset='-1' lat='49.87989698123' lon='12.3196489457' />
+                  <node id='-25470' changeset='-1' lat='49.87994713968' lon='12.32645981108' />
+                  <node id='-25469' changeset='-1' lat='49.88716941303' lon='12.32630413416' />
+                  <node id='-25468' changeset='-1' lat='49.88711926208' lon='12.31949326877' />
+                  <way id='-809' changeset='-1'>
+                    <nd ref='-25473' />
+                    <nd ref='-25474' />
+                    <nd ref='-25475' />
+                    <nd ref='-25476' />
+                    <nd ref='-25473' />
                     <tag k='bauwerksfunktion' v='1480' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM22222222' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM2222222220251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_BauwerkOderAnlageFuerSportFreizeitUndErholung' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
-                  </node>
-                  <relation id='-63' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
+                  </way>
+                  <way id='-741' changeset='-1'>
+                    <nd ref='-25468' />
+                    <nd ref='-25469' />
+                    <nd ref='-25478' />
+                    <nd ref='-25470' />
+                    <nd ref='-25477' />
+                    <nd ref='-25471' />
+                    <nd ref='-25468' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_FlaecheBesondererFunktionalerPraegung' />
+                    <tag k='funktion' v='1170' />
+                  </way>
+                  <relation id='-50' changeset='-1'>
+                    <member type='way' ref='-741' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
+                  <relation id='-60' changeset='-1'>
+                    <member type='way' ref='-809' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -485,16 +553,20 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
+                  <node id='-25469' changeset='-1' lat='49.88716941303' lon='12.32630413416' />
+                  <node id='-25468' changeset='-1' lat='49.88711926208' lon='12.31949326877' />
+                  <way id='-25402' changeset='-1'>
+                    <nd ref='-25469' />
+                    <nd ref='-25468' />
                     <tag k='art' v='1110' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_WegPfadSteig' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
-                  </node>
+                  </way>
                   <relation id='-63' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
+                    <member type='way' ref='-25402' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -582,13 +654,33 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                 <osmChange version="0.6" generator="JOSM">
                 <create>
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
-                    <tag k='bahnhofskategorie' v='1010' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Bahnverkehrsanlage' />
+                    <tag k='bahnhofskategorie' v='1010' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
                   </node>
+                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
+                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
+                  <way id='-663' changeset='-1'>
+                    <nd ref='-25360' />
+                    <nd ref='-25402' />
+                    <nd ref='-25361' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_Bahnstrecke' />
+                    <tag k='bahnkategorie' v='1100' />
+                    <tag k='elektrifizierung' v='1000' />
+                    <tag k='anzahlDerStreckengleise' v='1000' />
+                    <tag k='spurweite' v='1000' />
+                  </way>
+                  <relation id='-70' changeset='-1'>
+                    <member type='way' ref='-663' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
                   <relation id='-63' changeset='-1'>
                     <member type='node' ref='-25402' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
@@ -621,16 +713,42 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
-                    <tag k='art' v='1320' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
+                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
+                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
+                  <node id='-25370' changeset='-1' lat='49.87927158487' lon='12.31859812646' />
+                  <node id='-25371' changeset='-1' lat='49.88027158487' lon='12.31859812646' />
+                  <node id='-25372' changeset='-1' lat='49.88027158487' lon='12.32451384954' />
+                  <node id='-25373' changeset='-1' lat='49.87927158487' lon='12.32451384954' />
+                  <way id='-663' changeset='-1'>
+                    <nd ref='-25360' />
+                    <nd ref='-25361' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Flugverkehrsanlage' />
+                    <tag k='art' v='1320' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
-                  </node>
-                  <relation id='-63' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
+                  </way>
+                  <way id='-740' changeset='-1'>
+                    <nd ref='-25370' />
+                    <nd ref='-25371' />
+                    <nd ref='-25372' />
+                    <nd ref='-25373' />
+                    <nd ref='-25370' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM00000000' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM0000000020251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_Flugverkehr' />
+                    <tag k='art' v='5511' />
+                    <tag k='nutzung' v='1000' />
+a                  </way>
+                  <relation id='-70' changeset='-1'>
+                    <member type='way' ref='-663' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
+                  <relation id='-80' changeset='-1'>
+                    <member type='way' ref='-740' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -717,16 +835,35 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
+                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
+                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
+                  <node id='-25359' changeset='-1' lat='49.88413518675' lon='12.32447493031' />
+                  <node id='-25358' changeset='-1' lat='49.8841101097' lon='12.31855920723'>
+                    <tag k='identifikator:UUID' v='DEBYBDLM12345677' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567720251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
                     <tag k='art' v='1460' />
+                    <tag k='ergebnisDerUeberpruefung' v='2000' />
+                  </node>
+                  <way id='-663' changeset='-1'>
+                    <nd ref='-25358' />
+                    <nd ref='-25359' />
+                    <nd ref='-25360' />
+                    <nd ref='-25361' />
+                    <nd ref='-25358' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
-                    <tag k='ergebnisDerUeberpruefung' v='2000' />
-                  </node>
-                  <relation id='-63' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
+                    <tag k='object_type' v='AX_Hafenbecken' />
+                  </way>
+                  <relation id='-70' changeset='-1'>
+                    <member type='way' ref='-663' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
+                  <relation id='-60' changeset='-1'>
+                    <member type='node' ref='-25358' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -813,16 +950,25 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
-                    <tag k='bauwerksfunktion' v='2020' />
+                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
+                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
+                  <node id='-25359' changeset='-1' lat='49.88413518675' lon='12.32447493031' />
+                  <node id='-25358' changeset='-1' lat='49.8841101097' lon='12.31855920723' />
+                  <way id='-663' changeset='-1'>
+                    <nd ref='-25358' />
+                    <nd ref='-25359' />
+                    <nd ref='-25360' />
+                    <nd ref='-25361' />
+                    <nd ref='-25358' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_BauwerkImGewaesserbereich' />
+                    <tag k='bauwerksfunktion' v='2020' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
-                  </node>
+                  </way>
                   <relation id='-63' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
+                    <member type='way' ref='-663' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>

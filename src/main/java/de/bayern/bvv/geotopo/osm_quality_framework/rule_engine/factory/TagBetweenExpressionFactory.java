@@ -41,7 +41,7 @@ public class TagBetweenExpressionFactory implements ExpressionFactory {
             throw new IllegalArgumentException("tag_between: 'from_value' must be <= 'to_value'");
         }
 
-        return taggedObject -> {
+        return (taggedObject, baseTaggedObject) -> {
             String tagValue = taggedObject.getTags().get(tagKey);
             if (tagValue == null) return false;
 
@@ -59,6 +59,7 @@ public class TagBetweenExpressionFactory implements ExpressionFactory {
 
     private static int parseInt(String s, String field) {
         try {
+            if (s.equals("max_value")) return Integer.MAX_VALUE;
             return Integer.parseInt(s);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("tag_between: '" + field + "' must be an integer, but was '" + s + "'", e);

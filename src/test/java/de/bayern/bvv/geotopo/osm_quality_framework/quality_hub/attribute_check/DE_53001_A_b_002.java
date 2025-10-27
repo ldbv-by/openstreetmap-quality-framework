@@ -43,25 +43,33 @@ class DE_53001_A_b_002 extends DatabaseIntegrationTest {
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25365' changeset='-1' lat='49.88318223722' lon='12.34785675027' />
-                  <node id='-25364' changeset='-1' lat='49.88324430282' lon='12.34855027693' />
-                  <node id='-25363' changeset='-1' lat='49.88352980354' lon='12.34847321841' />
-                  <node id='-25362' changeset='-1' lat='49.88345532526' lon='12.3477411625' />
-                  <way id='-665' changeset='-1'>
+                  <node id='-25362' changeset='-1' lat='49.88064989274' lon='12.32196506929' />
+                  <node id='-25361' changeset='-1' lat='49.88237537717' lon='12.32196506929' />
+                  <way id='-736' changeset='-1'>
+                    <nd ref='-25361' />
                     <nd ref='-25362' />
-                    <nd ref='-25363' />
-                    <nd ref='-25364' />
-                    <nd ref='-25365' />
+                    <tag k='bauwerksfunktion' v='1900' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_BauwerkImVerkehrsbereich' />
+                    <tag k='breiteDesObjekts' v='5' />
+                  </way>
+                  <way id='-663' changeset='-1'>
+                    <nd ref='-25361' />
                     <nd ref='-25362' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_BauwerkImVerkehrsbereich' />
-                    <tag k='bauwerksfunktion' v='1900' />
-                    <tag k='breiteDesObjekts' v='5' />
+                    <tag k='object_type' v='AX_WegPfadSteig' />
                   </way>
-                  <relation id='-62' changeset='-1'>
-                    <member type='way' ref='-665' role='' />
+                  <relation id='-70' changeset='-1'>
+                    <member type='way' ref='-736' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
+                  <relation id='-80' changeset='-1'>
+                    <member type='way' ref='-663' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>

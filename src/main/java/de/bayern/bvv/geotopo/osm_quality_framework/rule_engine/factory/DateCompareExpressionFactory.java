@@ -45,7 +45,7 @@ public class DateCompareExpressionFactory implements ExpressionFactory {
             throw new IllegalArgumentException("date_compare: 'compare_tag_key' and 'compare_value' together are not allowed");
         }
 
-        return taggedObject -> {
+        return (taggedObject, baseTaggedObject) -> {
             String tagInstantStr = taggedObject.getTags().get(tagKey);
             Instant tagInstant =  toInstant(tagInstantStr)
                     .orElseThrow(() -> new IllegalArgumentException("date_compare: value '" + tagInstantStr + "' for 'tag_key' '" + tagKey + "' cannot be parsed"));

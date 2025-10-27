@@ -49,6 +49,7 @@ class DE_53002_G_b_004_005 extends DatabaseIntegrationTest {
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Strassenverkehrsanlage' />
                     <tag k='art' v='3001' />
+                    <tag k='name' v='Kreuz' />
                   </node>
                   <node id='-25434' changeset='-1' lat='49.88561514895' lon='12.32092479857' />
                   <node id='-25432' changeset='-1' lat='49.8855530864' lon='12.32664639346' />
@@ -61,6 +62,19 @@ class DE_53002_G_b_004_005 extends DatabaseIntegrationTest {
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Strassenachse' />
                   </way>
+                  <relation id='-80' changeset='-1'>
+                    <member type='way' ref='-802' role='' />
+                    <tag k='widmung' v='1301' />
+                    <tag k='object_type' v='AX_Strasse' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM11112222' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111222220251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                  </relation>
+                  <relation id='-79' changeset='-1'>
+                    <member type='relation' ref='-80' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
                   <relation id='-60' changeset='-1'>
                     <member type='node' ref='-25433' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
@@ -104,6 +118,7 @@ class DE_53002_G_b_004_005 extends DatabaseIntegrationTest {
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Strassenverkehrsanlage' />
                     <tag k='art' v='3001' />
+                    <tag k='name' v='Kreuz' />
                   </node>
                   <relation id='-60' changeset='-1'>
                     <member type='node' ref='-25433' role='' />

@@ -5,7 +5,7 @@ INSERT INTO openstreetmap_schema.object_types (object_type, is_abstract, is_rela
     ('AX_gehoertZu', false, true),
     ('AX_zeigtAuf', false, true),
     ('AX_ist', false, true),
-    ('AX_RelativeHoehe', false, true),
+    ('AX_objekthoehe', false, true),
 
     ('AX_Strasse', false, true),
     ('AX_Wasserlauf', false, true),
@@ -59,7 +59,7 @@ INSERT INTO openstreetmap_schema.object_types (object_type, is_abstract, is_rela
     ('AX_BauwerkeEinrichtungenUndSonstigeAngaben', true, false),
     ('AX_Turm', false, false),
     ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', false, false),
-    ('AX_RelativeHoehe', false, true), -- wird als Relation (eigener object_type) geführt
+    ('AX_objekthoehe', false, true), -- wird als Relation (eigener object_type) geführt
     ('AX_VorratsbehaelterSpeicherbauwerk', false, false),
     ('AX_Transportanlage', false, false),
     ('AX_Leitung', false, false),
@@ -2018,9 +2018,9 @@ INSERT INTO openstreetmap_schema.tags (object_type, tag_key, multiplicity, tag_d
     ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', 'bezeichnung', '0..1', 'CharacterString'),
     /* ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', 'objekthoehe', '0..*', 'AX_RelativeHoehe'), -- wird als Relation (eigener object_type) geführt */
     ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', 'zustand', '0..1', 'AX_Zustand_BauwerkOderAnlageFuerIndustrieUndGewerbe'),
-    ('AX_RelativeHoehe', 'hoehe', '1', 'Length'),
-    ('AX_RelativeHoehe', 'obererBezugspunkt', '0..1', 'AX_ObererBezugspunkt'),
-    ('AX_RelativeHoehe', 'untererBezugspunkt', '0..1', 'AX_UntererBezugspunkt'),
+    ('AX_objekthoehe', 'hoehe', '1', 'Length'),
+    ('AX_objekthoehe', 'obererBezugspunkt', '0..1', 'AX_ObererBezugspunkt'),
+    ('AX_objekthoehe', 'untererBezugspunkt', '0..1', 'AX_UntererBezugspunkt'),
     ('AX_VorratsbehaelterSpeicherbauwerk', 'bauwerksfunktion', '0..1', 'AX_Bauwerksfunktion_VorratsbehaelterSpeicherbauwerk'),
     /* ('AX_VorratsbehaelterSpeicherbauwerk', 'objekthoehe', '0..*', 'AX_RelativeHoehe'), -- wird als Relation (eigener object_type) geführt */
     ('AX_VorratsbehaelterSpeicherbauwerk', 'speicherinhalt', '0..1', 'AX_Speicherinhalt_VorratsbehaelterSpeicherbauwerk'),
@@ -2269,15 +2269,16 @@ INSERT INTO openstreetmap_schema.relations (object_type, relation_object_type, m
     ('AX_Benutzer', 'AX_gehoertZu', '1'),
     ('AX_Strassenachse', 'AX_Strasse', '1..*'),
     ('AX_Fahrbahnachse', 'AX_Strasse', '1..*'),
-    ('AX_Gebaeude_Kerndaten', 'AX_RelativeHoehe', '0..*'),
-    ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', 'AX_RelativeHoehe', '0..*'),
-    ('AX_VorratsbehaelterSpeicherbauwerk', 'AX_RelativeHoehe', '0..*'),
-    ('AX_SonstigesBauwerkOderSonstigeEinrichtung', 'AX_RelativeHoehe', '0..*'),
-    ('AX_Turm', 'AX_RelativeHoehe', '0..*'),
-    ('AX_BauwerkOderAnlageFuerSportFreizeitUndErholung', 'AX_RelativeHoehe', '0..*'),
-    ('AX_HistorischesBauwerkOderHistorischeEinrichtung', 'AX_RelativeHoehe', '0..*'),
-    ('AX_Schleuse', 'AX_RelativeHoehe', '0..*'),
-    ('AX_BauwerkImVerkehrsbereich', 'AX_RelativeHoehe', '0..*')
+    ('AX_Gebaeude_Kerndaten', 'AX_objekthoehe', '0..*'),
+    ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', 'AX_objekthoehe', '0..*'),
+    ('AX_VorratsbehaelterSpeicherbauwerk', 'AX_objekthoehe', '0..*'),
+    ('AX_SonstigesBauwerkOderSonstigeEinrichtung', 'AX_objekthoehe', '0..*'),
+    ('AX_Turm', 'AX_objekthoehe', '0..*'),
+    ('AX_BauwerkOderAnlageFuerSportFreizeitUndErholung', 'AX_objekthoehe', '0..*'),
+    ('AX_HistorischesBauwerkOderHistorischeEinrichtung', 'AX_objekthoehe', '0..*'),
+    ('AX_Schleuse', 'AX_objekthoehe', '0..*'),
+    ('AX_BauwerkImVerkehrsbereich', 'AX_objekthoehe', '0..*'),
+    ('AX_BauwerkImGewaesserbereich', 'AX_objekthoehe', '0..*')
 ON CONFLICT (object_type, relation_object_type) DO NOTHING;
 
 INSERT INTO openstreetmap_schema.relation_members (object_type, relation_object_type, type, role, multiplicity) VALUES
@@ -2296,13 +2297,14 @@ INSERT INTO openstreetmap_schema.relation_members (object_type, relation_object_
     ('AX_Benutzer', 'AX_ist', '*', '', '1'),
     ('AX_Strassenachse', 'AX_Strasse', '*', '', '0..*'),
     ('AX_Fahrbahnachse', 'AX_Strasse', '*', '', '0..*'),
-    ('AX_Gebaeude_Kerndaten', 'AX_RelativeHoehe', '*', '', '1'),
-    ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', 'AX_RelativeHoehe', '*', '', '1'),
-    ('AX_VorratsbehaelterSpeicherbauwerk', 'AX_RelativeHoehe', '*', '', '1'),
-    ('AX_SonstigesBauwerkOderSonstigeEinrichtung', 'AX_RelativeHoehe', '*', '', '1'),
-    ('AX_Turm', 'AX_RelativeHoehe', '*', '', '1'),
-    ('AX_BauwerkOderAnlageFuerSportFreizeitUndErholung', 'AX_RelativeHoehe', '*', '', '1'),
-    ('AX_HistorischesBauwerkOderHistorischeEinrichtung', 'AX_RelativeHoehe', '*', '', '1'),
-    ('AX_Schleuse', 'AX_RelativeHoehe', '*', '', '1'),
-    ('AX_BauwerkImVerkehrsbereich', 'AX_RelativeHoehe', '*', '', '1')
+    ('AX_Gebaeude_Kerndaten', 'AX_objekthoehe', '*', '', '1'),
+    ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', 'AX_objekthoehe', '*', '', '1'),
+    ('AX_VorratsbehaelterSpeicherbauwerk', 'AX_objekthoehe', '*', '', '1'),
+    ('AX_SonstigesBauwerkOderSonstigeEinrichtung', 'AX_objekthoehe', '*', '', '1'),
+    ('AX_Turm', 'AX_objekthoehe', '*', '', '1'),
+    ('AX_BauwerkOderAnlageFuerSportFreizeitUndErholung', 'AX_objekthoehe', '*', '', '1'),
+    ('AX_HistorischesBauwerkOderHistorischeEinrichtung', 'AX_objekthoehe', '*', '', '1'),
+    ('AX_Schleuse', 'AX_objekthoehe', '*', '', '1'),
+    ('AX_BauwerkImVerkehrsbereich', 'AX_objekthoehe', '*', '', '1'),
+    ('AX_BauwerkImGewaesserbereich', 'AX_objekthoehe', '*', '', '1')
 ON CONFLICT (object_type, relation_object_type, role) DO NOTHING;

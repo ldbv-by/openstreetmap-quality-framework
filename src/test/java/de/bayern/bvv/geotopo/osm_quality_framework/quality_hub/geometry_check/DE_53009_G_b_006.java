@@ -60,7 +60,7 @@ class DE_53009_G_b_006 extends DatabaseIntegrationTest {
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Gewaesserachse' />
                     <tag k='funktion' v='8300' />
-                    <tag k='breiteDesGewaessers' v='10' />
+                    <tag k='breiteDesGewaessers' v='6' />
                     <tag k='fliessrichtung' v='TRUE' />
                     <tag k='zustand' v='4000' />
                   </way>

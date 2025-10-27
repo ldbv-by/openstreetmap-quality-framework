@@ -156,6 +156,23 @@ class DE_53004_G_a_001 extends DatabaseIntegrationTest {
                     <tag k='object_type' v='AX_Bahnverkehrsanlage' />
                     <tag k='bahnhofskategorie' v='1010' />
                   </node>
+                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
+                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
+                  <way id='-663' changeset='-1'>
+                    <nd ref='-25360' />
+                    <nd ref='-25402' />
+                    <nd ref='-25361' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_SeilbahnSchwebebahn' />
+                    <tag k='bahnkategorie' v='2500' />
+                  </way>
+                  <relation id='-70' changeset='-1'>
+                    <member type='way' ref='-663' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
                   <relation id='-63' changeset='-1'>
                     <member type='node' ref='-25402' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />

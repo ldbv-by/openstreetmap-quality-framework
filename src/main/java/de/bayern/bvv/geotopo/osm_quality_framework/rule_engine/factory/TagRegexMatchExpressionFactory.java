@@ -39,7 +39,7 @@ public class TagRegexMatchExpressionFactory implements ExpressionFactory {
             }
         }
 
-        return taggedObject -> {
+        return (taggedObject, baseTaggedObject) -> {
             String tagValue = taggedObject.getTags().get(tagKey);
             if (tagValue == null) return false;
 

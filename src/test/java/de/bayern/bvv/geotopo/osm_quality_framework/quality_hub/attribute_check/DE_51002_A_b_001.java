@@ -57,7 +57,7 @@ class DE_51002_A_b_001 extends DatabaseIntegrationTest {
                   </relation>
                   <relation id='-64' changeset='-1'>
                     <member type='node' ref='-25402' role='' />
-                    <tag k='object_type' v='AX_RelativeHoehe' />
+                    <tag k='object_type' v='AX_objekthoehe' />
                     <tag k='hoehe' v='50' />
                   </relation>
                 </create>
@@ -101,7 +101,7 @@ class DE_51002_A_b_001 extends DatabaseIntegrationTest {
                   </relation>
                   <relation id='-64' changeset='-1'>
                     <member type='node' ref='-25402' role='' />
-                    <tag k='object_type' v='AX_RelativeHoehe' />
+                    <tag k='object_type' v='AX_objekthoehe' />
                     <tag k='hoehe' v='50' />
                   </relation>
                 </create>
@@ -137,6 +137,6 @@ class DE_51002_A_b_001 extends DatabaseIntegrationTest {
         assertThat(attributeCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'attribut-check'")
-                .contains("Die Relation 'AX_RelativeHoehe' darf nur bei der 'bauwerksfunktion' 1220, 1250, 1251, 1260, 1270, 1280, 1290 und 1350 vorkommen.");
+                .contains("Die Relation 'AX_objekthoehe' darf nur bei der 'bauwerksfunktion' 1220, 1250, 1251, 1260, 1270, 1280, 1290 und 1350 vorkommen.");
     }
 }

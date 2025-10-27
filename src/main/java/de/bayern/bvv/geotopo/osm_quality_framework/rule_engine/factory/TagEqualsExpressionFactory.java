@@ -30,7 +30,7 @@ public class TagEqualsExpressionFactory implements ExpressionFactory {
             throw new IllegalArgumentException("tag_exists: 'value' is required");
         }
 
-        return taggedObject -> {
+        return (taggedObject, baseTaggedObject) -> {
             String tagValue = taggedObject.getTags().get(tagKey);
             if (tagValue == null) return false;
 

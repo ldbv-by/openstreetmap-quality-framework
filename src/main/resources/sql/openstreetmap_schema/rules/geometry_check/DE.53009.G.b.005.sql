@@ -20,7 +20,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                     "all": [
                         { "type": "geom_type", "value": "LineString" },
                         {
-                            "relation": {
+                            "relations": {
                                 "conditions": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" },
                                 "checks": {
                                     "type": "spatial_compare",
@@ -37,7 +37,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                     "all": [
                         { "type": "geom_type", "value": "Polygon" },
                         {
-                            "relation": {
+                            "relations": {
                                 "conditions": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" },
                                 "checks": {
                                     "type": "spatial_compare",

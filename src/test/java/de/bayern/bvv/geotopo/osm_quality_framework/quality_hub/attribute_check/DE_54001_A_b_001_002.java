@@ -84,11 +84,11 @@ class DE_54001_A_b_001_002 extends DatabaseIntegrationTest {
                 <create>
                   <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='bewuchs' v='1011' />
-                    <tag k='zustand' v='5000' />
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Vegetationsmerkmal' />
+                    <tag k='zustand' v='5000' />
                   </node>
                   <relation id='-63' changeset='-1'>
                     <member type='node' ref='-25402' role='' />

@@ -37,7 +37,7 @@ public class ObjectExistsExpressionFactory implements ExpressionFactory {
     public Expression create(JsonNode json) {
         DataSetFilter dataSetFilter = this.parseDataSetFilter(json);
 
-        return taggedObject -> {
+        return (taggedObject, baseTaggedObject) -> {
             DataSetFilter resolvedDataSetFilter = this.resolveCurrentPlaceholders(dataSetFilter, taggedObject);
             DataSetDto resultDataSetDto = this.unifiedDataProvider.getDataSet(resolvedDataSetFilter);
 

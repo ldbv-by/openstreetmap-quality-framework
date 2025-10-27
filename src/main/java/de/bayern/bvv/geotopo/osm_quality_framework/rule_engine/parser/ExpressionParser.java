@@ -24,36 +24,36 @@ public final class ExpressionParser {
      * Parse Condition.
      */
     public Expression parse(JsonNode node) {
-        if (node == null || node.isNull() || node.isMissingNode() || node.isEmpty()) return taggedObject -> true;
+        if (node == null || node.isNull() || node.isMissingNode() || node.isEmpty()) return (taggedObject, baseTaggedObject) -> true;
 
         // Parse operators
         if (node.has("all")) {
             List<Expression> expressions = new ArrayList<>();
             node.get("all").forEach(n -> expressions.add(parse(n)));
-            return taggedObject -> { for  (Expression expression : expressions) if (!expression.evaluate(taggedObject)) return false; return true; };
+            return (taggedObject, baseTaggedObject) -> { for  (Expression expression : expressions) if (!expression.evaluate(taggedObject, baseTaggedObject)) return false; return true; };
         }
 
         if (node.has("any")) {
             List<Expression> expressions = new ArrayList<>();
             node.get("any").forEach(n -> expressions.add(parse(n)));
-            return taggedObject -> { for  (Expression expression : expressions) if (expression.evaluate(taggedObject)) return true; return false; };
+            return (taggedObject, baseTaggedObject) -> { for  (Expression expression : expressions) if (expression.evaluate(taggedObject, baseTaggedObject)) return true; return false; };
         }
 
         if (node.has("not")) {
             Expression expression = parse(node.get("not"));
-            return taggedObject -> !expression.evaluate(taggedObject);
+            return (taggedObject, baseTaggedObject) -> !expression.evaluate(taggedObject, baseTaggedObject);
         }
 
-        if (node.has("relation")) {
-            JsonNode relationNode = node.get("relation");
-            if (relationNode.has("conditions") || relationNode.has("checks")) {
-                Expression conditions = parse(node.get("relation").path("conditions"));
-                Expression checks = parse(node.get("relation").path("checks"));
+        if (node.has("relations")) {
+            JsonNode relationsNode = node.get("relations");
+            if (relationsNode.has("conditions") || relationsNode.has("checks")) {
+                Expression conditions = parse(relationsNode.path("conditions"));
+                Expression checks = parse(relationsNode.path("checks"));
 
-                return taggedObject -> {
+                return (taggedObject, baseTaggedObject) -> {
                     for (Relation relation : taggedObject.getRelations()) {
-                        if (conditions.evaluate(relation)) {
-                            if (!checks.evaluate(relation)) return false;
+                        if (conditions.evaluate(relation, baseTaggedObject)) {
+                            if (!checks.evaluate(relation, baseTaggedObject)) return false;
                         }
                     }
 
@@ -61,15 +61,15 @@ public final class ExpressionParser {
                 };
             } else {
                 List<Expression> expressions = new ArrayList<>();
-                if (relationNode.isArray()) {
-                    relationNode.forEach(n -> expressions.add(parse(n)));
+                if (relationsNode.isArray()) {
+                    relationsNode.forEach(n -> expressions.add(parse(n)));
                 } else {
-                    expressions.add(parse(relationNode));
+                    expressions.add(parse(relationsNode));
                 }
-                return taggedObject -> {
-                    for (Relation r : taggedObject.getRelations()) {
+                return (taggedObject, baseTaggedObject) -> {
+                    for (Relation relation : taggedObject.getRelations()) {
                         for (Expression e : expressions) {
-                            if (!e.evaluate(r)) return false;
+                            if (!e.evaluate(relation, baseTaggedObject)) return false;
                         }
                     }
                     return true;
@@ -81,16 +81,16 @@ public final class ExpressionParser {
             JsonNode jsonNode = node.get("way_nodes");
 
             if (jsonNode.has("conditions") || jsonNode.has("checks")) {
-                Expression conditions = parse(node.get("relation").path("conditions"));
-                Expression checks = parse(node.get("relation").path("checks"));
+                Expression conditions = parse(jsonNode.path("conditions"));
+                Expression checks = parse(jsonNode.path("checks"));
 
-                return taggedObject -> {
+                return (taggedObject, baseTaggedObject) -> {
                     List<Feature> wayNodes = this.getWayNodesAsFeature(taggedObject);
                     if (wayNodes.isEmpty()) return false;
 
                     for (Feature wayNode : wayNodes) {
-                        if (conditions.evaluate(wayNode)) {
-                            if (!checks.evaluate(wayNode)) return false;
+                        if (conditions.evaluate(wayNode, baseTaggedObject)) {
+                            if (!checks.evaluate(wayNode, baseTaggedObject)) return false;
                         }
                     }
 
@@ -103,13 +103,13 @@ public final class ExpressionParser {
                 } else {
                     expressions.add(parse(jsonNode));
                 }
-                return taggedObject -> {
+                return (taggedObject, baseTaggedObject) -> {
                     List<Feature> wayNodes = this.getWayNodesAsFeature(taggedObject);
                     if (wayNodes.isEmpty()) return false;
 
                     for (Feature wayNode : wayNodes) {
                         for (Expression e : expressions) {
-                            if (!e.evaluate(wayNode)) return false;
+                            if (!e.evaluate(wayNode, baseTaggedObject)) return false;
                         }
                     }
 
@@ -153,6 +153,8 @@ public final class ExpressionParser {
                                 geometryNode.getGeometryTransformed(),
                                 List.of(geometryNode)
                         );
+
+                        wayNodeFeature.setOsmId(geometryNode.getOsmId());
                     }
 
                     wayNodeFeatures.add(wayNodeFeature);

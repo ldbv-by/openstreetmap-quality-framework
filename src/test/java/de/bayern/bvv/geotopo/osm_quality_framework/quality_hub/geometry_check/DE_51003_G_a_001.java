@@ -96,7 +96,7 @@ class DE_51003_G_a_001 extends DatabaseIntegrationTest {
                     <tag k='object_type' v='AX_VorratsbehaelterSpeicherbauwerk' />
                   </way>
                   <relation id='-63' changeset='-1'>
-                    <member type='node' ref='-663' role='' />
+                    <member type='way' ref='-663' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -138,7 +138,7 @@ class DE_51003_G_a_001 extends DatabaseIntegrationTest {
                     <tag k='object_type' v='AX_VorratsbehaelterSpeicherbauwerk' />
                   </way>
                   <relation id='-63' changeset='-1'>
-                    <member type='node' ref='-663' role='' />
+                    <member type='way' ref='-663' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>

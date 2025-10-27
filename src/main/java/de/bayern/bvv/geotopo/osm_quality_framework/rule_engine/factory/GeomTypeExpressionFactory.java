@@ -32,7 +32,7 @@ public class GeomTypeExpressionFactory implements ExpressionFactory {
             throw new IllegalArgumentException("geom_type: 'value' is required. Possible values are Point, LineString and Polygon.");
         }
 
-        return taggedObject -> {
+        return (taggedObject, baseTaggedObject) -> {
 
             if (taggedObject instanceof Feature feature) {
                 return switch (value.trim()) {

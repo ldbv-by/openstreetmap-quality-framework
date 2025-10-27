@@ -11,6 +11,9 @@ import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.ExpressionFactory;
 import de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.api.UnifiedDataProvider;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -38,10 +41,10 @@ public class SpatialCompareExpressionFactory implements ExpressionFactory {
         String relationMasterRole = json.path("relation_master_role").asText();
         String relationCompareRole = json.path("relation_compare_role").asText();
 
-        return taggedObject -> {
+        return (taggedObject, baseTaggedObject) -> {
 
             if (taggedObject instanceof Feature feature) {
-                return this.spatialCompareFeature(feature, operators, dataSetFilter);
+                return this.spatialCompareFeature(feature, baseTaggedObject, operators, dataSetFilter);
             }
 
             if (taggedObject instanceof Relation relation) {
@@ -69,7 +72,7 @@ public class SpatialCompareExpressionFactory implements ExpressionFactory {
                                                        null), null, null), null);
                         }
 
-                        if (!this.spatialCompareFeature(masterFeature, operators, relationDataSetFilter)) return false;
+                        if (!this.spatialCompareFeature(masterFeature, baseTaggedObject, operators, relationDataSetFilter)) return false;
                         isCorrect = true;
                     }
                 }
@@ -124,12 +127,27 @@ public class SpatialCompareExpressionFactory implements ExpressionFactory {
         }
     }
 
-    private boolean spatialCompareFeature(Feature feature, Set<SpatialOperator> operators, DataSetFilter dataSetFilter) {
+    private boolean spatialCompareFeature(Feature feature, TaggedObject baseTaggedObject,
+                                          Set<SpatialOperator> operators, DataSetFilter dataSetFilter) {
+
         DataSetDto spatialResult = this.unifiedDataProvider.getDataSetBySpatialRelation(
                 FeatureMapper.toDto(feature),
                 operators,
                 dataSetFilter
         );
+
+        // Filter base object.
+        if (baseTaggedObject instanceof Feature baseFeature) {
+            if (baseFeature.getGeometry() instanceof Point) {
+                spatialResult.nodes().removeIf(f -> f.osmId().equals(baseFeature.getOsmId()));
+            } else if (baseFeature.getGeometry() instanceof LineString) {
+                spatialResult.ways().removeIf(f -> f.osmId().equals(baseFeature.getOsmId()));
+            } else if (baseFeature.getGeometry() instanceof Polygon) {
+                spatialResult.areas().removeIf(f -> f.osmId().equals(baseFeature.getOsmId()));
+            }
+        } else if (baseTaggedObject instanceof Relation baseRelation) {
+            spatialResult.relations().removeIf(f -> f.osmId().equals(baseRelation.getOsmId()));
+        }
 
         // True if a spatial results are found.
         return spatialResult != null &&

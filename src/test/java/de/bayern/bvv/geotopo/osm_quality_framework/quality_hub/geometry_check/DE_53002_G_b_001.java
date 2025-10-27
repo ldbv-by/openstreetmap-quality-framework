@@ -101,6 +101,19 @@ class DE_53002_G_b_001 extends DatabaseIntegrationTest {
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
+                  <relation id='-65' changeset='-1'>
+                    <member type='way' ref='-784' role='' />
+                    <tag k='object_type' v='AX_Strasse' />
+                    <tag k='widmung' v='1303' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM11111113' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111320251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                  </relation>
+                  <relation id='-66' changeset='-1'>
+                    <member type='relation' ref='-65 role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
                   <relation id='-70' changeset='-1'>
                     <member type='way' ref='-733' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
@@ -174,6 +187,14 @@ class DE_53002_G_b_001 extends DatabaseIntegrationTest {
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM2222222220251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                   </way>
+                  <relation id='-50' changeset='-1'>
+                    <member type='way' ref='-773' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AX_Strasse' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM55555555' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM5555555520251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                  </relation>
                   <relation id='-60' changeset='-1'>
                     <member type='way' ref='-733' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />

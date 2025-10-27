@@ -5,8 +5,8 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
     '{
         "checks": {
             "all": [
-                {"type": "tag_unique", "tag_key": "advStandardModell" },
-                {"type": "tag_unique", "tag_key": "sonstigesModell" }
+                {"type": "tag_unique", "tag_key": "advStandardModell", "max_level": "1" },
+                {"type": "tag_unique", "tag_key": "sonstigesModell", "max_level": "1" }
             ]
         }
     }',

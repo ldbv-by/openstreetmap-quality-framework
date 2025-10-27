@@ -24,6 +24,6 @@ public class TagExistsExpressionFactory implements ExpressionFactory {
             throw new IllegalArgumentException("tag_exists: 'tag_key' is required");
         }
 
-        return taggedObject -> taggedObject.getTags().containsKey(tagKey);
+        return (taggedObject, baseTaggedObject) -> taggedObject.getTags().containsKey(tagKey);
     }
 }

@@ -48,7 +48,7 @@ public class UriValidExpressionFactory implements ExpressionFactory {
             throw new IllegalArgumentException("uri_valid: 'tag_key' is required");
         }
 
-        return taggedObject -> {
+        return (taggedObject, baseTaggedObject) -> {
             String uri = taggedObject.getTags().get(tagKey);
 
             if (uri.startsWith("http://") || uri.startsWith("https://")) {

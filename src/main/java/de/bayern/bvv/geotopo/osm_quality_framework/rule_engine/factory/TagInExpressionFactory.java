@@ -1,6 +1,7 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.factory;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.TaggedObject;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.ExpressionFactory;
 import org.springframework.stereotype.Component;
@@ -21,31 +22,46 @@ public class TagInExpressionFactory implements ExpressionFactory {
     @Override
     public Expression create(JsonNode json) {
         String tagKey = json.path("tag_key").asText();
+        String value = json.path("value").asText();
         JsonNode values = json.path("values");
 
         if (tagKey == null || tagKey.isBlank()) {
             throw new IllegalArgumentException("tag_in: 'tag_key' is required");
         }
 
-        if (!values.isArray() || values.isEmpty()) {
-            throw new IllegalArgumentException("tag_in: 'values' must be a non-empty array");
+        if ((!values.isArray() || values.isEmpty()) && (value.isEmpty())) {
+            throw new IllegalArgumentException("tag_in: 'values' or 'value' must be a non-empty array");
         }
 
         Set<String> allowedValues = new HashSet<>();
-        for (JsonNode value : values) {
-            String v = value.asText(null);
-            if (v != null && !v.isBlank()) allowedValues.add(v);
+        if (values.isArray()) {
+            for (JsonNode val : values) {
+                String v = val.asText(null);
+                if (v != null && !v.isBlank()) allowedValues.add(v);
+            }
         }
 
-        return taggedObject -> {
+        return (taggedObject, baseTaggedObject) -> {
             String tagValue = taggedObject.getTags().get(tagKey);
             if (tagValue == null) return false;
 
-            for (String value : allowedValues) {
-                if (tagValue.contains(value)) return true;
+            if (value != null && !value.isEmpty()) {
+                allowedValues.addAll(Arrays.asList(resolveCurrentPlaceholder(taggedObject, value).split(TaggedObject.TAG_VALUE_SEPARATOR)));
+            }
+
+            for (String val : allowedValues) {
+                if (tagValue.contains(val)) return true;
             }
             return false;
         };
     }
 
+    private String resolveCurrentPlaceholder(TaggedObject taggedObject, String value) {
+        if (value.startsWith("current:")) {
+            String taggedObjectTagKey = value.substring("current:".length());
+            return taggedObject.getTags().get(taggedObjectTagKey);
+        }
+
+        return value;
+    }
 }

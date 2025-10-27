@@ -72,8 +72,8 @@ public class GeometryCheckService implements QualityService {
                     Expression conditions = this.expressionParser.parse(rule.getExpression().path("conditions"));
                     Expression checks = this.expressionParser.parse(rule.getExpression().path("checks"));
 
-                    if (conditions.evaluate(taggedObject)) {
-                        if (!checks.evaluate(taggedObject)) {
+                    if (conditions.evaluate(taggedObject, taggedObject)) {
+                        if (!checks.evaluate(taggedObject, taggedObject)) {
                             this.setError(taggedObject, rule.getErrorText());
                         }
                     }

@@ -58,7 +58,7 @@ class DE_44004_A_a_001 extends DatabaseIntegrationTest {
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Gewaesserachse' />
                     <tag k='funktion' v='8300' />
-                    <tag k='breiteDesGewaessers' v='10' />
+                    <tag k='breiteDesGewaessers' v='9' />
                     <tag k='fliessrichtung' v='TRUE' />
                   </way>
                   <relation id='-70' changeset='-1'>
@@ -109,7 +109,7 @@ class DE_44004_A_a_001 extends DatabaseIntegrationTest {
                     <tag k='object_type' v='AX_Gewaesserachse' />
                     <tag k='funktion' v='8300' />
                     <tag k='hydrologischesMerkmal' v='2000' />
-                    <tag k='breiteDesGewaessers' v='10' />
+                    <tag k='breiteDesGewaessers' v='9' />
                     <tag k='fliessrichtung' v='TRUE' />
                   </way>
                   <relation id='-70' changeset='-1'>

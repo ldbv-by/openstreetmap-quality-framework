@@ -6,5 +6,5 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Ta
  * Represent an expression for conditions or checks.
  */
 public interface Expression {
-    boolean evaluate(TaggedObject taggedObject);
+    boolean evaluate(TaggedObject taggedObject, TaggedObject baseTaggedObject);
 }

@@ -43,20 +43,41 @@ class DE_53007_A_b_001 extends DatabaseIntegrationTest {
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25365' changeset='-1' lat='49.88318223722' lon='12.34785675027' />
-                  <node id='-25364' changeset='-1' lat='49.88324430282' lon='12.34855027693' />
-                  <way id='-665' changeset='-1'>
-                    <nd ref='-25364' />
-                    <nd ref='-25365' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
+                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
+                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
+                  <node id='-25370' changeset='-1' lat='49.87927158487' lon='12.31859812646' />
+                  <node id='-25371' changeset='-1' lat='49.88027158487' lon='12.31859812646' />
+                  <node id='-25372' changeset='-1' lat='49.88027158487' lon='12.32451384954' />
+                  <node id='-25373' changeset='-1' lat='49.87927158487' lon='12.32451384954' />
+                  <way id='-663' changeset='-1'>
+                    <nd ref='-25360' />
+                    <nd ref='-25361' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Flugverkehrsanlage' />
                     <tag k='art' v='1310' />
-                    <tag k='breiteDesObjekts' v='20' />
                   </way>
-                  <relation id='-62' changeset='-1'>
-                    <member type='way' ref='-665' role='' />
+                  <way id='-740' changeset='-1'>
+                    <nd ref='-25370' />
+                    <nd ref='-25371' />
+                    <nd ref='-25372' />
+                    <nd ref='-25373' />
+                    <nd ref='-25370' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM00000000' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM0000000020251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_Flugverkehr' />
+                    <tag k='art' v='5511' />
+                    <tag k='nutzung' v='1000' />
+a                  </way>
+                  <relation id='-70' changeset='-1'>
+                    <member type='way' ref='-663' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
+                  <relation id='-80' changeset='-1'>
+                    <member type='way' ref='-740' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
