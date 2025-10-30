@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -80,6 +77,7 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
 
         // --- Helper function: Creates a derived feature filter that using the given osm ids.
         BiFunction<Set<Long>, int[], FeatureFilter> ff = (osmIdsSet, slot) -> new FeatureFilter(
+                featureFilter != null && featureFilter.osmIds() != null ? featureFilter.osmIds() :
                 new OsmIds(
                         slot[0] == 1 ? osmIdsSet : null, // nodes
                         slot[1] == 1 ? osmIdsSet : null, // ways
@@ -87,7 +85,8 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
                         slot[3] == 1 ? osmIdsSet : null  // relations
                 ),
                 featureFilter == null ? null : featureFilter.tags(),
-                featureFilter == null ? null : featureFilter.boundingBox()
+                featureFilter == null ? null : featureFilter.boundingBox(),
+                featureFilter == null ? null : featureFilter.role()
         );
 
         final Set<GeometryType> N = Set.of(GeometryType.NODE);
@@ -124,7 +123,8 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
                         osmIds.apply(R, OperationType.DELETE)
                 ),
                 featureFilter == null ? null : featureFilter.tags(),
-                featureFilter == null ? null : featureFilter.boundingBox()
+                featureFilter == null ? null : featureFilter.boundingBox(),
+                featureFilter == null ? null : featureFilter.role()
         );
 
         result.setDelete(Optional.ofNullable(this.osmGeometriesService.getDataSet(deleteFeatureFilter, coordinateReferenceSystem))

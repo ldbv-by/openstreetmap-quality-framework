@@ -24,10 +24,10 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                 "conditions": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" },
                                 "checks": {
                                     "type": "spatial_compare",
-                                    "relation_master_role": "over",
+                                    "reference_feature_role": "over",
                                     "operator": "equals_topo",
-                                    "relation_compare_role": "under",
-                                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Strassenachse|AX_Fahrwegachse|AX_Bahnstrecke|AX_WegPfadSteig" } } }
+                                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AA_hatDirektUnten|AX_Strassenachse|AX_Fahrwegachse|AX_Bahnstrecke|AX_WegPfadSteig" }, "role": "under" } },
+                                    "self_check": true
                                 }
                             }
                         }
@@ -41,9 +41,10 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                 "conditions": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" },
                                 "checks": {
                                     "type": "spatial_compare",
-                                    "relation_master_role": "over",
+                                    "reference_feature_role": "over",
                                     "operator": "contains",
-                                    "relation_compare_role": "under"
+                                    "data_set_filter": { "featureFilter": { "role": "under" } },
+                                    "self_check": true
                                 }
                             }
                         }

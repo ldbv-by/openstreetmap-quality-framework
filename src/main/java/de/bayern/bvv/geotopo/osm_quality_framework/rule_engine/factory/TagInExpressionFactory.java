@@ -42,16 +42,22 @@ public class TagInExpressionFactory implements ExpressionFactory {
         }
 
         return (taggedObject, baseTaggedObject) -> {
-            String tagValue = taggedObject.getTags().get(tagKey);
-            if (tagValue == null) return false;
+            String orgTagValue = taggedObject.getTags().get(tagKey);
+            if (orgTagValue == null) return false;
+
+            List<String> tagValues = Arrays.stream(orgTagValue.split(TaggedObject.TAG_VALUE_SEPARATOR)).toList();
+            if (tagValues.isEmpty()) return false;
 
             if (value != null && !value.isEmpty()) {
                 allowedValues.addAll(Arrays.asList(resolveCurrentPlaceholder(taggedObject, value).split(TaggedObject.TAG_VALUE_SEPARATOR)));
             }
 
-            for (String val : allowedValues) {
-                if (tagValue.contains(val)) return true;
+            for (String tagValue : tagValues) {
+                for (String allowedValue : allowedValues) {
+                    if (tagValue.contains(allowedValue)) return true;
+                }
             }
+
             return false;
         };
     }

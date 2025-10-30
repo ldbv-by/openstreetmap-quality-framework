@@ -24,14 +24,15 @@ class UnifiedDataProviderIntegrationTest extends DatabaseIntegrationTest {
     void testGetDataSetBySpatialRelation_Within() {
         // Arrange
         FeatureFilter featureFilter = new FeatureFilter(
-                new OsmIds(null, Set.of(779L), null, null), null, null);
+                new OsmIds(null, Set.of(779L), null, null), null, null, null);
 
         DataSetDto dataSetDto = this.osmGeometriesService.getDataSet(featureFilter, null);
         FeatureDto featureDto = dataSetDto.ways().getFirst();
 
         // Act
         DataSetDto resultDataSet = this.unifiedDataProvider
-                .getDataSetBySpatialRelation(featureDto, Set.of(SpatialOperator.WITHIN), null);
+                .getDataSetBySpatialRelation(featureDto, Set.of(SpatialOperator.WITHIN),
+                        new DataSetFilter(null, null, null, null), false);
 
         // Assert
         assertThat(resultDataSet.nodes().size())

@@ -44,39 +44,59 @@ public class ChangesetCommonRepositoryImpl<T> {
         if (featureFilter != null && featureFilter.tags() != null) {
             for (Map.Entry<String, String> tag : featureFilter.tags().entrySet()) {
 
-                Expression<String> tagValueExpr = criteriaBuilder.function(
+                // Raw text value from JSONB
+                Expression<String> rawTagValueExpr = criteriaBuilder.function(
                         "jsonb_extract_path_text",
                         String.class,
                         root.get("tags"),
                         criteriaBuilder.literal(tag.getKey())
                 );
 
-                String tagValue = tag.getValue().trim();
+                // Trim DB value to be safe: btrim(jsonb_extract_path_text(...))
+                Expression<String> dbValTrim = criteriaBuilder.function(
+                        "btrim",
+                        String.class,
+                        rawTagValueExpr
+                );
 
-                if (tagValue.contains("|")) {
-                    boolean allowNotExists = false;
-                    CriteriaBuilder.In<String> in = criteriaBuilder.in(tagValueExpr);
+                // Build padded DB value: ';' || coalesce(trimmed, '') || ';'
+                Expression<String> coalesced = criteriaBuilder.coalesce(dbValTrim, "");
+                Expression<String> paddedLeft  = criteriaBuilder.concat(criteriaBuilder.literal(";"), coalesced);
+                Expression<String> paddedValue = criteriaBuilder.concat(paddedLeft, criteriaBuilder.literal(";"));
 
-                    String[] tagValues = tagValue.split("\\|");
-                    for (String val : tagValues) {
-                        if (val.equalsIgnoreCase("not_exists")) {
-                            allowNotExists = true;
-                        } else if (!val.trim().isEmpty()) {
-                            in.value(val.trim());
-                        }
+                String tagValue = tag.getValue() != null ? tag.getValue().trim() : "";
+                String[] requested = tagValue.split("\\|");
+
+                List<Predicate> orParts = new ArrayList<>();
+                boolean allowNotExists = false;
+
+                for (String val : requested) {
+                    String v = val.trim();
+                    if (v.isEmpty()) continue;
+                    if (v.equalsIgnoreCase("not_exists")) {
+                        allowNotExists = true;
+                        continue;
                     }
+                    // 1) exact equality (covers single DB values like "7101")
+                    Predicate eq = criteriaBuilder.equal(dbValTrim, v);
 
-                    if (allowNotExists) {
-                        predicates.add(criteriaBuilder.or(in, criteriaBuilder.isNull(tagValueExpr)));
-                    } else {
-                        predicates.add(in);
-                    }
+                    // 2) token-exact match inside semicolon list (covers "7000;7101;7005")
+                    Predicate likeToken = criteriaBuilder.like(
+                            paddedValue,
+                            "%" + ";" + v + ";" + "%"
+                    );
+
+                    orParts.add(criteriaBuilder.or(eq, likeToken));
+                }
+
+                if (allowNotExists) {
+                    orParts.add(criteriaBuilder.isNull(rawTagValueExpr));
+                }
+
+                if (!orParts.isEmpty()) {
+                    predicates.add(criteriaBuilder.or(orParts.toArray(new Predicate[0])));
                 } else {
-                    if (tagValue.equalsIgnoreCase("not_exists")) {
-                        predicates.add(criteriaBuilder.isNull(tagValueExpr));
-                    } else {
-                        predicates.add(criteriaBuilder.equal(tagValueExpr, tagValue));
-                    }
+                    predicates.add(criteriaBuilder.isNull(rawTagValueExpr));
                 }
             }
         }

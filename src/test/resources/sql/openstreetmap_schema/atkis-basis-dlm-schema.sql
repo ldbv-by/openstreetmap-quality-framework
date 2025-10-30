@@ -16,6 +16,15 @@ INSERT INTO openstreetmap_schema.object_types (object_type, is_abstract, is_rela
     ('AX_SchutzgebietNachNaturUmweltOderBodenschutzrecht', false, true),
     ('AX_Verwaltungsgemeinschaft', false, true),
 
+    ('AX_KommunalesGebiet', false, true),
+    ('AX_Gebiet_Bundesland', false, true),
+    ('AX_Gebiet_Regierungsbezirk', false, true),
+    ('AX_Gebiet_Kreis', false, true),
+    ('AX_Gebiet', true, true),
+    ('AX_Gebiet_Verwaltungsgemeinschaft', false, true),
+    ('AX_KommunalesTeilgebiet', false, true),
+    ('AX_Kondominium', false, true),
+
     ('AX_LagebezeichnungMitHausnummer', false, false),
     ('AX_LagebezeichnungMitPseudonummer', false, false),
     ('AX_Lage', true, false),
@@ -121,15 +130,7 @@ INSERT INTO openstreetmap_schema.object_types (object_type, is_abstract, is_rela
     ('AX_Gewann', false, false),
     ('AX_Insel', false, false),
     ('AX_Wohnplatz', false, false),
-    ('AX_KommunalesGebiet', false, false),
-    ('AX_Gebiet_Bundesland', false, false),
-    ('AX_Gebiet_Regierungsbezirk', false, false),
-    ('AX_Gebiet_Kreis', false, false),
-    ('AX_Kondominium', false, false),
     ('AX_Gebietsgrenze', false, false),
-    ('AX_Gebiet', true, false),
-    ('AX_Gebiet_Verwaltungsgemeinschaft', false, false),
-    ('AX_KommunalesTeilgebiet', false, false),
     ('AX_Benutzer', false, false),
     ('AX_Benutzergruppe', true, false),
     ('AX_BenutzergruppeMitZugriffskontrolle', false, false),
@@ -2278,7 +2279,15 @@ INSERT INTO openstreetmap_schema.relations (object_type, relation_object_type, m
     ('AX_HistorischesBauwerkOderHistorischeEinrichtung', 'AX_objekthoehe', '0..*'),
     ('AX_Schleuse', 'AX_objekthoehe', '0..*'),
     ('AX_BauwerkImVerkehrsbereich', 'AX_objekthoehe', '0..*'),
-    ('AX_BauwerkImGewaesserbereich', 'AX_objekthoehe', '0..*')
+    ('AX_BauwerkImGewaesserbereich', 'AX_objekthoehe', '0..*'),
+    ('AX_Gebietsgrenze', 'AX_KommunalesGebiet', '1..2'),
+    ('AX_Gebietsgrenze', 'AX_Gebiet_Bundesland', '0..1'),
+    ('AX_Gebietsgrenze', 'AX_Gebiet_Regierungsbezirk', '0..2'),
+    ('AX_Gebietsgrenze', 'AX_Gebiet_Kreis', '0..2'),
+    ('AX_Gebietsgrenze', 'AX_Gebiet', '0..2'),
+    ('AX_Gebietsgrenze', 'AX_Gebiet_Verwaltungsgemeinschaft', '0..2'),
+    ('AX_Gebietsgrenze', 'AX_KommunalesTeilgebiet', '0..2'),
+    ('AX_Gebietsgrenze', 'AX_Kondominium', '0..2')
 ON CONFLICT (object_type, relation_object_type) DO NOTHING;
 
 INSERT INTO openstreetmap_schema.relation_members (object_type, relation_object_type, type, role, multiplicity) VALUES
@@ -2306,5 +2315,19 @@ INSERT INTO openstreetmap_schema.relation_members (object_type, relation_object_
     ('AX_HistorischesBauwerkOderHistorischeEinrichtung', 'AX_objekthoehe', '*', '', '1'),
     ('AX_Schleuse', 'AX_objekthoehe', '*', '', '1'),
     ('AX_BauwerkImVerkehrsbereich', 'AX_objekthoehe', '*', '', '1'),
-    ('AX_BauwerkImGewaesserbereich', 'AX_objekthoehe', '*', '', '1')
+    ('AX_BauwerkImGewaesserbereich', 'AX_objekthoehe', '*', '', '1'),
+    ('AX_Gebietsgrenze', 'AX_KommunalesGebiet', '*', 'outer', '1..*'),
+    ('AX_Gebietsgrenze', 'AX_KommunalesGebiet', '*', 'inner', '0..*'),
+    ('AX_Gebietsgrenze', 'AX_Gebiet_Bundesland', '*', 'outer', '1..*'),
+    ('AX_Gebietsgrenze', 'AX_Gebiet_Bundesland', '*', 'inner', '0..*'),
+    ('AX_Gebietsgrenze', 'AX_Gebiet_Regierungsbezirk', '*', 'outer', '1..*'),
+    ('AX_Gebietsgrenze', 'AX_Gebiet_Regierungsbezirk', '*', 'inner', '0..*'),
+    ('AX_Gebietsgrenze', 'AX_Gebiet_Kreis', '*', 'outer', '1..*'),
+    ('AX_Gebietsgrenze', 'AX_Gebiet_Kreis', '*', 'inner', '0..*'),
+    ('AX_Gebietsgrenze', 'AX_Gebiet', '*', 'outer', '1..*'),
+    ('AX_Gebietsgrenze', 'AX_Gebiet', '*', 'inner', '0..*'),
+    ('AX_Gebietsgrenze', 'AX_Gebiet_Verwaltungsgemeinschaft', '*', 'outer', '1..*'),
+    ('AX_Gebietsgrenze', 'AX_Gebiet_Verwaltungsgemeinschaft', '*', 'inner', '0..*'),
+    ('AX_Gebietsgrenze', 'AX_Kondominium', '*', 'outer', '1..*'),
+    ('AX_Gebietsgrenze', 'AX_Kondominium', '*', 'inner', '0..*')
 ON CONFLICT (object_type, relation_object_type, role) DO NOTHING;

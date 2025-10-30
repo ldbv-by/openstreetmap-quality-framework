@@ -2,7 +2,9 @@ package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.factory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.FeatureMapper;
@@ -11,13 +13,14 @@ import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.ExpressionFactory;
 import de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.api.UnifiedDataProvider;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.operation.union.UnaryUnionOp;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Evaluates the type of geometry.
@@ -27,133 +30,221 @@ import java.util.stream.Collectors;
 public class SpatialCompareExpressionFactory implements ExpressionFactory {
 
     private final UnifiedDataProvider unifiedDataProvider;
-    private final ObjectMapper objectMapper;
 
+    /**
+     * Defines the unique rule type.
+     */
     @Override
-    public String type() {
-        return "spatial_compare";
-    }
+    public String type() { return "spatial_compare"; }
 
+    /**
+     * Defines the possible rule parameters.
+     */
+    private record RuleParams (
+        Set<SpatialOperator> operators, // covered, covered_by, intersects, surrounded_by, ...
+        DataSetFilter dataSetFilter,    // feature set used for comparison with the reference feature.
+        String referenceFeatureRole,    // only relation members with this role are considered as the reference feature.
+        boolean selfCheck               // checks only the reference object (default = false).
+    ) {}
+
+    /**
+     * Defines the rule parameters and the execution block of a rule.
+     */
     @Override
     public Expression create(JsonNode json) {
-        Set<SpatialOperator> operators = this.parseOperators(json);
-        DataSetFilter dataSetFilter = this.parseDataSetFilter(json);
-        String relationMasterRole = json.path("relation_master_role").asText();
-        String relationCompareRole = json.path("relation_compare_role").asText();
 
+        // ----- Parse rule params ------
+        RuleParams params = this.parseParams(json);
+
+        // ----- Execute rule ------
         return (taggedObject, baseTaggedObject) -> {
 
+            // Defines the reference feature. For regular features, the given object is used.
+            // For relations, a union geometry of all relation members is created and used as the reference feature.
+            // The referenceFeatureRole parameter can be used to restrict which members are considered.
+            Feature referenceFeature = new Feature();
+            DataSetFilter preparedDataSetFilter = this.prepareDataSetFilterForSelfCheck(taggedObject, params.dataSetFilter, params.selfCheck);
+
             if (taggedObject instanceof Feature feature) {
-                return this.spatialCompareFeature(feature, baseTaggedObject, operators, dataSetFilter);
+                referenceFeature = feature;
+
+            } else if (taggedObject instanceof Relation relation) {
+                // Get reference feature dataset.
+                DataSet referenceFeaturesDataSet = Optional.ofNullable(
+                        this.unifiedDataProvider.getRelationMembers(relation.getOsmId(), params.referenceFeatureRole)
+                ) .map(DataSetMapper::toDomain).orElse(null);
+
+                if (referenceFeaturesDataSet == null) return false;
+
+                // Aggregates the reference feature dataset and returns a cumulative feature.
+                referenceFeature = this.getUnionReferenceFeature(referenceFeaturesDataSet, relation);
             }
 
-            if (taggedObject instanceof Relation relation) {
-                DataSet masterDataSet = Optional.ofNullable(this.unifiedDataProvider.getRelationMembers(relation.getOsmId(), relationMasterRole, null))
-                        .map(DataSetMapper::toDomain).orElse(null);
-
-                boolean isCorrect = false;
-                if (masterDataSet != null) {
-                    for (TaggedObject masterTaggedObject : masterDataSet.getAll()) {
-                        if (!(masterTaggedObject instanceof Feature masterFeature)) return false;
-
-                        DataSetFilter relationDataSetFilter = dataSetFilter;
-                        if (relationCompareRole != null) {
-                            DataSet compareDataSet = Optional.ofNullable(this.unifiedDataProvider.getRelationMembers(relation.getOsmId(), relationCompareRole, null))
-                                    .map(DataSetMapper::toDomain).orElse(null);
-
-                            if (compareDataSet == null) return false;
-
-                            relationDataSetFilter = new DataSetFilter(
-                                    null,
-                                    new FeatureFilter(
-                                            new OsmIds(compareDataSet.getNodes() == null ? null : compareDataSet.getNodes().stream().map(Feature::getOsmId).collect(Collectors.toSet()),
-                                                       compareDataSet.getWays()  == null ? null : compareDataSet.getWays().stream().map(Feature::getOsmId).collect(Collectors.toSet()),
-                                                       compareDataSet.getAreas()  == null ? null : compareDataSet.getAreas().stream().map(Feature::getOsmId).collect(Collectors.toSet()),
-                                                       null), null, null), null);
-                        }
-
-                        if (!this.spatialCompareFeature(masterFeature, baseTaggedObject, operators, relationDataSetFilter)) return false;
-                        isCorrect = true;
-                    }
-                }
-
-                return isCorrect;
-            }
-
-            return false;
+            // Execute spatial compare
+            return this.executeSpatialCompare(
+                    referenceFeature, baseTaggedObject, params, preparedDataSetFilter);
         };
     }
 
-    private Set<SpatialOperator> parseOperators(JsonNode json) {
-        JsonNode operatorsArray = json.path("operators");
-        EnumSet<SpatialOperator> result = EnumSet.noneOf(SpatialOperator.class);
+    /**
+     * Parse rule parameters.
+     */
+    private RuleParams parseParams(JsonNode json) {
+        Set<SpatialOperator> operators = this.parseOperators(json);
+        DataSetFilter dataSetFilter = this.parseDataSetFilter(json);
+        String referenceFeatureRole = json.path("reference_feature_role").asText();
+        boolean selfCheck = Optional.of(json.path("self_check").asBoolean()).orElse(false);
 
-        if (operatorsArray != null && operatorsArray.isArray() && !operatorsArray.isEmpty()) {
-            for (JsonNode operator : operatorsArray) {
-                try {
-                    SpatialOperator spatialOperator = SpatialOperator.valueOf(operator.asText().trim().toUpperCase());
-                    result.add(spatialOperator);
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException("spatial_compare: 'operator' " + operator.asText() + " not found.");
-                }
-            }
-        } else {
-            String operator = json.path("operator").asText(null);
-            if (operator == null || operator.isBlank()) {
-                throw new IllegalArgumentException("spatial_compare: 'operator(s)' is required.");
-            }
-
-            try {
-                SpatialOperator spatialOperator = SpatialOperator.valueOf(operator.trim().toUpperCase());
-                result.add(spatialOperator);
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("spatial_compare: 'operator' " + operator + " not found.");
-            }
-        }
-
-        if (result.isEmpty()) {
-            throw new IllegalArgumentException("spatial_compare: 'operator(s)' is required.");
-        }
-        return result;
+        return new RuleParams(
+                operators, dataSetFilter, referenceFeatureRole, selfCheck
+        );
     }
 
-    private DataSetFilter parseDataSetFilter(JsonNode json) {
-        JsonNode dataSetFilter = json.path("data_set_filter");
+    // ------ Helper function to parse operator/s.
+    private Set<SpatialOperator> parseOperators(JsonNode json) {
+        EnumSet<SpatialOperator> operators = EnumSet.noneOf(SpatialOperator.class);
+
+        JsonNode operatorsJsonNode = json.path("operators");
+
+        if (operatorsJsonNode == null || operatorsJsonNode.isEmpty()) {
+            operatorsJsonNode = json.path("operator");
+            if (operatorsJsonNode == null) throw new IllegalArgumentException(type() + ": 'operator(s)' is required.");
+        }
 
         try {
-            return this.objectMapper.treeToValue(dataSetFilter, DataSetFilter.class);
+            if (!operatorsJsonNode.isArray()) {
+                SpatialOperator operator = SpatialOperator.valueOf(operatorsJsonNode.asText().trim().toUpperCase());
+                operators.add(operator);
+            } else {
+                for (JsonNode operatorJson : operatorsJsonNode) {
+                    SpatialOperator operator = SpatialOperator.valueOf(operatorJson.asText().trim().toUpperCase());
+                    operators.add(operator);
+                }
+            }
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(type() + ": 'operator(s)' not found.");
+        }
+
+        return operators;
+    }
+
+    // ----- Helper function to parse data set filter.
+    private DataSetFilter parseDataSetFilter(JsonNode json) {
+        JsonNode dataSetFilterJsonNode = json.path("data_set_filter");
+        if (dataSetFilterJsonNode == null || dataSetFilterJsonNode.isEmpty()) {
+            return new DataSetFilter(null, null, null, null);
+        }
+
+        try {
+            ObjectMapper objectMapper = JsonMapper.builder()
+                    .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+                    .build();
+
+            return objectMapper.treeToValue(dataSetFilterJsonNode, DataSetFilter.class);
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("spatial_compare: 'data_set_filter' is required. Error: " + e.getMessage());
+            throw new IllegalArgumentException(type() + ": 'data_set_filter' parse error.");
         }
     }
 
-    private boolean spatialCompareFeature(Feature feature, TaggedObject baseTaggedObject,
-                                          Set<SpatialOperator> operators, DataSetFilter dataSetFilter) {
+    /**
+     * Executes the spatial compare.
+     */
+    private boolean executeSpatialCompare(Feature feature,
+                                          TaggedObject baseTaggedObject,
+                                          RuleParams params,
+                                          DataSetFilter dataSetFilter) {
 
         DataSetDto spatialResult = this.unifiedDataProvider.getDataSetBySpatialRelation(
                 FeatureMapper.toDto(feature),
-                operators,
-                dataSetFilter
+                params.operators,
+                dataSetFilter,
+                params.selfCheck
         );
 
-        // Filter base object.
-        if (baseTaggedObject instanceof Feature baseFeature) {
-            if (baseFeature.getGeometry() instanceof Point) {
-                spatialResult.nodes().removeIf(f -> f.osmId().equals(baseFeature.getOsmId()));
-            } else if (baseFeature.getGeometry() instanceof LineString) {
-                spatialResult.ways().removeIf(f -> f.osmId().equals(baseFeature.getOsmId()));
-            } else if (baseFeature.getGeometry() instanceof Polygon) {
-                spatialResult.areas().removeIf(f -> f.osmId().equals(baseFeature.getOsmId()));
+        // Filters the base object if it should be excluded.
+        if (!params.selfCheck) {
+            if (baseTaggedObject instanceof Feature baseFeature) {
+                if (baseFeature.getGeometry() instanceof Point) {
+                    spatialResult.nodes().removeIf(f -> f.osmId().equals(baseFeature.getOsmId()));
+                } else if (baseFeature.getGeometry() instanceof LineString) {
+                    spatialResult.ways().removeIf(f -> f.osmId().equals(baseFeature.getOsmId()));
+                } else if (baseFeature.getGeometry() instanceof Polygon) {
+                    spatialResult.areas().removeIf(f -> f.osmId().equals(baseFeature.getOsmId()));
+                }
+            } else if (baseTaggedObject instanceof Relation baseRelation) {
+                spatialResult.relations().removeIf(f -> f.osmId().equals(baseRelation.getOsmId()));
             }
-        } else if (baseTaggedObject instanceof Relation baseRelation) {
-            spatialResult.relations().removeIf(f -> f.osmId().equals(baseRelation.getOsmId()));
         }
 
-        // True if a spatial results are found.
+        // Rule is true if spatial results are found.
         return spatialResult != null &&
                 ((spatialResult.nodes() != null && !spatialResult.nodes().isEmpty()) ||
                         (spatialResult.ways() != null && !spatialResult.ways().isEmpty()) ||
                         (spatialResult.areas() != null && !spatialResult.areas().isEmpty()) ||
                         (spatialResult.relations() != null && !spatialResult.relations().isEmpty()));
+    }
+
+    /**
+     * Aggregates the reference feature dataset and returns a cumulative feature.
+     */
+    private Feature getUnionReferenceFeature(DataSet referenceFeatureDataSet, Relation relation) {
+
+        Geometry unionGeometry = UnaryUnionOp.union(
+            referenceFeatureDataSet.getAll().stream()
+                    .filter(f -> f instanceof Feature)
+                    .map(Feature.class::cast)
+                    .map(Feature::getGeometry)
+                    .toList()
+        );
+
+        Feature unionFeature = new Feature();
+        unionFeature.setOsmId(relation.getOsmId());
+        unionFeature.setObjectType(relation.getObjectType());
+        unionFeature.setGeometry(unionGeometry);
+
+        return unionFeature;
+    }
+
+    /**
+     * Prepares the dataset filter for self check
+     */
+    private DataSetFilter prepareDataSetFilterForSelfCheck(TaggedObject taggedObject, DataSetFilter dataSetFilter, boolean selfCheck) {
+        if (selfCheck) {
+            boolean osmIdsAreSet = dataSetFilter.featureFilter() != null && dataSetFilter.featureFilter().osmIds() != null;
+            Set<Long> nodeIds = osmIdsAreSet ? dataSetFilter.featureFilter().osmIds().nodeIds() : null;
+            Set<Long> wayIds = osmIdsAreSet ? dataSetFilter.featureFilter().osmIds().wayIds() : null;
+            Set<Long> areaIds = osmIdsAreSet ? dataSetFilter.featureFilter().osmIds().areaIds() : null;
+            Set<Long> relationIds = osmIdsAreSet ? dataSetFilter.featureFilter().osmIds().relationIds() : null;
+
+            if (taggedObject instanceof Feature feature) {
+                if (feature.getGeometry() instanceof Point) {
+                    if (nodeIds == null) nodeIds = new HashSet<>();
+                    nodeIds.add(feature.getOsmId());
+                } else if (feature.getGeometry() instanceof LineString) {
+                    if (wayIds == null) wayIds = new HashSet<>();
+                    wayIds.add(feature.getOsmId());
+                } else if (feature.getGeometry() instanceof Polygon) {
+                    if (areaIds == null) areaIds = new HashSet<>();
+                    areaIds.add(feature.getOsmId());
+                }
+            } else if (taggedObject instanceof Relation relation) {
+                if (relationIds == null) relationIds = new HashSet<>();
+                relationIds.add(relation.getOsmId());
+            }
+
+            return new DataSetFilter(
+                    dataSetFilter.ignoreChangesetData(),
+                    dataSetFilter.coordinateReferenceSystem(),
+                    dataSetFilter.aggregator(),
+                    new FeatureFilter(
+                            new OsmIds(nodeIds, wayIds, areaIds, relationIds),
+                            (dataSetFilter.featureFilter() != null) ? dataSetFilter.featureFilter().tags() : null,
+                            (dataSetFilter.featureFilter() != null) ? dataSetFilter.featureFilter().boundingBox() : null,
+                            (dataSetFilter.featureFilter() != null) ? dataSetFilter.featureFilter().role() : null
+                    )
+            );
+        }
+
+        return dataSetFilter;
     }
 }

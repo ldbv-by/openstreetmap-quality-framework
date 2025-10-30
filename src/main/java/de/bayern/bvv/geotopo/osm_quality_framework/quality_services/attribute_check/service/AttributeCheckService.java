@@ -75,6 +75,9 @@ public class AttributeCheckService implements QualityService {
                 // ----- Check schema rules "attribute-check" for tagged object.
                 if (this.qualityServiceResult.getErrors().isEmpty()) {
                     for (Rule rule : objectType.getRules().stream().filter(r -> r.getType().equals("attribute-check")).toList()) {
+                        log.info("attribute-check({}): start rule={}",
+                                qualityServiceRequestDto.changesetId(), rule.getId());
+
                         long ruleStartTime = System.currentTimeMillis();
                         Expression conditions = this.expressionParser.parse(rule.getExpression().path("conditions"));
                         Expression checks = this.expressionParser.parse(rule.getExpression().path("checks"));
@@ -85,7 +88,7 @@ public class AttributeCheckService implements QualityService {
                             }
                         }
 
-                        log.info("attribute-check({}): rule={}, time={} ms",
+                        log.info("attribute-check({}): finish rule={}, time={} ms",
                                 qualityServiceRequestDto.changesetId(), rule.getId(), System.currentTimeMillis() - ruleStartTime);
                     }
                 }

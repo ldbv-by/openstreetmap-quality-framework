@@ -21,7 +21,7 @@ class OsmGeometriesIntegrationTest extends DatabaseIntegrationTest {
     void testGetAreaByOsmId() {
         // Arrange
         FeatureFilter featureFilter = new FeatureFilter(
-                new OsmIds(null, null, Set.of(10727L), null), null, null);
+                new OsmIds(null, null, Set.of(10727L), null), null, null, null);
 
         // Act
         DataSetDto dataSetDto = this.osmGeometriesService.getDataSet(featureFilter, null);
@@ -54,7 +54,7 @@ class OsmGeometriesIntegrationTest extends DatabaseIntegrationTest {
     void testGetStreetByOsmId() {
         // Arrange
         FeatureFilter featureFilter = new FeatureFilter(
-                new OsmIds(null, Set.of(3660L), null, null), null, null);
+                new OsmIds(null, Set.of(3660L), null, null), null, null, null);
 
         // Act
         DataSetDto dataSetDto = this.osmGeometriesService.getDataSet(featureFilter, null);

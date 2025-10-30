@@ -49,6 +49,7 @@ class DE_31002_B_b_001 extends DatabaseIntegrationTest {
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Bauteil' />
+                    <tag k='lageZurErdoberflaeche' v='1200' />
                   </node>
                   <relation id='-63' changeset='-1'>
                     <member type='node' ref='-25402' role='' />

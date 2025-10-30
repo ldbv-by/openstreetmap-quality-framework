@@ -103,7 +103,7 @@ class DE_53008_G_b_003_F_b_003 extends DatabaseIntegrationTest {
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
                   <relation id='-100' changeset='-1'>
-                    <member type='way' ref='-663' role='over' />
+                    <member type='way' ref='-667' role='over' />
                     <member type='way' ref='-700' role='under' />
                     <tag k='object_type' v='AA_hatDirektUnten' />
                   </relation>

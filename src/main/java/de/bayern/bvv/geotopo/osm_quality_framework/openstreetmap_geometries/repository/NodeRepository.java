@@ -18,7 +18,7 @@ public interface NodeRepository extends JpaRepository<NodeEntity,Long>, NodeRepo
             FROM openstreetmap_geometries.relation_members rm
            WHERE rm.relation_osm_id = :relationOsmId
              AND rm.member_type = 'n'
-             AND (:memberRole IS NULL OR rm.member_role = :memberRole)
+             AND (:memberRole IS NULL OR :memberRole = '' OR rm.member_role = :memberRole)
         )
         SELECT n.*
           FROM openstreetmap_geometries.nodes n

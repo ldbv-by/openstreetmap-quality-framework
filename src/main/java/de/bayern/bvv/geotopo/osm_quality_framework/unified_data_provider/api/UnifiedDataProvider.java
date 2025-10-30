@@ -3,6 +3,7 @@ package de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.api;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSetFilter;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.FeatureDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.SpatialAggregator;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.SpatialOperator;
 
 import java.util.Set;
@@ -23,10 +24,12 @@ public interface UnifiedDataProvider {
      */
     DataSetDto getDataSetBySpatialRelation(FeatureDto featureDto,
                                            Set<SpatialOperator> operators,
-                                           DataSetFilter dataSetFilter);
+                                           DataSetFilter dataSetFilter,
+                                           boolean selfCheck);
 
     /**
      * Returns a data set of all relation members.
      */
+    DataSetDto getRelationMembers(Long relationId, String role);
     DataSetDto getRelationMembers(Long relationId, String role, String coordinateReferenceSystem);
 }

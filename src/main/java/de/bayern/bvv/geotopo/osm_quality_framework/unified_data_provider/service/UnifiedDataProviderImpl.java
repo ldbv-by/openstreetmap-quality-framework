@@ -11,16 +11,14 @@ import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.api.
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.FeatureDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.FeatureMapper;
 import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.locationtech.jts.index.strtree.STRtree;
+import org.locationtech.jts.operation.union.UnaryUnionOp;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Service implementation of {@link UnifiedDataProvider}.
@@ -86,51 +84,85 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
      * (e.g., contains, within, intersects) with the provided feature.
      */
     @Override
-    public DataSetDto getDataSetBySpatialRelation(FeatureDto featureDto, Set<SpatialOperator> operators, DataSetFilter dataSetFilter) {
+    public DataSetDto getDataSetBySpatialRelation(FeatureDto referenceFeatureDto,
+                                                  Set<SpatialOperator> operators,
+                                                  DataSetFilter dataSetFilter,
+                                                  boolean selfCheck) {
         DataSet resultDataSet = new DataSet();
 
+        // Check inputs
+        if (referenceFeatureDto == null) throw new IllegalArgumentException("referenceFeatureDto cannot be null");
+        if (operators == null) throw new IllegalArgumentException("operators cannot be null");
+
         // Prepare the reference feature and its prepared geometry for fast spatial predicates.
-        Feature referenceFeature = FeatureMapper.toDomain(featureDto);
+        Feature referenceFeature = FeatureMapper.toDomain(referenceFeatureDto);
         PreparedGeometry referenceGeometry = PreparedGeometryFactory.prepare(referenceFeature.getGeometry());
+
+        Envelope referenceEnvelope = referenceFeature.getGeometry().getEnvelopeInternal();
+        referenceEnvelope.expandBy(1e-5);
 
         // Prepare candidate features.
         // If no search bounding box is provided, derive it from the reference feature’s geometry.
-        Envelope referenceEnvelope = featureDto.geometry().getEnvelopeInternal();
-
-        if (referenceEnvelope != null) {
-            referenceEnvelope.expandBy(1e-5);
-
-            BoundingBox bbox = new BoundingBox(
-                    referenceEnvelope.getMinX(),
-                    referenceEnvelope.getMinY(),
-                    referenceEnvelope.getMaxX(),
-                    referenceEnvelope.getMaxY()
-            );
-
-            FeatureFilter featureFilter = (dataSetFilter != null) ? dataSetFilter.featureFilter() : null;
-            FeatureFilter modifiedFeatureFilter = (featureFilter == null || featureFilter.boundingBox() == null)
-                    ? new FeatureFilter(
-                    (featureFilter != null) ? featureFilter.osmIds() : null,
-                    (featureFilter != null) ? featureFilter.tags() : null,
-                    bbox
-            ) : featureFilter;
-
-            dataSetFilter = new DataSetFilter(
-                    (dataSetFilter != null) ? dataSetFilter.ignoreChangesetData() : null,
-                    modifiedFeatureFilter,
-                    (dataSetFilter != null) ? dataSetFilter.coordinateReferenceSystem() : null
-            );
-        }
+        DataSetFilter preparedDataSetFilter = this.prepareDataSetFilter(dataSetFilter, referenceEnvelope);
 
         // Fetch the candidate features using the (possibly) augmented filter.
-        DataSet candidateDataSet = Optional.ofNullable(this.getDataSet(dataSetFilter))
+        DataSet candidateDataSet = Optional.ofNullable(this.getDataSet(preparedDataSetFilter))
                 .map(DataSetMapper::toDomain).orElse(null);
 
         // Evaluate spatial relations and collect matching candidates.
         if (candidateDataSet != null) {
-            if (candidateDataSet.getNodes() != null) getSpatialCandidates(candidateDataSet.getNodes(), resultDataSet.getNodes(), referenceFeature, referenceGeometry, referenceEnvelope, operators);
-            if (candidateDataSet.getWays() != null)  getSpatialCandidates(candidateDataSet.getWays(), resultDataSet.getWays(), referenceFeature, referenceGeometry, referenceEnvelope, operators);
-            if (candidateDataSet.getAreas() != null) getSpatialCandidates(candidateDataSet.getAreas(), resultDataSet.getAreas(), referenceFeature, referenceGeometry, referenceEnvelope, operators);
+            List<Feature> candidateFeatures = new ArrayList<>();
+            if (candidateDataSet.getNodes() != null && !candidateDataSet.getNodes().isEmpty()) candidateFeatures.addAll(candidateDataSet.getNodes());
+            if (candidateDataSet.getWays() != null && !candidateDataSet.getWays().isEmpty()) candidateFeatures.addAll(candidateDataSet.getWays());
+            if (candidateDataSet.getAreas() != null && !candidateDataSet.getAreas().isEmpty()) candidateFeatures.addAll(candidateDataSet.getAreas());
+
+            if (candidateDataSet.getRelations() != null && !candidateDataSet.getRelations().isEmpty()) {
+                List<Feature> candidateRelations = new ArrayList<>();
+
+                for (Relation relation : candidateDataSet.getRelations()) {
+                    String candidateRole = (dataSetFilter.featureFilter() == null) ? null : dataSetFilter.featureFilter().role();
+                    DataSet candidateMembers = Optional.ofNullable(this.getRelationMembers(relation.getOsmId(), candidateRole))
+                            .map(DataSetMapper::toDomain).orElse(null);
+
+                    if  (candidateMembers != null) {
+                        List<Feature> candidateMemberFeatures = new ArrayList<>();
+                        for (TaggedObject candidateMember : candidateMembers.getAll()) {
+                            if (candidateMember instanceof Feature candidateMemberFeature) {
+                                candidateMemberFeatures.add(candidateMemberFeature);
+                            }
+                        }
+
+                            if (!candidateMemberFeatures.isEmpty()) {
+                            Feature relationMemberFeature = this.aggregateFeatures(candidateMemberFeatures, SpatialAggregator.UNION);
+                            if (relationMemberFeature == null) continue;
+                            relationMemberFeature.setOsmId(relation.getOsmId());
+                            relationMemberFeature.setObjectType(relation.getObjectType());
+
+                            candidateRelations.add(relationMemberFeature);
+                        }
+                    }
+                }
+
+                if (!candidateRelations.isEmpty()) candidateFeatures.addAll(candidateRelations);
+            }
+
+            if (!candidateFeatures.isEmpty()) {
+                List<Feature> resultFeatures = new ArrayList<>();
+                this.getSpatialCandidates(candidateFeatures, resultFeatures, referenceFeature,
+                        referenceGeometry, referenceEnvelope, operators, dataSetFilter, selfCheck);
+
+                for (Feature resultFeature : resultFeatures) {
+                    switch (resultFeature.getGeometry()) {
+                        case Point _ -> resultDataSet.getNodes().add(resultFeature);
+                        case LineString _ -> resultDataSet.getWays().add(resultFeature);
+                        case Polygon _ -> resultDataSet.getAreas().add(resultFeature);
+                        case null, default -> candidateDataSet.getRelations().stream()
+                                .filter(cr -> cr.getOsmId().equals(resultFeature.getOsmId()))
+                                .findFirst()
+                                .ifPresent(cr -> resultDataSet.getRelations().add(cr));
+                    }
+                }
+            }
         }
 
         return DataSetMapper.toDto(resultDataSet);
@@ -141,19 +173,29 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
      * specified spatial operators relative to {@code referenceFeature}.
      */
     private void getSpatialCandidates(List<Feature> features, List<Feature> result, Feature referenceFeature,
-                                      PreparedGeometry referenceGeometry, Envelope referenceEnvelope, Set<SpatialOperator> operators) {
+                                      PreparedGeometry referenceGeometry, Envelope referenceEnvelope,
+                                      Set<SpatialOperator> operators, DataSetFilter dataSetFilter, boolean selfCheck) {
+
         STRtree candidateDataSetTree = new STRtree();
 
         for (Feature candidate : features) {
             // Skip the same object (same OSM id and type) as the reference feature.
             if (Objects.equals(candidate.getOsmId(), referenceFeature.getOsmId()) &&
-                candidate.getObjectType().equals(referenceFeature.getObjectType())) continue;
+                candidate.getObjectType().equals(referenceFeature.getObjectType()) &&
+                !selfCheck) continue;
 
             candidateDataSetTree.insert(candidate.getGeometry().getEnvelopeInternal(), candidate);
         }
 
         @SuppressWarnings("unchecked")
         List<Feature> candidates = candidateDataSetTree.query(referenceEnvelope);
+        if (candidates.isEmpty()) return;
+
+        if (dataSetFilter.aggregator() != null) {
+            Feature aggregateFeature = this.aggregateFeatures(candidates, dataSetFilter.aggregator());
+            candidates.clear();
+            candidates.add(aggregateFeature);
+        }
 
         // Apply the requested spatial predicates to each candidate.
         for (Feature candidate : candidates) {
@@ -178,11 +220,98 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
                 }
             }
         }
+
+        // Check SURROUNDED_BY
+        if (operators.contains(SpatialOperator.SURROUNDED_BY)) {
+            Geometry referenceOuterBoundary = this.getOuterBoundary(referenceFeature.getGeometry());
+
+            Feature unionCandidate;
+            if (dataSetFilter.aggregator() == null) {
+                unionCandidate = this.aggregateFeatures(candidates, SpatialAggregator.UNION);
+            } else {
+                unionCandidate = candidates.stream().findFirst().orElse(null);
+            }
+
+            if (unionCandidate == null) return;
+
+            if (referenceOuterBoundary.coveredBy(unionCandidate.getGeometry())) {
+                for (Feature candidate : candidates) {
+                    if (candidate.getGeometry().intersects(referenceOuterBoundary)) {
+                        result.add(candidate);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Prepares the DataSetFilter to load only features that intersect the reference feature’s bounding box.
+     * Add relation ids of the relation filter.
+     */
+    private DataSetFilter prepareDataSetFilter(DataSetFilter dataSetFilter, Envelope referenceEnvelope) {
+        boolean featureFilterIsSet = dataSetFilter != null && dataSetFilter.featureFilter() != null;
+
+        return new DataSetFilter(
+                (dataSetFilter != null) ? dataSetFilter.ignoreChangesetData() : null,
+                (dataSetFilter != null) ? dataSetFilter.coordinateReferenceSystem() : null,
+                (dataSetFilter != null) ? dataSetFilter.aggregator() : null,
+                new FeatureFilter(
+                        (featureFilterIsSet) ? ((dataSetFilter.featureFilter().osmIds() != null) ? dataSetFilter.featureFilter().osmIds() : null) : null,
+                        (featureFilterIsSet) ? dataSetFilter.featureFilter().tags() : null,
+                        (featureFilterIsSet && (dataSetFilter.featureFilter().boundingBox() != null)) ?
+                                dataSetFilter.featureFilter().boundingBox() :
+                                        new BoundingBox(
+                                            referenceEnvelope.getMinX(), referenceEnvelope.getMinY(),
+                                            referenceEnvelope.getMaxX(), referenceEnvelope.getMaxY()),
+                        (featureFilterIsSet) ? dataSetFilter.featureFilter().role() : null
+                )
+        );
+    }
+
+
+    /**
+     * Aggregate Features.
+     */
+    private Feature aggregateFeatures(List<Feature> features, SpatialAggregator aggregator) {
+        if (aggregator == SpatialAggregator.UNION) {
+            Geometry aggregateGeometry = UnaryUnionOp.union(features.stream().map(Feature::getGeometry).toList());
+            return new Feature(aggregateGeometry, null, Collections.emptyList());
+        }
+
+        return null;
+    }
+
+    /**
+     * Get outer boundary.
+     */
+    private Geometry getOuterBoundary(Geometry geometry) {
+        GeometryFactory geometryFactory = new GeometryFactory();
+        List<LineString> rings = new ArrayList<>();
+
+        if (geometry instanceof Polygon polygon) {
+            rings.add(polygon.getExteriorRing());
+        } else if (geometry instanceof MultiPolygon multiPolygon) {
+            for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
+                Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
+                rings.add(polygon.getExteriorRing());
+            }
+        } else if (geometry instanceof LineString || geometry instanceof MultiLineString) {
+            return geometry;
+        } else {
+            return geometry.getBoundary();
+        }
+
+        return geometryFactory.createMultiLineString(rings.toArray(LineString[]::new));
     }
 
     /**
      * Returns a data set of all relation members.
      */
+    @Override
+    public DataSetDto getRelationMembers(Long relationId, String role) {
+        return this.getRelationMembers(relationId, role, null);
+    }
+
     @Override
     public DataSetDto getRelationMembers(Long relationId, String role, String coordinateReferenceSystem) {
         DataSetDto relationMembers = this.changesetDataService.getRelationMembers(1L, relationId, role, coordinateReferenceSystem);

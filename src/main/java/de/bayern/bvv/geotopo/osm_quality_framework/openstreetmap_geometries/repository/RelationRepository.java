@@ -29,7 +29,7 @@ public interface RelationRepository extends JpaRepository<RelationEntity,Long>, 
             FROM openstreetmap_geometries.relation_members rm
            WHERE rm.relation_osm_id = :relationOsmId
              AND rm.member_type = 'r'
-             AND (:memberRole IS NULL OR rm.member_role = :memberRole)
+             AND (:memberRole IS NULL OR :memberRole = '' OR rm.member_role = :memberRole)
         )
         SELECT r.*
           FROM openstreetmap_geometries.relations r

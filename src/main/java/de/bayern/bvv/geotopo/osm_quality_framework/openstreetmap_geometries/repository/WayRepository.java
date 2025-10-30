@@ -19,7 +19,7 @@ public interface WayRepository extends JpaRepository<WayEntity,Long>, WayReposit
             FROM openstreetmap_geometries.relation_members rm
            WHERE rm.relation_osm_id = :relationOsmId
              AND rm.member_type = 'w'
-             AND (:memberRole IS NULL OR rm.member_role = :memberRole)
+             AND (:memberRole IS NULL OR :memberRole = '' OR rm.member_role = :memberRole)
         )
         SELECT w.*
           FROM openstreetmap_geometries.ways w

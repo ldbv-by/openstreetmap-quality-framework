@@ -75,6 +75,9 @@ class DE_57002_G_b_002 extends DatabaseIntegrationTest {
                             <tag k='identifikator:UUID' v='DEBYBDLM00000000' />
                             <tag k='identifikator:UUIDundZeit' v='DEBYBDLM0000000020251014T125300Z' />
                             <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                            <tag k='admin_level' v='4' />
+                            <tag k="boundary" v="administrative"/>
+                            <tag k="admin_level" v="4"/>
                 		</way>
                 		<way id="-5" version="0">
                 			<nd ref="-19"/>
@@ -183,6 +186,8 @@ class DE_57002_G_b_002 extends DatabaseIntegrationTest {
                             <tag k='identifikator:UUID' v='DEBYBDLM00000000' />
                             <tag k='identifikator:UUIDundZeit' v='DEBYBDLM0000000020251014T125300Z' />
                             <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                            <tag k="boundary" v="administrative"/>
+                            <tag k="admin_level" v="4"/>
                 		</way>
                 		<way id="-5" version="0">
                 			<nd ref="-19"/>

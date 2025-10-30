@@ -1,6 +1,5 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.repository;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.NodeEntity;
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.WayEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,7 +17,7 @@ public interface ChangesetWayRepository extends JpaRepository<WayEntity,Long>, C
             FROM changeset_data.relation_members rm
            WHERE rm.relation_osm_id = :relationOsmId
              AND rm.member_type = 'w'
-             AND (:memberRole IS NULL OR rm.member_role = :memberRole)
+             AND (:memberRole IS NULL OR :memberRole = '' OR rm.member_role = :memberRole)
              AND rm.changeset_id = :changesetId
         )
         SELECT w.*

@@ -68,6 +68,9 @@ public class GeometryCheckService implements QualityService {
             if (objectType != null) {
                 // ----- Check schema rules "geometry-check" for tagged object.
                 for (Rule rule : objectType.getRules().stream().filter(r -> r.getType().equals("geometry-check")).toList()) {
+                    log.info("geometry-check({}): start rule={}",
+                            qualityServiceRequestDto.changesetId(), rule.getId());
+
                     long ruleStartTime = System.currentTimeMillis();
                     Expression conditions = this.expressionParser.parse(rule.getExpression().path("conditions"));
                     Expression checks = this.expressionParser.parse(rule.getExpression().path("checks"));
@@ -78,7 +81,7 @@ public class GeometryCheckService implements QualityService {
                         }
                     }
 
-                    log.info("geometry-check({}): rule={}, time={} ms",
+                    log.info("geometry-check({}): finish rule={}, time={} ms",
                             qualityServiceRequestDto.changesetId(), rule.getId(), System.currentTimeMillis() - ruleStartTime);
                 }
             }

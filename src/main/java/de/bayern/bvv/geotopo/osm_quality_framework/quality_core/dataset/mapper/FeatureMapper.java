@@ -53,8 +53,10 @@ public class FeatureMapper {
         }
 
         List<GeometryNodeDto> geometryNodesDto = new ArrayList<>();
-        for (GeometryNode geometryNode : feature.getGeometryNodes()) {
-            geometryNodesDto.add(GeometryNodeMapper.toDto(geometryNode));
+        if (feature.getGeometryNodes() != null) {
+            for (GeometryNode geometryNode : feature.getGeometryNodes()) {
+                geometryNodesDto.add(GeometryNodeMapper.toDto(geometryNode));
+            }
         }
 
         return new FeatureDto(

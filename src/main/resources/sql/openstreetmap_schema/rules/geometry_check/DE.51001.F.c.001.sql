@@ -1,5 +1,5 @@
 INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error_text) VALUES (
-    'DE.51002.G.b.001',
+    'DE.51001.F.c.001',
     'geometry-check',
     'AX_Turm',
     '{

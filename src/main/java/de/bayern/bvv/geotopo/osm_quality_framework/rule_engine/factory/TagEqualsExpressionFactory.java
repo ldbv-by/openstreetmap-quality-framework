@@ -6,6 +6,9 @@ import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.ExpressionFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Evaluates whether a tag value equals to a fixed value.
  */
@@ -31,10 +34,17 @@ public class TagEqualsExpressionFactory implements ExpressionFactory {
         }
 
         return (taggedObject, baseTaggedObject) -> {
-            String tagValue = taggedObject.getTags().get(tagKey);
-            if (tagValue == null) return false;
+            String orgTagValue = taggedObject.getTags().get(tagKey);
+            if (orgTagValue == null) return false;
 
-            return tagValue.equals(this.resolveCurrentPlaceholder(taggedObject, value));
+            List<String> tagValues = Arrays.stream(orgTagValue.split(TaggedObject.TAG_VALUE_SEPARATOR)).toList();
+            if (tagValues.isEmpty()) return false;
+
+            for (String tagValue : tagValues) {
+                if (tagValue.equals(this.resolveCurrentPlaceholder(taggedObject, value))) return true;
+            }
+
+            return false;
         };
     }
 

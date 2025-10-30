@@ -8,5 +8,6 @@ import java.util.Map;
 public record FeatureFilter(
     OsmIds osmIds,
     Map<String, String> tags,
-    BoundingBox boundingBox
+    BoundingBox boundingBox,
+    String role
 ) {}
