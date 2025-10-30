@@ -22,12 +22,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * AdV-Beschreibung:
- * Als Geometrietypen sind nur Punkt- und Liniengeometrie zugelassen.
+ * Sonstiges Recht' mit der Attributart 'Art der Festlegung' und der Werteart 5400 kann nur auf
+ * Objekten der Objektartengruppe 'Vegetation' liegen.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(JacksonConfiguration.class)
-class DE_51004_G_a_001 extends DatabaseIntegrationTest {
+class DE_71011_G_b_001 extends DatabaseIntegrationTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -36,21 +37,49 @@ class DE_51004_G_a_001 extends DatabaseIntegrationTest {
     ObjectMapper objectMapper;
 
     @Test
-    void createAxTransportanlageSpeicherbauwerkAsNode() throws Exception {
+    void createRieselfeldAufWald() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
-                    <tag k='bauwerksfunktion' v='1101' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
+                  <node id='-25366' changeset='-1' lat='49.88418770251' lon='12.32312094704' />
+                  <node id='-25365' changeset='-1' lat='49.88279744114' lon='12.32304388852' />
+                  <node id='-25364' changeset='-1' lat='49.88282226758' lon='12.32104036708' />
+                  <node id='-25363' changeset='-1' lat='49.88416287676' lon='12.32119448412' />
+                  <node id='-25361' changeset='-1' lat='49.88083611148' lon='12.31946066748' />
+                  <node id='-25360' changeset='-1' lat='49.8806126638' lon='12.32512446848' />
+                  <node id='-25359' changeset='-1' lat='49.88565239886' lon='12.32481623442' />
+                  <node id='-25358' changeset='-1' lat='49.88585099833' lon='12.31976890155' />
+                  <way id='-667' changeset='-1'>
+                    <nd ref='-25363' />
+                    <nd ref='-25364' />
+                    <nd ref='-25365' />
+                    <nd ref='-25363' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM00000000' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM0000000020251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_Transportanlage' />
-                  </node>
-                  <relation id='-63' changeset='-1'>
-                    <member type='node' ref='-25402' role='' />
+                    <tag k='object_type' v='AX_SonstigesRecht' />
+                    <tag k='artDerFestlegung' v='5400' />
+                  </way>
+                  <way id='-663' changeset='-1'>
+                    <nd ref='-25358' />
+                    <nd ref='-25359' />
+                    <nd ref='-25360' />
+                    <nd ref='-25361' />
+                    <nd ref='-25358' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_Wald' />
+                  </way>
+                  <relation id='-70' changeset='-1'>
+                    <member type='way' ref='-663' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
+                  <relation id='-60' changeset='-1'>
+                    <member type='way' ref='-667' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -75,30 +104,28 @@ class DE_51004_G_a_001 extends DatabaseIntegrationTest {
     }
 
     @Test
-    void createAxTransportanlageSpeicherbauwerkAsArea() throws Exception {
+    void createRieselfeldOhneWald() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
-                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
-                  <node id='-25359' changeset='-1' lat='49.88413518675' lon='12.32447493031' />
-                  <node id='-25358' changeset='-1' lat='49.8841101097' lon='12.31855920723' />
-                  <way id='-663' changeset='-1'>
-                    <nd ref='-25358' />
-                    <nd ref='-25359' />
-                    <nd ref='-25360' />
-                    <nd ref='-25361' />
-                    <nd ref='-25358' />
-                    <tag k='bauwerksfunktion' v='1101' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
+                  <node id='-25365' changeset='-1' lat='49.88279744114' lon='12.32304388852' />
+                  <node id='-25364' changeset='-1' lat='49.88282226758' lon='12.32104036708' />
+                  <node id='-25363' changeset='-1' lat='49.88416287676' lon='12.32119448412' />
+                  <way id='-667' changeset='-1'>
+                    <nd ref='-25363' />
+                    <nd ref='-25364' />
+                    <nd ref='-25365' />
+                    <nd ref='-25363' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM00000000' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM0000000020251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_Transportanlage' />
+                    <tag k='object_type' v='AX_SonstigesRecht' />
+                    <tag k='artDerFestlegung' v='5400' />
                   </way>
-                  <relation id='-63' changeset='-1'>
-                    <member type='way' ref='-663' role='' />
+                  <relation id='-60' changeset='-1'>
+                    <member type='way' ref='-667' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -135,49 +162,6 @@ class DE_51004_G_a_001 extends DatabaseIntegrationTest {
         assertThat(geometryCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'geometry-check'")
-                .contains("Als Geometrietypen sind nur Punkt- und Liniengeometrien zugelassen.");
-    }
-
-    @Test
-    void createAxTransportanlageSpeicherbauwerkAsWay() throws Exception {
-        // Arrange
-        final Long CHANGESET_ID = 1L;
-        final String CHANGESET_XML = """
-                <osmChange version="0.6" generator="JOSM">
-                <create>
-                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
-                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
-                  <way id='-663' changeset='-1'>
-                    <nd ref='-25360' />
-                    <nd ref='-25361' />
-                    <tag k='bauwerksfunktion' v='1101' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
-                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_Transportanlage' />
-                  </way>
-                  <relation id='-63' changeset='-1'>
-                    <member type='way' ref='-663' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
-                </create>
-                </osmChange>
-                """;
-
-        // Act
-        MvcResult mvcResult = this.mockMvc.perform(
-                        post("/osm-quality-framework/v1/quality-hub/check/changeset/{id}", CHANGESET_ID)
-                                .contentType(MediaType.APPLICATION_XML)
-                                .content(CHANGESET_XML))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andReturn();
-
-        QualityHubResultDto qualityHubResultDto = this.objectMapper.readValue(mvcResult.getResponse().getContentAsByteArray(), QualityHubResultDto.class);
-
-        // Assert
-        assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
-        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result to be valid, but it was invalid.").isTrue();
+                .contains("Ein Objekt 'AX_SonstigesRecht' mit 'artDerFestlegung' 5400 muss auf einem Objekt der Objektartengruppe 'Vegetation' liegen.");
     }
 }

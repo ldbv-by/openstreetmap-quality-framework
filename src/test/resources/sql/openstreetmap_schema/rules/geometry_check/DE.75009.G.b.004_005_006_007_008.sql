@@ -1,5 +1,5 @@
 INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error_text) VALUES (
-    'DE.75009.G.b.004_005_006_007',
+    'DE.75009.G.b.004_005_006_007_008',
     'geometry-check',
     'AX_Gebietsgrenze',
     '{

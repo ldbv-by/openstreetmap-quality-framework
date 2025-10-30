@@ -26,11 +26,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Objekte der Objektart 'Relief' müssen an der Landesgrenze enden.
  * Objekte der Objektart 'Gesetzliche Festlegungen, Gebietseinheiten, Kataloge' müssen an der Landesgrenze enden.
  * Für linienförmige REO auf der Landesgrenze gibt es eigene REO-Bildungen.
+ * Ein komplett auf einer Landesgrenze verlaufendes linienförmiges REO und das davon referenzierte ZUSO müssen zum selben Bundesland gehören.
+ * Alle zu diesem ZUSO gehörigen linienförmigen REOs müssen vollständig auf einer Landesgrenze liegen.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(JacksonConfiguration.class)
-class DE_75009_G_b_004_005_006_007 extends DatabaseIntegrationTest {
+class DE_75009_G_b_004_005_006_007_008 extends DatabaseIntegrationTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -1130,11 +1132,6 @@ class DE_75009_G_b_004_005_006_007 extends DatabaseIntegrationTest {
                     </relation>
                     <relation id='-16' changeset='-1'>
                         <member type='way' ref='-20' role='' />
-                        <tag k='advStandardModell' v='Basis-DLM' />
-                        <tag k='object_type' v='AA_modellart' />
-                    </relation>
-                    <relation id='-17' changeset='-1'>
-                        <member type='way' ref='-21' role='' />
                         <tag k='advStandardModell' v='Basis-DLM' />
                         <tag k='object_type' v='AA_modellart' />
                     </relation>
