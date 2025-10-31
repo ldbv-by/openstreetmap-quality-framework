@@ -163,6 +163,6 @@ class DE_61003_G_b_001 extends DatabaseIntegrationTest {
         assertThat(geometryCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'geometry-check'")
-                .contains("Ein flächenförmiges Objekt 'AX_DammWallDeich' mit 'funktion' 3002 oder 3002 muss innerhalb ein Objekt 'AX_Strassenachse', 'AX_Fahrwegachse', 'AX_Bahnstrecke', 'AX_Gleis' oder 'AX_WegPfadSteig' mit 'art' 1106 oder 1110 haben.");
+                .contains("Ein flächenförmiges Objekt 'AX_DammWallDeich' mit 'funktion' 3002 oder 3003 muss innerhalb ein Objekt 'AX_Strassenachse', 'AX_Fahrwegachse', 'AX_Bahnstrecke', 'AX_Gleis' oder 'AX_WegPfadSteig' mit 'art' 1106 oder 1110 haben.");
     }
 }

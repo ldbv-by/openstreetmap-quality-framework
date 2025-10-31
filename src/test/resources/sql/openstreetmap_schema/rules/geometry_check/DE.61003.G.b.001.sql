@@ -24,5 +24,5 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
             ]
         }
     }',
-    'Ein flächenförmiges Objekt ''AX_DammWallDeich'' mit ''funktion'' 3002 oder 3002 muss innerhalb ein Objekt ''AX_Strassenachse'', ''AX_Fahrwegachse'', ''AX_Bahnstrecke'', ''AX_Gleis'' oder ''AX_WegPfadSteig'' mit ''art'' 1106 oder 1110 haben.')
+    'Ein flächenförmiges Objekt ''AX_DammWallDeich'' mit ''funktion'' 3002 oder 3003 muss innerhalb ein Objekt ''AX_Strassenachse'', ''AX_Fahrwegachse'', ''AX_Bahnstrecke'', ''AX_Gleis'' oder ''AX_WegPfadSteig'' mit ''art'' 1106 oder 1110 haben.')
 ON CONFLICT (id) DO NOTHING;

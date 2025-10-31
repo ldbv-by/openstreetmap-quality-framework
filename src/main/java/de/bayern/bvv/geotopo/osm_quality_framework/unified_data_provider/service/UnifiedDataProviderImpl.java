@@ -191,6 +191,7 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
         List<Feature> candidates = candidateDataSetTree.query(referenceEnvelope);
         if (candidates.isEmpty()) return;
 
+        List<Feature> nonAggregateCandidates = new ArrayList<>(candidates);
         if (dataSetFilter.aggregator() != null) {
             Feature aggregateFeature = this.aggregateFeatures(candidates, dataSetFilter.aggregator());
             candidates.clear();
@@ -216,7 +217,15 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
                 }
 
                 if (match) {
-                    result.add(candidate);
+                    if (dataSetFilter.aggregator() != null) {
+                        for (Feature nonAggregateCandidate : nonAggregateCandidates) {
+                            if (referenceGeometry.getGeometry().intersects(nonAggregateCandidate.getGeometry())) {
+                                result.add(nonAggregateCandidate);
+                            }
+                        }
+                    } else {
+                        result.add(candidate);
+                    }
                 }
             }
         }
