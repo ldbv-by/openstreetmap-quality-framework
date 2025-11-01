@@ -1,7 +1,9 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.repository;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.entity.WayEntity;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Criteria;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.FeatureFilter;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.OsmIds;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -19,12 +21,12 @@ public class WayRepositoryImpl extends CommonRepositoryImpl<WayEntity> implement
     private EntityManager entityManager;
 
     @Override
-    public List<WayEntity> fetchByFeatureFilter(FeatureFilter featureFilter) {
+    public List<WayEntity> fetchByFeatureFilter(OsmIds osmIds, Criteria criteria) {
         CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
         CriteriaQuery<WayEntity> criteriaQuery = criteriaBuilder.createQuery(WayEntity.class);
         Root<WayEntity> wayRoot = criteriaQuery.from(WayEntity.class);
 
-        TypedQuery<WayEntity> query = this.getTypedQuery(this.entityManager, criteriaQuery, wayRoot, featureFilter);
+        TypedQuery<WayEntity> query = this.getTypedQuery(this.entityManager, criteriaQuery, wayRoot, osmIds, criteria);
 
         return query.getResultList();
     }

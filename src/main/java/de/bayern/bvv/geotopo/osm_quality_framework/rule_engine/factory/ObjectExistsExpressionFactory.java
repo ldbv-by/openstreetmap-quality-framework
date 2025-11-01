@@ -2,11 +2,16 @@ package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.factory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.util.CriteriaDeserializer;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.ExpressionFactory;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.util.RuleAlias;
 import de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.api.UnifiedDataProvider;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.LineString;
@@ -38,8 +43,8 @@ public class ObjectExistsExpressionFactory implements ExpressionFactory {
         DataSetFilter dataSetFilter = this.parseDataSetFilter(json);
 
         return (taggedObject, baseTaggedObject) -> {
-            DataSetFilter resolvedDataSetFilter = this.resolveCurrentPlaceholders(dataSetFilter, taggedObject);
-            DataSetDto resultDataSetDto = this.unifiedDataProvider.getDataSet(resolvedDataSetFilter);
+            DataSetFilter preparedDataSetFilter = RuleAlias.replaceDataSetFilter(dataSetFilter, taggedObject);
+            DataSetDto resultDataSetDto = this.unifiedDataProvider.getDataSet(preparedDataSetFilter);
 
             if (resultDataSetDto == null) return false;
 
@@ -94,37 +99,24 @@ public class ObjectExistsExpressionFactory implements ExpressionFactory {
     }
 
     private DataSetFilter parseDataSetFilter(JsonNode json) {
-        JsonNode dataSetFilter = json.path("data_set_filter");
+        JsonNode dataSetFilterJsonNode = json.path("data_set_filter");
+        if (dataSetFilterJsonNode == null || dataSetFilterJsonNode.isEmpty()) {
+            return new DataSetFilter(null, null, null, null, null, null);
+        }
 
         try {
-            return this.objectMapper.treeToValue(dataSetFilter, DataSetFilter.class);
+            ObjectMapper objectMapper = JsonMapper.builder()
+                    .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+                    .build();
+
+            SimpleModule criteriaModule = new SimpleModule();
+            criteriaModule.addDeserializer(Criteria.class, new CriteriaDeserializer());
+            objectMapper.registerModule(criteriaModule);
+
+            return objectMapper.treeToValue(dataSetFilterJsonNode, DataSetFilter.class);
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("object_exists: 'data_set_filter' is required. Error: " + e.getMessage());
+            throw new IllegalArgumentException(type() + ": 'data_set_filter' parse error.");
         }
-
     }
 
-    private DataSetFilter resolveCurrentPlaceholders(DataSetFilter dataSetFilter, TaggedObject taggedObject) {
-        if (dataSetFilter != null && dataSetFilter.featureFilter() != null && dataSetFilter.featureFilter().tags() != null) {
-            Map<String, String> resolvedTags = new HashMap<>();
-            for (Map.Entry<String, String> entry : dataSetFilter.featureFilter().tags().entrySet()) {
-                String tagValue = entry.getValue();
-                if (tagValue.startsWith("current:")) {
-                    String taggedObjectTagKey = tagValue.substring("current:".length());
-                    tagValue = taggedObject.getTags().get(taggedObjectTagKey);
-                }
-
-                resolvedTags.put(entry.getKey(), tagValue);
-            }
-
-            return new DataSetFilter(
-                    dataSetFilter.ignoreChangesetData(),
-                    dataSetFilter.coordinateReferenceSystem(),
-                    dataSetFilter.aggregator(),
-                    new FeatureFilter(dataSetFilter.featureFilter().osmIds(), resolvedTags, dataSetFilter.featureFilter().boundingBox(), null)
-            );
-        }
-
-        return dataSetFilter;
-    }
 }

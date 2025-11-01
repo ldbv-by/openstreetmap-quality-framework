@@ -5,12 +5,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.FeatureMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.util.CriteriaDeserializer;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.ExpressionFactory;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.util.RuleAlias;
 import de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.api.UnifiedDataProvider;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Geometry;
@@ -63,7 +66,7 @@ public class SpatialCompareExpressionFactory implements ExpressionFactory {
             // For relations, a union geometry of all relation members is created and used as the reference feature.
             // The referenceFeatureRole parameter can be used to restrict which members are considered.
             Feature referenceFeature = new Feature();
-            DataSetFilter preparedDataSetFilter = this.prepareDataSetFilterForSelfCheck(taggedObject, params.dataSetFilter, params.selfCheck);
+            DataSetFilter preparedDataSetFilter = RuleAlias.replaceDataSetFilter(params.dataSetFilter, taggedObject, params.selfCheck);
 
             if (taggedObject instanceof Feature feature) {
                 referenceFeature = feature;
@@ -132,13 +135,17 @@ public class SpatialCompareExpressionFactory implements ExpressionFactory {
     private DataSetFilter parseDataSetFilter(JsonNode json) {
         JsonNode dataSetFilterJsonNode = json.path("data_set_filter");
         if (dataSetFilterJsonNode == null || dataSetFilterJsonNode.isEmpty()) {
-            return new DataSetFilter(null, null, null, null);
+            return new DataSetFilter(null, null, null, null, null, null);
         }
 
         try {
             ObjectMapper objectMapper = JsonMapper.builder()
                     .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
                     .build();
+
+            SimpleModule criteriaModule = new SimpleModule();
+            criteriaModule.addDeserializer(Criteria.class, new CriteriaDeserializer());
+            objectMapper.registerModule(criteriaModule);
 
             return objectMapper.treeToValue(dataSetFilterJsonNode, DataSetFilter.class);
         } catch (JsonProcessingException e) {
@@ -203,48 +210,5 @@ public class SpatialCompareExpressionFactory implements ExpressionFactory {
         unionFeature.setGeometry(unionGeometry);
 
         return unionFeature;
-    }
-
-    /**
-     * Prepares the dataset filter for self check
-     */
-    private DataSetFilter prepareDataSetFilterForSelfCheck(TaggedObject taggedObject, DataSetFilter dataSetFilter, boolean selfCheck) {
-        if (selfCheck) {
-            boolean osmIdsAreSet = dataSetFilter.featureFilter() != null && dataSetFilter.featureFilter().osmIds() != null;
-            Set<Long> nodeIds = osmIdsAreSet ? dataSetFilter.featureFilter().osmIds().nodeIds() : null;
-            Set<Long> wayIds = osmIdsAreSet ? dataSetFilter.featureFilter().osmIds().wayIds() : null;
-            Set<Long> areaIds = osmIdsAreSet ? dataSetFilter.featureFilter().osmIds().areaIds() : null;
-            Set<Long> relationIds = osmIdsAreSet ? dataSetFilter.featureFilter().osmIds().relationIds() : null;
-
-            if (taggedObject instanceof Feature feature) {
-                if (feature.getGeometry() instanceof Point) {
-                    if (nodeIds == null) nodeIds = new HashSet<>();
-                    nodeIds.add(feature.getOsmId());
-                } else if (feature.getGeometry() instanceof LineString) {
-                    if (wayIds == null) wayIds = new HashSet<>();
-                    wayIds.add(feature.getOsmId());
-                } else if (feature.getGeometry() instanceof Polygon) {
-                    if (areaIds == null) areaIds = new HashSet<>();
-                    areaIds.add(feature.getOsmId());
-                }
-            } else if (taggedObject instanceof Relation relation) {
-                if (relationIds == null) relationIds = new HashSet<>();
-                relationIds.add(relation.getOsmId());
-            }
-
-            return new DataSetFilter(
-                    dataSetFilter.ignoreChangesetData(),
-                    dataSetFilter.coordinateReferenceSystem(),
-                    dataSetFilter.aggregator(),
-                    new FeatureFilter(
-                            new OsmIds(nodeIds, wayIds, areaIds, relationIds),
-                            (dataSetFilter.featureFilter() != null) ? dataSetFilter.featureFilter().tags() : null,
-                            (dataSetFilter.featureFilter() != null) ? dataSetFilter.featureFilter().boundingBox() : null,
-                            (dataSetFilter.featureFilter() != null) ? dataSetFilter.featureFilter().role() : null
-                    )
-            );
-        }
-
-        return dataSetFilter;
     }
 }

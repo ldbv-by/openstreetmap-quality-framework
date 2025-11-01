@@ -4,6 +4,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.dto.Ch
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.ChangesetState;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.ChangesetDataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSetFilter;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.FeatureFilter;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public interface ChangesetDataService {
     /**
      * Returns the current objects of a changeset matching the given filter.
      */
-    ChangesetDataSetDto getDataSet(Long changesetId, FeatureFilter featureFilter, String coordinateReferenceSystem);
+    ChangesetDataSetDto getDataSet(Long changesetId, DataSetFilter dataSetFilter);
 
     /**
      * Returns a data set of all relation members.

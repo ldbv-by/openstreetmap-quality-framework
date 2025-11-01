@@ -1,7 +1,8 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.repository;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.entity.AreaEntity;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.FeatureFilter;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Criteria;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.OsmIds;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -17,12 +18,12 @@ public class AreaRepositoryImpl extends CommonRepositoryImpl<AreaEntity> impleme
     private EntityManager entityManager;
 
     @Override
-    public List<AreaEntity> fetchByFeatureFilter(FeatureFilter featureFilter) {
+    public List<AreaEntity> fetchByFeatureFilter(OsmIds osmIds, Criteria criteria) {
         CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
         CriteriaQuery<AreaEntity> criteriaQuery = criteriaBuilder.createQuery(AreaEntity.class);
         Root<AreaEntity> areaRoot = criteriaQuery.from(AreaEntity.class);
 
-        TypedQuery<AreaEntity> query = this.getTypedQuery(this.entityManager, criteriaQuery, areaRoot, featureFilter);
+        TypedQuery<AreaEntity> query = this.getTypedQuery(this.entityManager, criteriaQuery, areaRoot, osmIds, criteria);
 
         return query.getResultList();
     }

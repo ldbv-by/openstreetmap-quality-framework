@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleGeneralException(Exception exception) { return exception.getMessage();}
+    public String handleGeneralException(Exception exception) { return exception.getMessage() + ":" + exception.getCause().getMessage(); }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

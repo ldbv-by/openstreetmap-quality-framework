@@ -3,6 +3,8 @@ package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.attribute_check;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.JacksonConfiguration;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.dto.QualityHubResultDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceErrorDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceResultDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.test_core.DatabaseIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,34 +36,77 @@ class DE_57003_A_c_001 extends DatabaseIntegrationTest {
     @Autowired
     ObjectMapper objectMapper;
 
-/*
     @Test
-    void createGewaesserstationierungsachseVollstaendigInEinemGewaesser() throws Exception {
+    void createGewaesserstationierungsachseVollstaendigInZweiGewaesserOhneFliessrichtung() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
-                <osmChange version="0.6" generator="JOSM">
+                <osmChange version="0.6" generator="iD">
                 <create>
-                  <node id='-25362' changeset='-1' lat='49.88726442037' lon='12.34853103036' />
-                  <node id='-25361' changeset='-1' lat='49.88719305086' lon='12.34836366889' />
-                  <way id='-799' changeset='-1'>
-                    <nd ref='-25361' />
-                    <nd ref='-25362' />
-                    <tag k='artDerGewaesserstationierungsachse' v='2000' />
-                    <tag k='fliessrichtung' v='TRUE' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
-                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_Gewaesserstationierungsachse' />
-                  </way>
-                  <relation id='-71' changeset='-1'>
-                    <member type='way' ref='-799' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
+                    <node id="-1" lon="12.33103749863201" lat="49.87911888618271" version="0"/>
+                    <node id="-2" lon="12.331030993733307" lat="49.878754209010715" version="0"/>
+                    <node id="-7" lon="12.33103432094183" lat="49.87894073908409" version="0"/>
+                    <node id="-11" lon="12.330705006139802" lat="49.87924665099593" version="0"/>
+                    <node id="-12" lon="12.330697927747774" lat="49.87895700627898" version="0"/>
+                    <node id="-13" lon="12.331405766950473" lat="49.87895016425679" version="0"/>
+                    <node id="-14" lon="12.331412845342502" lat="49.87923752835419" version="0"/>
+                    <node id="-17" lon="12.330683770963722" lat="49.87867876326103" version="0"/>
+                    <node id="-20" lon="12.33139161016642" lat="49.87864911432034" version="0"/>
+                    <way id="-1" version="0">
+                        <nd ref="-1"/>
+                        <nd ref="-7"/>
+                        <nd ref="-2"/>
+                        <tag k="object_type" v="AX_Gewaesserstationierungsachse"/>
+                        <tag k="identifikator:UUID" v="DEBYBDLM00000000"/>
+                        <tag k="identifikator:UUIDundZeit" v="DEBYBDLM0000000020251014T125300Z"/>
+                        <tag k="lebenszeitintervall:beginnt" v="2025-10-14T12:53:00Z"/>
+                        <tag k="artDerGewaesserstationierungsachse" v="2000"/>
+                        <tag k="fliessrichtung" v="FALSE"/>
+                    </way>
+                    <way id="-4" version="0">
+                        <nd ref="-11"/>
+                        <nd ref="-12"/>
+                        <nd ref="-13"/>
+                        <nd ref="-14"/>
+                        <nd ref="-11"/>
+                        <tag k="object_type" v="AX_Fliessgewaesser"/>
+                        <tag k="funktion" v="8300"/>
+                        <tag k="identifikator:UUID" v="DEBYBDLM22222222"/>
+                        <tag k="identifikator:UUIDundZeit" v="DEBYBDLM2222222220251014T125300Z"/>
+                        <tag k="lebenszeitintervall:beginnt" v="2025-10-14T12:53:00Z"/>
+                    </way>
+                    <way id="-5" version="0">
+                        <nd ref="-17"/>
+                        <nd ref="-12"/>
+                        <nd ref="-13"/>
+                        <nd ref="-20"/>
+                        <nd ref="-17"/>
+                        <tag k="object_type" v="AX_Fliessgewaesser"/>
+                        <tag k="identifikator:UUID" v="DEBYBDLM11111111"/>
+                        <tag k="identifikator:UUIDundZeit" v="DEBYBDLM1111111120251014T125300Z"/>
+                        <tag k="lebenszeitintervall:beginnt" v="2025-10-14T12:53:00Z"/>
+                        <tag k="funktion" v="8300"/>
+                    </way>
+                    <relation id='-1' changeset='-1'>
+                        <member type='way' ref='-1' role='' />
+                        <tag k='advStandardModell' v='Basis-DLM' />
+                        <tag k='object_type' v='AA_modellart' />
+                    </relation>
+                    <relation id='-2' changeset='-1'>
+                        <member type='way' ref='-4' role='' />
+                        <tag k='advStandardModell' v='Basis-DLM' />
+                        <tag k='object_type' v='AA_modellart' />
+                    </relation>
+                    <relation id='-3' changeset='-1'>
+                        <member type='way' ref='-5' role='' />
+                        <tag k='advStandardModell' v='Basis-DLM' />
+                        <tag k='object_type' v='AA_modellart' />
+                    </relation>
                 </create>
-                </osmChange>
-                """;
+                <modify/>
+                <delete if-unused="true"/>
+            </osmChange>
+            """;
 
         // Act
         MvcResult mvcResult = this.mockMvc.perform(
@@ -78,33 +123,79 @@ class DE_57003_A_c_001 extends DatabaseIntegrationTest {
         assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
         assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result to be valid, but it was invalid.").isTrue();
     }
-*/
+
 
     @Test
-    void createGewaesserstationierungsachseVollstaendigInEinemGewaesser() throws Exception {
+    void createGewaesserstationierungsachseVollstaendigInZweiGewaesserMitFliessrichtung() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
-                <osmChange version="0.6" generator="JOSM">
+                <osmChange version="0.6" generator="iD">
                 <create>
-                  <way id='-667' changeset='-1'>
-                    <nd ref='62151' />
-                    <nd ref='62158' />
-                    <tag k='artDerGewaesserstationierungsachse' v='2000' />
-                    <tag k='fliessrichtung' v='FALSE' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
-                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_Gewaesserstationierungsachse' />
-                  </way>
-                  <relation id='-65' changeset='-1'>
-                    <member type='way' ref='-667' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
+                    <node id="-1" lon="12.33103749863201" lat="49.87911888618271" version="0"/>
+                    <node id="-2" lon="12.331030993733307" lat="49.878754209010715" version="0"/>
+                    <node id="-7" lon="12.33103432094183" lat="49.87894073908409" version="0"/>
+                    <node id="-11" lon="12.330705006139802" lat="49.87924665099593" version="0"/>
+                    <node id="-12" lon="12.330697927747774" lat="49.87895700627898" version="0"/>
+                    <node id="-13" lon="12.331405766950473" lat="49.87895016425679" version="0"/>
+                    <node id="-14" lon="12.331412845342502" lat="49.87923752835419" version="0"/>
+                    <node id="-17" lon="12.330683770963722" lat="49.87867876326103" version="0"/>
+                    <node id="-20" lon="12.33139161016642" lat="49.87864911432034" version="0"/>
+                    <way id="-1" version="0">
+                        <nd ref="-1"/>
+                        <nd ref="-7"/>
+                        <nd ref="-2"/>
+                        <tag k="object_type" v="AX_Gewaesserstationierungsachse"/>
+                        <tag k="identifikator:UUID" v="DEBYBDLM00000000"/>
+                        <tag k="identifikator:UUIDundZeit" v="DEBYBDLM0000000020251014T125300Z"/>
+                        <tag k="lebenszeitintervall:beginnt" v="2025-10-14T12:53:00Z"/>
+                        <tag k="artDerGewaesserstationierungsachse" v="2000"/>
+                        <tag k="fliessrichtung" v="TRUE"/>
+                    </way>
+                    <way id="-4" version="0">
+                        <nd ref="-11"/>
+                        <nd ref="-12"/>
+                        <nd ref="-13"/>
+                        <nd ref="-14"/>
+                        <nd ref="-11"/>
+                        <tag k="object_type" v="AX_Fliessgewaesser"/>
+                        <tag k="funktion" v="8300"/>
+                        <tag k="identifikator:UUID" v="DEBYBDLM22222222"/>
+                        <tag k="identifikator:UUIDundZeit" v="DEBYBDLM2222222220251014T125300Z"/>
+                        <tag k="lebenszeitintervall:beginnt" v="2025-10-14T12:53:00Z"/>
+                    </way>
+                    <way id="-5" version="0">
+                        <nd ref="-17"/>
+                        <nd ref="-12"/>
+                        <nd ref="-13"/>
+                        <nd ref="-20"/>
+                        <nd ref="-17"/>
+                        <tag k="object_type" v="AX_Fliessgewaesser"/>
+                        <tag k="identifikator:UUID" v="DEBYBDLM11111111"/>
+                        <tag k="identifikator:UUIDundZeit" v="DEBYBDLM1111111120251014T125300Z"/>
+                        <tag k="lebenszeitintervall:beginnt" v="2025-10-14T12:53:00Z"/>
+                        <tag k="funktion" v="8300"/>
+                    </way>
+                    <relation id='-1' changeset='-1'>
+                        <member type='way' ref='-1' role='' />
+                        <tag k='advStandardModell' v='Basis-DLM' />
+                        <tag k='object_type' v='AA_modellart' />
+                    </relation>
+                    <relation id='-2' changeset='-1'>
+                        <member type='way' ref='-4' role='' />
+                        <tag k='advStandardModell' v='Basis-DLM' />
+                        <tag k='object_type' v='AA_modellart' />
+                    </relation>
+                    <relation id='-3' changeset='-1'>
+                        <member type='way' ref='-5' role='' />
+                        <tag k='advStandardModell' v='Basis-DLM' />
+                        <tag k='object_type' v='AA_modellart' />
+                    </relation>
                 </create>
-                </osmChange>
-                """;
+                <modify/>
+                <delete if-unused="true"/>
+            </osmChange>
+            """;
 
         // Act
         MvcResult mvcResult = this.mockMvc.perform(
@@ -119,6 +210,22 @@ class DE_57003_A_c_001 extends DatabaseIntegrationTest {
 
         // Assert
         assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
-        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result to be valid, but it was invalid.").isTrue();
+        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        QualityServiceResultDto attributeCheck = qualityHubResultDto.qualityServiceResults().stream()
+                .filter(s -> "attribute-check".equals(s.qualityServiceId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("QualityService 'attribute-check' not found"));
+
+        assertThat(attributeCheck.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        assertThat(attributeCheck.errors())
+                .as("Errors of 'attribute-check' must not be empty")
+                .isNotEmpty();
+
+        assertThat(attributeCheck.errors())
+                .extracting(QualityServiceErrorDto::errorText)
+                .as("Error text of 'attribut-check'")
+                .contains("Eine Gewässerstationierungsachse mit AGA 2000, die (vollständig) in einem oder mehreren Fließgewässern mit FKT 8300 liegt, hat FLR 'FALSE'");
     }
 }

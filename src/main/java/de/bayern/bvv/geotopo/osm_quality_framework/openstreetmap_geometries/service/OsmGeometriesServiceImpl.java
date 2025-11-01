@@ -37,16 +37,22 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
      * Returns the current tagged objects.
      */
     @Override
-    public DataSetDto getDataSet(FeatureFilter featureFilter, String coordinateReferenceSystem) {
+    public DataSetDto getDataSet(DataSetFilter dataSetFilter) {
         DataSet resultDataSet = new DataSet();
 
-        resultDataSet.getNodes().addAll(this.getNodesByFeatureFilter(featureFilter, coordinateReferenceSystem));
-        resultDataSet.getWays().addAll(this.getWaysByFeatureFilter(featureFilter, coordinateReferenceSystem));
-        resultDataSet.getAreas().addAll(this.getAreasByFeatureFilter(featureFilter, coordinateReferenceSystem));
+        Criteria criteria = (dataSetFilter == null) ? null : dataSetFilter.criteria();
+        OsmIds osmIds = (dataSetFilter == null) ? null : dataSetFilter.osmIds();
+        String coordinateReferenceSystem = (dataSetFilter == null) ? null : dataSetFilter.coordinateReferenceSystem();
 
-        // Todo: Bounding box filter currently excludes relations — necessary?
-        if (featureFilter.boundingBox() == null) {
-            resultDataSet.getRelations().addAll(this.getRelationsByFeatureFilter(featureFilter));
+        List<Relation> relations = new ArrayList<>();
+        resultDataSet.getNodes().addAll(this.getNodesByFeatureFilter(osmIds, criteria, coordinateReferenceSystem, relations));
+        resultDataSet.getWays().addAll(this.getWaysByFeatureFilter(osmIds, criteria, coordinateReferenceSystem, relations));
+        resultDataSet.getAreas().addAll(this.getAreasByFeatureFilter(osmIds, criteria, coordinateReferenceSystem, relations));
+
+        if (osmIds != null && osmIds.relationIds() != null && !osmIds.relationIds().isEmpty()) {
+            resultDataSet.getRelations().addAll(this.getRelationsByFeatureFilter(osmIds, criteria));
+        } else {
+            resultDataSet.getRelations().addAll(relations);
         }
 
         return DataSetMapper.toDto(resultDataSet);
@@ -70,14 +76,15 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     /**
      * Returns the current nodes by feature filter.
      */
-    private List<Feature> getNodesByFeatureFilter(FeatureFilter featureFilter, String coordinateReferenceSystem) {
+    private List<Feature> getNodesByFeatureFilter(OsmIds osmIds, Criteria criteria, String coordinateReferenceSystem, List<Relation> relations) {
         List<Feature> nodes = new ArrayList<>();
-        List<NodeEntity> nodeEntities = this.nodeRepository.fetchByFeatureFilter(featureFilter);
+        List<NodeEntity> nodeEntities = this.nodeRepository.fetchByFeatureFilter(osmIds, criteria);
 
         if (nodeEntities != null) {
             for (NodeEntity nodeEntity : nodeEntities) {
-                List<Relation> relations = this.getRelationsForOsmObject("n", nodeEntity.getOsmId());
-                nodes.add(NodeEntityMapper.toFeature(nodeEntity, relations, coordinateReferenceSystem));
+                List<Relation> nodeRelations = this.getRelationsForOsmObject("n", nodeEntity.getOsmId());
+                nodes.add(NodeEntityMapper.toFeature(nodeEntity, nodeRelations, coordinateReferenceSystem));
+                relations.addAll(nodeRelations);
             }
         }
 
@@ -104,15 +111,16 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     /**
      * Returns the current ways by feature filter.
      */
-    private List<Feature> getWaysByFeatureFilter(FeatureFilter featureFilter, String coordinateReferenceSystem) {
+    private List<Feature> getWaysByFeatureFilter(OsmIds osmIds, Criteria criteria, String coordinateReferenceSystem, List<Relation> relations) {
         List<Feature> ways = new ArrayList<>();
-        List<WayEntity> wayEntities = this.wayRepository.fetchByFeatureFilter(featureFilter);
+        List<WayEntity> wayEntities = this.wayRepository.fetchByFeatureFilter(osmIds, criteria);
 
         if (wayEntities != null) {
             for (WayEntity wayEntity : wayEntities) {
-                List<Relation> relations = this.getRelationsForOsmObject("w", wayEntity.getOsmId());
+                List<Relation> wayRelations = this.getRelationsForOsmObject("w", wayEntity.getOsmId());
                 List<GeometryNode> geometryNodes = this.getGeometryNodes(wayEntity, coordinateReferenceSystem);
-                ways.add(WayEntityMapper.toFeature(wayEntity, geometryNodes, relations, coordinateReferenceSystem));
+                ways.add(WayEntityMapper.toFeature(wayEntity, geometryNodes, wayRelations, coordinateReferenceSystem));
+                relations.addAll(wayRelations);
             }
         }
 
@@ -140,15 +148,16 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     /**
      * Returns the current areas by feature filter.
      */
-    private List<Feature> getAreasByFeatureFilter(FeatureFilter featureFilter, String coordinateReferenceSystem) {
+    private List<Feature> getAreasByFeatureFilter(OsmIds osmIds, Criteria criteria, String coordinateReferenceSystem, List<Relation> relations) {
         List<Feature> areas = new ArrayList<>();
-        List<AreaEntity> areaEntities = this.areaRepository.fetchByFeatureFilter(featureFilter);
+        List<AreaEntity> areaEntities = this.areaRepository.fetchByFeatureFilter(osmIds, criteria);
 
         if (areaEntities != null) {
             for (AreaEntity areaEntity : areaEntities) {
-                List<Relation> relations = this.getRelationsForOsmObject(areaEntity.getOsmGeometryType().toString(), areaEntity.getOsmId());
+                List<Relation> areaRelations = this.getRelationsForOsmObject(areaEntity.getOsmGeometryType().toString(), areaEntity.getOsmId());
                 List<GeometryNode> geometryNodes = this.getGeometryNodes(areaEntity, coordinateReferenceSystem);
-                areas.add(AreaEntityMapper.toFeature(areaEntity, geometryNodes, relations, coordinateReferenceSystem));
+                areas.add(AreaEntityMapper.toFeature(areaEntity, geometryNodes, areaRelations, coordinateReferenceSystem));
+                relations.addAll(areaRelations);
             }
         }
 
@@ -176,9 +185,9 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     /**
      * Returns the current relations by feature filter.
      */
-    private List<Relation> getRelationsByFeatureFilter(FeatureFilter featureFilter) {
+    private List<Relation> getRelationsByFeatureFilter(OsmIds osmIds, Criteria criteria) {
         List<Relation> relations = new ArrayList<>();
-        List<RelationEntity> relationEntities = this.relationRepository.fetchByFeatureFilter(featureFilter);
+        List<RelationEntity> relationEntities = this.relationRepository.fetchByFeatureFilter(osmIds, criteria);
 
         if (relationEntities != null) {
             for (RelationEntity relationEntity : relationEntities) {

@@ -3,6 +3,7 @@ package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.api.OsmGeometriesService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.FeatureDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSetFilter;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.FeatureFilter;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.OsmIds;
 import de.bayern.bvv.geotopo.osm_quality_framework.test_core.DatabaseIntegrationTest;
@@ -20,11 +21,12 @@ class OsmGeometriesIntegrationTest extends DatabaseIntegrationTest {
     @Test
     void testGetAreaByOsmId() {
         // Arrange
-        FeatureFilter featureFilter = new FeatureFilter(
-                new OsmIds(null, null, Set.of(10727L), null), null, null, null);
+        DataSetFilter dataSetFilter = new DataSetFilter(
+                null, null, null,
+                new OsmIds(null, Set.of(10727L), null, null), null,null);
 
         // Act
-        DataSetDto dataSetDto = this.osmGeometriesService.getDataSet(featureFilter, null);
+        DataSetDto dataSetDto = this.osmGeometriesService.getDataSet(dataSetFilter);
 
         // Assert
         assertThat(dataSetDto.nodes().size())
@@ -53,11 +55,12 @@ class OsmGeometriesIntegrationTest extends DatabaseIntegrationTest {
     @Test
     void testGetStreetByOsmId() {
         // Arrange
-        FeatureFilter featureFilter = new FeatureFilter(
-                new OsmIds(null, Set.of(3660L), null, null), null, null, null);
+        DataSetFilter dataSetFilter = new DataSetFilter(
+                null, null, null,
+                new OsmIds(null, Set.of(3660L), null, null), null, null);
 
         // Act
-        DataSetDto dataSetDto = this.osmGeometriesService.getDataSet(featureFilter, null);
+        DataSetDto dataSetDto = this.osmGeometriesService.getDataSet(dataSetFilter);
 
         // Assert
         assertThat(dataSetDto.nodes().size())

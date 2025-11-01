@@ -37,9 +37,7 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
     public DataSetDto getDataSet(DataSetFilter dataSetFilter) {
 
         // Load current OSM geometries from the database and map to the domain model.
-        DataSet currentDataSet = Optional.ofNullable(this.osmGeometriesService.getDataSet(
-                        dataSetFilter.featureFilter(),
-                        dataSetFilter.coordinateReferenceSystem()))
+        DataSet currentDataSet = Optional.ofNullable(this.osmGeometriesService.getDataSet(dataSetFilter))
                 .map(DataSetMapper::toDomain)
                 .orElse(new DataSet());
 
@@ -47,10 +45,7 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
         if (dataSetFilter.ignoreChangesetData() == null || !dataSetFilter.ignoreChangesetData()) {
             for (Long changesetId : this.changesetDataService.getChangesetIds(Set.of(ChangesetState.OPEN, ChangesetState.CHECKED))) {
 
-                ChangesetDataSet cs = Optional.ofNullable(this.changesetDataService.getDataSet(
-                                changesetId,
-                                dataSetFilter.featureFilter(),
-                                dataSetFilter.coordinateReferenceSystem()))
+                ChangesetDataSet cs = Optional.ofNullable(this.changesetDataService.getDataSet(changesetId, dataSetFilter))
                         .map(ChangesetDataSetMapper::toDomain)
                         .orElse(null);
 
@@ -103,7 +98,7 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
 
         // Prepare candidate features.
         // If no search bounding box is provided, derive it from the reference feature’s geometry.
-        DataSetFilter preparedDataSetFilter = this.prepareDataSetFilter(dataSetFilter, referenceEnvelope);
+        DataSetFilter preparedDataSetFilter = this.addBboxToDataSetFilter(dataSetFilter, referenceEnvelope);
 
         // Fetch the candidate features using the (possibly) augmented filter.
         DataSet candidateDataSet = Optional.ofNullable(this.getDataSet(preparedDataSetFilter))
@@ -120,7 +115,7 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
                 List<Feature> candidateRelations = new ArrayList<>();
 
                 for (Relation relation : candidateDataSet.getRelations()) {
-                    String candidateRole = (dataSetFilter.featureFilter() == null) ? null : dataSetFilter.featureFilter().role();
+                    String candidateRole = (dataSetFilter.memberFilter() == null) ? null : dataSetFilter.memberFilter().role();
                     DataSet candidateMembers = Optional.ofNullable(this.getRelationMembers(relation.getOsmId(), candidateRole))
                             .map(DataSetMapper::toDomain).orElse(null);
 
@@ -257,24 +252,39 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
      * Prepares the DataSetFilter to load only features that intersect the reference feature’s bounding box.
      * Add relation ids of the relation filter.
      */
-    private DataSetFilter prepareDataSetFilter(DataSetFilter dataSetFilter, Envelope referenceEnvelope) {
-        boolean featureFilterIsSet = dataSetFilter != null && dataSetFilter.featureFilter() != null;
+    private DataSetFilter addBboxToDataSetFilter(DataSetFilter dataSetFilter, Envelope referenceEnvelope) {
+        boolean hasBboxFilter = false;
+        if (dataSetFilter != null && dataSetFilter.criteria() != null) {
+            switch (dataSetFilter.criteria()) {
+                case Leaf leaf -> hasBboxFilter = "bbox".equalsIgnoreCase(leaf.type());
+                case All(List<Criteria> items) -> {
+                    if (items != null) {
+                        hasBboxFilter = items.stream().anyMatch(it -> it instanceof Leaf leaf && "bbox".equalsIgnoreCase(leaf.type()));
+                    }
+                }
+                case Any(List<Criteria> items) -> {
+                    if (items != null) {
+                        hasBboxFilter = items.stream().anyMatch(it -> it instanceof Leaf leaf && "bbox".equalsIgnoreCase(leaf.type()));
+                    }
+                }
+                default -> {}
+            }
+        }
+
+        // Bounding Box already on top level
+        if (hasBboxFilter) return dataSetFilter;
+
+        // Set Bounding Box and return new dataset filter
+        Leaf boundingBoxLeaf = new Leaf("bbox", Map.of("min_x", referenceEnvelope.getMinX(), "min_y", referenceEnvelope.getMinY(),
+                "max_x", referenceEnvelope.getMaxX(), "max_y", referenceEnvelope.getMaxY()));
 
         return new DataSetFilter(
                 (dataSetFilter != null) ? dataSetFilter.ignoreChangesetData() : null,
                 (dataSetFilter != null) ? dataSetFilter.coordinateReferenceSystem() : null,
                 (dataSetFilter != null) ? dataSetFilter.aggregator() : null,
-                new FeatureFilter(
-                        (featureFilterIsSet) ? ((dataSetFilter.featureFilter().osmIds() != null) ? dataSetFilter.featureFilter().osmIds() : null) : null,
-                        (featureFilterIsSet) ? dataSetFilter.featureFilter().tags() : null,
-                        (featureFilterIsSet && (dataSetFilter.featureFilter().boundingBox() != null)) ?
-                                dataSetFilter.featureFilter().boundingBox() :
-                                        new BoundingBox(
-                                            referenceEnvelope.getMinX(), referenceEnvelope.getMinY(),
-                                            referenceEnvelope.getMaxX(), referenceEnvelope.getMaxY()),
-                        (featureFilterIsSet) ? dataSetFilter.featureFilter().role() : null
-                )
-        );
+                null,
+                (dataSetFilter == null || dataSetFilter.criteria() == null) ? boundingBoxLeaf : new All(List.of(dataSetFilter.criteria(), boundingBoxLeaf)),
+                (dataSetFilter != null) ? dataSetFilter.memberFilter() : null);
     }
 
 

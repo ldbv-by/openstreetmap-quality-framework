@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -61,33 +60,20 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
      * Returns the current objects of a changeset matching the given filter.
      */
     @Override
-    public ChangesetDataSetDto getDataSet(Long changesetId, FeatureFilter featureFilter, String coordinateReferenceSystem) {
+    public ChangesetDataSetDto getDataSet(Long changesetId, DataSetFilter dataSetFilter) {
         ChangesetDataSet result = new ChangesetDataSet();
+
+        Criteria criteria = (dataSetFilter == null) ? null : dataSetFilter.criteria();
+        String coordinateReferenceSystem = (dataSetFilter == null) ? null : dataSetFilter.coordinateReferenceSystem();
+
+        Set<Long> nodeOsmIds = (dataSetFilter == null || dataSetFilter.osmIds() == null) ? null : dataSetFilter.osmIds().nodeIds();
+        Set<Long> wayOsmIds = (dataSetFilter == null || dataSetFilter.osmIds() == null) ? null : dataSetFilter.osmIds().wayIds();
+        Set<Long> areaOsmIds = (dataSetFilter == null || dataSetFilter.osmIds() == null) ? null : dataSetFilter.osmIds().areaIds();
+        Set<Long> relationOsmIds = (dataSetFilter == null || dataSetFilter.osmIds() == null) ? null : dataSetFilter.osmIds().relationIds();
 
         // --- Load all changeset objects for the given id.
         List<ChangesetObjectEntity> changesetObjects =
                 this.changesetObjectRepository.findByChangesetId(changesetId);
-
-        // --- Helper function: Filter osm ids from the changeset objects by operation and geometry types.
-        BiFunction<Set<GeometryType>, OperationType, Set<Long>> osmIds =
-                (geometryTypes, operationType) -> changesetObjects.stream()
-                        .filter(o -> geometryTypes.contains(o.getGeometryType()) && o.getOperationType() == operationType)
-                        .map(ChangesetObjectEntity::getOsmId)
-                        .collect(Collectors.toSet());
-
-        // --- Helper function: Creates a derived feature filter that using the given osm ids.
-        BiFunction<Set<Long>, int[], FeatureFilter> ff = (osmIdsSet, slot) -> new FeatureFilter(
-                featureFilter != null && featureFilter.osmIds() != null ? featureFilter.osmIds() :
-                new OsmIds(
-                        slot[0] == 1 ? osmIdsSet : null, // nodes
-                        slot[1] == 1 ? osmIdsSet : null, // ways
-                        slot[2] == 1 ? osmIdsSet : null, // areas
-                        slot[3] == 1 ? osmIdsSet : null  // relations
-                ),
-                featureFilter == null ? null : featureFilter.tags(),
-                featureFilter == null ? null : featureFilter.boundingBox(),
-                featureFilter == null ? null : featureFilter.role()
-        );
 
         final Set<GeometryType> N = Set.of(GeometryType.NODE);
         final Set<GeometryType> W = Set.of(GeometryType.WAY);
@@ -95,39 +81,57 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
         final Set<GeometryType> R = Set.of(GeometryType.RELATION);
 
         // CREATE
-        result.getCreate().getNodes().addAll(
-                getNodesByFeatureFilter(changesetId, ff.apply(osmIds.apply(N, OperationType.CREATE), new int[]{1,0,0,0}), coordinateReferenceSystem));
-        result.getCreate().getWays().addAll(
-                getWaysByFeatureFilter(changesetId, ff.apply(osmIds.apply(W, OperationType.CREATE), new int[]{0,1,0,0}), coordinateReferenceSystem));
-        result.getCreate().getAreas().addAll(
-                getAreasByFeatureFilter(changesetId, ff.apply(osmIds.apply(A, OperationType.CREATE), new int[]{0,0,1,0}), coordinateReferenceSystem));
-        result.getCreate().getRelations().addAll(
-                getRelationsByFeatureFilter(changesetId, ff.apply(osmIds.apply(R, OperationType.CREATE), new int[]{0,0,0,1})));
+        List<Relation> relations = new ArrayList<>();
+        OsmIds osmIds = this.getOsmIds(changesetObjects, N, OperationType.CREATE, new int[]{1,0,0,0}, nodeOsmIds);
+        result.getCreate().getNodes().addAll(getNodesByFeatureFilter(changesetId, osmIds, criteria, coordinateReferenceSystem, relations));
+
+        osmIds = this.getOsmIds(changesetObjects, W, OperationType.CREATE, new int[]{0,1,0,0}, wayOsmIds);
+        result.getCreate().getWays().addAll(getWaysByFeatureFilter(changesetId, osmIds, criteria, coordinateReferenceSystem, relations));
+
+        osmIds = this.getOsmIds(changesetObjects, A, OperationType.CREATE, new int[]{0,0,1,0}, areaOsmIds);
+        result.getCreate().getAreas().addAll(getAreasByFeatureFilter(changesetId, osmIds, criteria, coordinateReferenceSystem, relations));
+
+        osmIds = this.getOsmIds(changesetObjects, R, OperationType.CREATE, new int[]{0,0,0,1}, relationOsmIds);
+        if (osmIds.relationIds() != null) {
+            result.getCreate().getRelations().addAll(getRelationsByFeatureFilter(changesetId, osmIds, criteria));
+        } else {
+            result.getCreate().getRelations().addAll(relations);
+        }
 
         // MODIFY
-        result.getModify().getNodes().addAll(
-                getNodesByFeatureFilter(changesetId, ff.apply(osmIds.apply(N, OperationType.MODIFY), new int[]{1,0,0,0}), coordinateReferenceSystem));
-        result.getModify().getWays().addAll(
-                getWaysByFeatureFilter(changesetId, ff.apply(osmIds.apply(W, OperationType.MODIFY), new int[]{0,1,0,0}), coordinateReferenceSystem));
-        result.getModify().getAreas().addAll(
-                getAreasByFeatureFilter(changesetId, ff.apply(osmIds.apply(A, OperationType.MODIFY), new int[]{0,0,1,0}), coordinateReferenceSystem));
-        result.getModify().getRelations().addAll(
-                getRelationsByFeatureFilter(changesetId, ff.apply(osmIds.apply(R, OperationType.MODIFY), new int[]{0,0,0,1})));
+        relations = new ArrayList<>();
+        osmIds = this.getOsmIds(changesetObjects, N, OperationType.MODIFY, new int[]{1,0,0,0}, nodeOsmIds);
+        result.getModify().getNodes().addAll(getNodesByFeatureFilter(changesetId, osmIds, criteria, coordinateReferenceSystem, relations));
+
+        osmIds = this.getOsmIds(changesetObjects, W, OperationType.MODIFY, new int[]{0,1,0,0}, wayOsmIds);
+        result.getModify().getWays().addAll(getWaysByFeatureFilter(changesetId, osmIds, criteria, coordinateReferenceSystem, relations));
+
+        osmIds = this.getOsmIds(changesetObjects, A, OperationType.MODIFY, new int[]{0,1,0,0}, areaOsmIds);
+        result.getModify().getAreas().addAll(getAreasByFeatureFilter(changesetId, osmIds, criteria, coordinateReferenceSystem, relations));
+
+        osmIds = this.getOsmIds(changesetObjects, R, OperationType.MODIFY, new int[]{0,0,0,1}, relationOsmIds);
+        if (osmIds.relationIds() != null) {
+            result.getModify().getRelations().addAll(getRelationsByFeatureFilter(changesetId, osmIds, criteria));
+        } else {
+            result.getModify().getRelations().addAll(relations);
+        }
 
         // DELETE (from openstreetmap_geometries)
-        FeatureFilter deleteFeatureFilter = new FeatureFilter(
-                new OsmIds(
-                        osmIds.apply(N, OperationType.DELETE),
-                        osmIds.apply(W, OperationType.DELETE),
-                        osmIds.apply(A, OperationType.DELETE),
-                        osmIds.apply(R, OperationType.DELETE)
-                ),
-                featureFilter == null ? null : featureFilter.tags(),
-                featureFilter == null ? null : featureFilter.boundingBox(),
-                featureFilter == null ? null : featureFilter.role()
+        DataSetFilter deleteDataSetFilter = new DataSetFilter(
+             dataSetFilter == null ? null : dataSetFilter.ignoreChangesetData(),
+             dataSetFilter == null ? null : dataSetFilter.coordinateReferenceSystem(),
+             dataSetFilter == null ? null : dataSetFilter.aggregator(),
+             new OsmIds(
+                     this.getOsmIds(changesetObjects, N, OperationType.DELETE, nodeOsmIds),
+                     this.getOsmIds(changesetObjects, W, OperationType.DELETE, wayOsmIds),
+                     this.getOsmIds(changesetObjects, A, OperationType.DELETE, areaOsmIds),
+                     this.getOsmIds(changesetObjects, R, OperationType.DELETE, relationOsmIds)
+             ),
+            dataSetFilter == null ? null : dataSetFilter.criteria(),
+            dataSetFilter == null ? null : dataSetFilter.memberFilter()
         );
 
-        result.setDelete(Optional.ofNullable(this.osmGeometriesService.getDataSet(deleteFeatureFilter, coordinateReferenceSystem))
+        result.setDelete(Optional.ofNullable(this.osmGeometriesService.getDataSet(deleteDataSetFilter))
                 .map(DataSetMapper::toDomain).orElse(null));
 
         return ChangesetDataSetMapper.toDto(result);
@@ -151,14 +155,15 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
     /**
      * Returns the current nodes by feature filter.
      */
-    private List<Feature> getNodesByFeatureFilter(Long changesetId, FeatureFilter featureFilter, String coordinateReferenceSystem) {
+    private List<Feature> getNodesByFeatureFilter(Long changesetId, OsmIds osmIds, Criteria criteria, String coordinateReferenceSystem, List<Relation> relations) {
         List<Feature> nodes = new ArrayList<>();
-        List<NodeEntity> nodeEntities = this.nodeRepository.fetchByFeatureFilter(changesetId, featureFilter);
+        List<NodeEntity> nodeEntities = this.nodeRepository.fetchByFeatureFilter(changesetId, osmIds, criteria);
 
         if (nodeEntities != null) {
             for (NodeEntity nodeEntity : nodeEntities) {
-                List<Relation> relations = this.getRelationsForOsmObject(changesetId,"n", nodeEntity.getOsmId());
-                nodes.add(NodeEntityMapper.toFeature(nodeEntity, relations, coordinateReferenceSystem));
+                List<Relation> nodeRelations = this.getRelationsForOsmObject(changesetId,"n", nodeEntity.getOsmId());
+                nodes.add(NodeEntityMapper.toFeature(nodeEntity, nodeRelations, coordinateReferenceSystem));
+                relations.addAll(nodeRelations);
             }
         }
 
@@ -185,15 +190,16 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
     /**
      * Returns the current ways by feature filter.
      */
-    private List<Feature> getWaysByFeatureFilter(Long changesetId, FeatureFilter featureFilter, String coordinateReferenceSystem) {
+    private List<Feature> getWaysByFeatureFilter(Long changesetId, OsmIds osmIds, Criteria criteria, String coordinateReferenceSystem, List<Relation> relations) {
         List<Feature> ways = new ArrayList<>();
-        List<WayEntity> wayEntities = this.wayRepository.fetchByFeatureFilter(changesetId, featureFilter);
+        List<WayEntity> wayEntities = this.wayRepository.fetchByFeatureFilter(changesetId, osmIds, criteria);
 
         if (wayEntities != null) {
             for (WayEntity wayEntity : wayEntities) {
-                List<Relation> relations = this.getRelationsForOsmObject(changesetId,"w", wayEntity.getOsmId());
+                List<Relation> wayRelations = this.getRelationsForOsmObject(changesetId,"w", wayEntity.getOsmId());
                 List<GeometryNode> geometryNodes = this.getGeometryNodes(wayEntity, coordinateReferenceSystem);
-                ways.add(WayEntityMapper.toFeature(wayEntity, geometryNodes, relations, coordinateReferenceSystem));
+                ways.add(WayEntityMapper.toFeature(wayEntity, geometryNodes, wayRelations, coordinateReferenceSystem));
+                relations.addAll(wayRelations);
             }
         }
 
@@ -221,15 +227,16 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
     /**
      * Returns the current areas by feature filter.
      */
-    private List<Feature> getAreasByFeatureFilter(Long changesetId, FeatureFilter featureFilter, String coordinateReferenceSystem) {
+    private List<Feature> getAreasByFeatureFilter(Long changesetId, OsmIds osmIds, Criteria criteria, String coordinateReferenceSystem, List<Relation> relations) {
         List<Feature> areas = new ArrayList<>();
-        List<AreaEntity> areaEntities = this.areaRepository.fetchByFeatureFilter(changesetId, featureFilter);
+        List<AreaEntity> areaEntities = this.areaRepository.fetchByFeatureFilter(changesetId, osmIds, criteria);
 
         if (areaEntities != null) {
             for (AreaEntity areaEntity : areaEntities) {
-                List<Relation> relations = this.getRelationsForOsmObject(changesetId, areaEntity.getOsmGeometryType().toString(), areaEntity.getOsmId());
+                List<Relation> areaRelations = this.getRelationsForOsmObject(changesetId, areaEntity.getOsmGeometryType().toString(), areaEntity.getOsmId());
                 List<GeometryNode> geometryNodes = this.getGeometryNodes(areaEntity, coordinateReferenceSystem);
-                areas.add(AreaEntityMapper.toFeature(areaEntity, geometryNodes, relations, coordinateReferenceSystem));
+                areas.add(AreaEntityMapper.toFeature(areaEntity, geometryNodes, areaRelations, coordinateReferenceSystem));
+                relations.addAll(areaRelations);
             }
         }
 
@@ -257,9 +264,9 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
     /**
      * Returns the current relations by feature filter.
      */
-    private List<Relation> getRelationsByFeatureFilter(Long changesetId, FeatureFilter featureFilter) {
+    private List<Relation> getRelationsByFeatureFilter(Long changesetId, OsmIds osmIds, Criteria criteria) {
         List<Relation> relations = new ArrayList<>();
-        List<RelationEntity> relationEntities = this.relationRepository.fetchByFeatureFilter(changesetId, featureFilter);
+        List<RelationEntity> relationEntities = this.relationRepository.fetchByFeatureFilter(changesetId, osmIds, criteria);
 
         if (relationEntities != null) {
             for (RelationEntity relationEntity : relationEntities) {
@@ -346,5 +353,28 @@ public class ChangesetDataServiceImpl implements ChangesetDataService {
         return this.wayNodeRepository.findById_WayOsmIdOrderById_Seq(wayEntity.getOsmId())
                 .stream().map(n  -> WayNodeEntityMapper.toGeometryNode(n, coordinateReferenceSystem))
                 .toList();
+    }
+
+    private Set<Long> getOsmIds(List<ChangesetObjectEntity> changesetObjects, Set<GeometryType> geometryTypes,
+                                OperationType operationType, Set<Long> inputOsmIds){
+
+        return changesetObjects.stream()
+                .filter(o -> geometryTypes.contains(o.getGeometryType()) && o.getOperationType() == operationType)
+                .map(ChangesetObjectEntity::getOsmId)
+                .filter(id -> inputOsmIds == null || inputOsmIds.contains(id))
+                .collect(Collectors.toSet());
+    }
+
+
+    private OsmIds getOsmIds(List<ChangesetObjectEntity> changesetObjects, Set<GeometryType> geometryTypes,
+                             OperationType operationType, int[] slot, Set<Long> inputOsmIds) {
+        Set<Long> osmIdsSet = this.getOsmIds(changesetObjects, geometryTypes, operationType, inputOsmIds);
+
+        return new OsmIds(
+                slot[0] == 1 ? osmIdsSet : null, // nodes
+                slot[1] == 1 ? osmIdsSet : null, // ways
+                slot[2] == 1 ? osmIdsSet : null, // areas
+                slot[3] == 1 ? osmIdsSet : null  // relations
+        );
     }
 }

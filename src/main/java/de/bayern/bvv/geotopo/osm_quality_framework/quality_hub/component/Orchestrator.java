@@ -76,7 +76,7 @@ public class Orchestrator {
                                       CompletableFuture<Void> allStepsDone) {
 
         ChangesetDataSetDto changesetDataSetDto = this.changesetDataService.getDataSet(
-                changeset.getId(), null, null);
+                changeset.getId(), null);
 
         Set<QualityPipeline.Step> runnableSteps = this.getRunnableSteps(publishedPipelineSteps);
 

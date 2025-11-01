@@ -8,5 +8,7 @@ public record DataSetFilter(
         Boolean ignoreChangesetData,
         String coordinateReferenceSystem,
         SpatialAggregator aggregator,
-        FeatureFilter featureFilter
+        OsmIds osmIds,
+        Criteria criteria,
+        MemberFilter memberFilter
 ) {}
