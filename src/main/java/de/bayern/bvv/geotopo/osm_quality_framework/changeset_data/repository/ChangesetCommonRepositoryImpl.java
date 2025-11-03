@@ -148,6 +148,20 @@ public class ChangesetCommonRepositoryImpl<T> {
                 );
             }
 
+            case "tag_exists": {
+                String key = (String) params.get("tag_key");
+
+                if (key == null) {
+                    throw new IllegalArgumentException(type + ": 'tag_key' is required.");
+                }
+
+                Expression<Object> jsonPath =
+                        criteriaBuilder.function("jsonb_extract_path", Object.class,
+                                root.get("tags"), criteriaBuilder.literal(key));
+
+                return criteriaBuilder.isNotNull(jsonPath);
+            }
+
             case "relation_exists": {
                 String objectType = (String) params.get("object_type");
 

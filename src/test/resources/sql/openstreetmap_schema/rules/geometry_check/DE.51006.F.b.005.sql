@@ -7,7 +7,19 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
         "checks": {
             "type": "spatial_compare",
             "operator": "covered_by",
-            "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_SportFreizeitUndErholungsflaeche|AX_Landwirtschaft|AX_Wald|AX_Gehoelz|AX_Heide|AX_Moor|AX_Sumpf|AX_UnlandVegetationsloseFlaeche|AX_StehendesGewaesser" } } }
+            "data_set_filter": {
+                "criteria": {
+                    "type": "tag_in", "tag_key": "object_type", "values": [ "AX_SportFreizeitUndErholungsflaeche",
+                                                                            "AX_Landwirtschaft",
+                                                                            "AX_Wald",
+                                                                            "AX_Gehoelz",
+                                                                            "AX_Heide",
+                                                                            "AX_Moor",
+                                                                            "AX_Sumpf",
+                                                                            "AX_UnlandVegetationsloseFlaeche",
+                                                                            "AX_StehendesGewaesser" ]
+                }
+            }
         }
     }',
     'Ein Objekt mit der ''bauwerksfunktion'' 1510 darf nur auf ''AX_SportFreizeitUndErholungsflaeche'', ''AX_Landwirtschaft'', ''AX_Wald'', ''AX_Gehoelz'', ''AX_Heide'', ''AX_Moor'', ''AX_Sumpf'', ''AX_UnlandVegetationsloseFlaeche''  oder ''AX_StehendesGewaesser'' liegen.')

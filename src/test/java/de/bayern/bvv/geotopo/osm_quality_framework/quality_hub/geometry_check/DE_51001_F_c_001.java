@@ -77,6 +77,11 @@ class DE_51001_F_c_001 extends DatabaseIntegrationTest {
                          <tag k='advStandardModell' v='Basis-DLM' />
                          <tag k='object_type' v='AA_modellart' />
                       </relation>
+                      <relation id='-3' changeset='-1'>
+                        <member type='node' ref='-7' role='' />
+                        <tag k='hoehe' v='10' />
+                        <tag k='object_type' v='AX_objekthoehe' />
+                      </relation>
                     </create>
                     <modify/>
                 </osmChange>
@@ -116,6 +121,11 @@ class DE_51001_F_c_001 extends DatabaseIntegrationTest {
                          <member type='node' ref='-7' role='' />
                          <tag k='advStandardModell' v='Basis-DLM' />
                          <tag k='object_type' v='AA_modellart' />
+                      </relation>
+                      <relation id='-3' changeset='-1'>
+                        <member type='node' ref='-7' role='' />
+                        <tag k='hoehe' v='10' />
+                        <tag k='object_type' v='AX_objekthoehe' />
                       </relation>
                     </create>
                     <modify/>

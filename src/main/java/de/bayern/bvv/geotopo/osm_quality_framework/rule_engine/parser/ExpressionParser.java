@@ -109,12 +109,19 @@ public final class ExpressionParser {
             JsonNode jsonNode = node.get("relation_members");
             LoopInfo loopInfo = this.parseLoopInfo(jsonNode);
 
+            String role;
+            if (node.has("role")) {
+                role = jsonNode.path("role").asText();
+            } else {
+                role = null;
+            }
+
             if (jsonNode.has("conditions") || jsonNode.has("checks")) {
                 Expression conditions = parse(jsonNode.path("conditions"));
                 Expression checks = parse(jsonNode.path("checks"));
 
                 return (taggedObject, baseTaggedObject) -> {
-                    List<Feature> relationMembers = this.getRelationMembersAsFeature(taggedObject);
+                    List<Feature> relationMembers = this.getRelationMembersAsFeature(taggedObject, role);
                     if (relationMembers.isEmpty()) return false;
 
                     int candidates = 0;
@@ -140,7 +147,7 @@ public final class ExpressionParser {
                     if (!jsonNode.has("loop_info")) expressions.add(parse(jsonNode));
                 }
                 return (taggedObject, baseTaggedObject) -> {
-                    List<Feature> relationMembers = this.getRelationMembersAsFeature(taggedObject);
+                    List<Feature> relationMembers = this.getRelationMembersAsFeature(taggedObject, role);
                     if (relationMembers.isEmpty()) return false;
 
                     int candidates = 0;
@@ -277,7 +284,7 @@ public final class ExpressionParser {
     /**
      * Get relation members as feature list.
      */
-    private List<Feature> getRelationMembersAsFeature(TaggedObject taggedObject) {
+    private List<Feature> getRelationMembersAsFeature(TaggedObject taggedObject, String role) {
         List<Feature> relationMemberFeatures = new ArrayList<>();
 
         if (taggedObject instanceof Relation relation) {
@@ -328,7 +335,7 @@ public final class ExpressionParser {
 
     /** Wendet die LoopInfo auf Zähler an. */
     private boolean evaluateLoop(int success, int candidates, LoopInfo loopInfo) {
-        if (candidates == 0) return false;
+        if (candidates == 0) return true;
 
         return switch (loopInfo.type()) {
             case ANY      -> success >= 1;

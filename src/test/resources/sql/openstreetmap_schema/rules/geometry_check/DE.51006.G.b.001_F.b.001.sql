@@ -3,7 +3,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
     'geometry-check',
     'AX_BauwerkOderAnlageFuerSportFreizeitUndErholung',
     '{
-        "conditions": { "type": "tag_in", "tag_key": "bauwerksfunktion", "values": ["1430", "1431", "1432"] },
+        "conditions": { "type": "tag_between", "tag_key": "bauwerksfunktion", "from_value": "1430", "to_value": "1432" },
         "checks": {
             "type": "spatial_compare",
             "operator": "covered_by",

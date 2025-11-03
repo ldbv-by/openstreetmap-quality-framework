@@ -5,13 +5,20 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
     '{
         "conditions": { "type": "tag_equals", "tag_key": "artDerFestlegung", "value": "5400" },
         "checks": {
-            "any": [
-                {
-                    "type": "spatial_compare",
-                    "operator": "covered_by",
-                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Landwirtschaft|AX_Wald|AX_Gehoelz|AX_Heide|AX_Moor|AX_Sumpf|AX_UnlandVegetationsloseFlaeche|AX_FlaecheZurZeitUnbestimmbar" } } }
+            "type": "spatial_compare",
+            "operator": "covered_by",
+            "data_set_filter": {
+                "criteria": {
+                    "type": "tag_in", "tag_key": "object_type", "values": [ "AX_Landwirtschaft",
+                                                                            "AX_Wald",
+                                                                            "AX_Gehoelz",
+                                                                            "AX_Heide",
+                                                                            "AX_Moor",
+                                                                            "AX_Sumpf",
+                                                                            "AX_UnlandVegetationsloseFlaeche",
+                                                                            "AX_FlaecheZurZeitUnbestimmbar" ]
                 }
-            ]
+            }
         }
     }',
     'Ein Objekt ''AX_SonstigesRecht'' mit ''artDerFestlegung'' 5400 muss auf einem Objekt der Objektartengruppe ''Vegetation'' liegen.')

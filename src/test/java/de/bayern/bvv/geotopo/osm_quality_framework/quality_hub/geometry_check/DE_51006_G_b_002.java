@@ -109,6 +109,16 @@ class DE_51006_G_b_002 extends DatabaseIntegrationTest {
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
+                  <relation id='-80' changeset='-1'>
+                    <member type='way' ref='-809' role='' />
+                    <tag k='object_type' v='AX_objekthoehe' />
+                    <tag k='hoehe' v='10' />
+                  </relation>
+                  <relation id='-90' changeset='-1'>
+                    <member type='way' ref='-903' role='' />
+                    <tag k='object_type' v='AX_objekthoehe' />
+                    <tag k='hoehe' v='10' />
+                  </relation>
                 </create>
                 </osmChange>
                 """;
@@ -183,6 +193,11 @@ class DE_51006_G_b_002 extends DatabaseIntegrationTest {
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
+                  <relation id='-90' changeset='-1'>
+                    <member type='way' ref='-903' role='' />
+                    <tag k='object_type' v='AX_objekthoehe' />
+                    <tag k='hoehe' v='10' />
+                  </relation>
                 </create>
                 </osmChange>
                 """;
@@ -246,6 +261,11 @@ class DE_51006_G_b_002 extends DatabaseIntegrationTest {
                     <member type='way' ref='-903' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
+                  </relation>
+                  <relation id='-90' changeset='-1'>
+                    <member type='way' ref='-903' role='' />
+                    <tag k='object_type' v='AX_objekthoehe' />
+                    <tag k='hoehe' v='10' />
                   </relation>
                 </create>
                 </osmChange>

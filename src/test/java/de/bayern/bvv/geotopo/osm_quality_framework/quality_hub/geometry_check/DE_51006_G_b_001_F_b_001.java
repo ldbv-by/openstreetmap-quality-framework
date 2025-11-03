@@ -111,6 +111,16 @@ class DE_51006_G_b_001_F_b_001 extends DatabaseIntegrationTest {
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
+                  <relation id='-80' changeset='-1'>
+                    <member type='way' ref='-809' role='' />
+                    <tag k='object_type' v='AX_objekthoehe' />
+                    <tag k='hoehe' v='10' />
+                  </relation>
+                  <relation id='-90' changeset='-1'>
+                    <member type='way' ref='-903' role='' />
+                    <tag k='object_type' v='AX_objekthoehe' />
+                    <tag k='hoehe' v='10' />
+                  </relation>
                 </create>
                 </osmChange>
                 """;
@@ -159,6 +169,11 @@ class DE_51006_G_b_001_F_b_001 extends DatabaseIntegrationTest {
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
+                  <relation id='-60' changeset='-1'>
+                    <member type='way' ref='-903' role='' />
+                    <tag k='object_type' v='AX_objekthoehe' />
+                    <tag k='hoehe' v='10' />
+                  </relation>
                 </create>
                 </osmChange>
                 """;
@@ -192,7 +207,7 @@ class DE_51006_G_b_001_F_b_001 extends DatabaseIntegrationTest {
         assertThat(geometryCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'geometry-check'")
-                .contains("Die Wertearten mit der 'bauwerksfunktion' 1431 und 1432 müssen 'AX_FlaecheBesondererFunktionalerPraegung' oder 'AX_SportFreizeitUndErholungsflaeche' überlagern.");
+                .contains("Die Wertearten mit der 'bauwerksfunktion' 1430, 1431 und 1432 müssen 'AX_FlaecheBesondererFunktionalerPraegung' oder 'AX_SportFreizeitUndErholungsflaeche' überlagern.");
     }
 
     @Test
@@ -268,6 +283,16 @@ class DE_51006_G_b_001_F_b_001 extends DatabaseIntegrationTest {
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
+                  <relation id='-80' changeset='-1'>
+                    <member type='way' ref='-809' role='' />
+                    <tag k='object_type' v='AX_objekthoehe' />
+                    <tag k='hoehe' v='10' />
+                  </relation>
+                  <relation id='-90' changeset='-1'>
+                    <member type='way' ref='-903' role='' />
+                    <tag k='object_type' v='AX_objekthoehe' />
+                    <tag k='hoehe' v='10' />
+                  </relation>
                 </create>
                 </osmChange>
                 """;
@@ -301,6 +326,6 @@ class DE_51006_G_b_001_F_b_001 extends DatabaseIntegrationTest {
         assertThat(geometryCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'geometry-check'")
-                .contains("Die Wertearten mit der 'bauwerksfunktion' 1431 und 1432 müssen 'AX_FlaecheBesondererFunktionalerPraegung' oder 'AX_SportFreizeitUndErholungsflaeche' überlagern.");
+                .contains("Die Wertearten mit der 'bauwerksfunktion' 1430, 1431 und 1432 müssen 'AX_FlaecheBesondererFunktionalerPraegung' oder 'AX_SportFreizeitUndErholungsflaeche' überlagern.");
     }
 }

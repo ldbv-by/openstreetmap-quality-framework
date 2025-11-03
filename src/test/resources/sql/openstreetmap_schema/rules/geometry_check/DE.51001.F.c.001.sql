@@ -7,7 +7,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
         "checks": {
             "type": "spatial_compare",
             "operator": "covered_by",
-            "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Flugverkehr" } } }
+            "data_set_filter": { "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Flugverkehr" } }
         }
     }',
     'Ein ''AX_Turm'' mit ''bauwerksfunktion'' 1004 muss innerhalb von ''AX_Flugverkehr'' liegen.')

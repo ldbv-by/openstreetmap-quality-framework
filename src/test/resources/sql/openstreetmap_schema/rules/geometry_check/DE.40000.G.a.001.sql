@@ -1,7 +1,7 @@
 INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error_text) VALUES (
     'DE.40000.G.a.001',
     'geometry-check',
-    'AX_Turm', /*AX_TatsaechlicheNutzung',*/
+    'AX_Wohnbauflaeche', /*AX_TatsaechlicheNutzung',*/
     '{
         "conditions": {
             "all": [
@@ -19,5 +19,5 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
             }
         }
     }',
-    'Die Members von ''AX_KommunalesGebiet'' dürfen nur ''AX_Gebietsgrenze'' mit ''artDerGebietsgrenze'' 7101, 7102, 7104, 7105, 7106 oder 7107 sein. Zudem muss ''AX_KommunalesGebiet'' muss lückenlos und flächendeckend sein.')
+    'TODO: Die Members von ''AX_KommunalesGebiet'' dürfen nur ''AX_Gebietsgrenze'' mit ''artDerGebietsgrenze'' 7101, 7102, 7104, 7105, 7106 oder 7107 sein. Zudem muss ''AX_KommunalesGebiet'' muss lückenlos und flächendeckend sein.')
 ON CONFLICT (id) DO NOTHING;
