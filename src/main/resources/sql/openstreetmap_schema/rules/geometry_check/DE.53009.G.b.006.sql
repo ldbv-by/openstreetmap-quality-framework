@@ -12,7 +12,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
         "checks": {
             "type": "spatial_compare",
             "operator": "covered_by",
-            "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Gewaesserachse" } } }
+            "data_set_filter": { "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Gewaesserachse" } }
         }
     }',
     'Ein Objekt mit der ''bauwerksfunktion'' 2050 mus auf einem Objekt ''AX_Gewaesserachse'' liegen.')

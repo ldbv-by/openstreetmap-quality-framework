@@ -134,14 +134,28 @@ class DE_53008_G_b_003_F_b_003 extends DatabaseIntegrationTest {
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25362' changeset='-1' lat='49.88064989274' lon='12.32196506929' />
-                  <node id='-25361' changeset='-1' lat='49.88237537717' lon='12.32196506929' />
-                  <node id='-25364' changeset='-1' lat='49.88488281818' lon='12.32196506929' />
-                  <way id='-663' changeset='-1'>
-                    <nd ref='-25361' />
+                  <node id='-25364' changeset='-1' lat='49.88391203301' lon='12.32100867214' />
+                  <node id='-25363' changeset='-1' lat='49.88344292461' lon='12.31757273382' />
+                  <node id='-25361' changeset='-1' lat='49.88225125607' lon='12.32115595486' />
+                  <node id='-25360' changeset='-1' lat='49.88220160258' lon='12.32481623442' />
+                  <node id='-25359' changeset='-1' lat='49.88582617344' lon='12.32489329293' />
+                  <node id='-25358' changeset='-1' lat='49.88572687375' lon='12.32084772079' />
+                  <node id='-25401' changeset='-1' lat='49.88348259962' lon='12.31321296609' />
+                  <way id='-667' changeset='-1'>
+                    <nd ref='-25401' />
+                    <nd ref='-25363' />
                     <nd ref='-25364' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM00000000' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM0000000020251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
+                    <tag k='art' v='1460' />
+                  </way>
+                  <way id='-700' changeset='-1'>
+                    <nd ref='-25363' />
+                    <nd ref='-25364' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Bahnstrecke' />
                     <tag k='bahnkategorie' v='1100' />
@@ -149,29 +163,36 @@ class DE_53008_G_b_003_F_b_003 extends DatabaseIntegrationTest {
                     <tag k='anzahlDerStreckengleise' v='1000' />
                     <tag k='spurweite' v='1000' />
                   </way>
-                  <way id='-600' changeset='-1'>
-                    <nd ref='-25364' />
+                  <way id='-663' changeset='-1'>
+                    <nd ref='-25358' />
+                    <nd ref='-25359' />
+                    <nd ref='-25360' />
                     <nd ref='-25361' />
-                    <nd ref='-25362' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
+                    <nd ref='-25364' />
+                    <nd ref='-25358' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
-                    <tag k='art' v='1460' />
+                    <tag k='object_type' v='AX_Hafenbecken' />
                   </way>
-                  <relation id='-60' changeset='-1'>
-                    <member type='node' ref='-663' role='' />
+                  <relation id='-70' changeset='-1'>
+                    <member type='way' ref='-663' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
-                  <relation id='-80' changeset='-1'>
-                    <member type='way' ref='-600' role='' />
+                  <relation id='-60' changeset='-1'>
+                    <member type='way' ref='-667' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
+                  <relation id='-50' changeset='-1'>
+                    <member type='way' ref='-700' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
                   <relation id='-100' changeset='-1'>
-                    <member type='way' ref='-663' role='over' />
-                    <member type='way' ref='-600' role='under' />
+                    <member type='way' ref='-667' role='over' />
+                    <member type='way' ref='-700' role='under' />
                     <tag k='object_type' v='AA_hatDirektUnten' />
                   </relation>
                 </create>

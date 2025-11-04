@@ -241,7 +241,15 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
             if (referenceOuterBoundary.coveredBy(unionCandidate.getGeometry())) {
                 for (Feature candidate : candidates) {
                     if (candidate.getGeometry().intersects(referenceOuterBoundary)) {
-                        result.add(candidate);
+                        if (dataSetFilter.aggregator() != null) {
+                            for (Feature nonAggregateCandidate : nonAggregateCandidates) {
+                                if (referenceGeometry.getGeometry().intersects(nonAggregateCandidate.getGeometry())) {
+                                    result.add(nonAggregateCandidate);
+                                }
+                            }
+                        } else {
+                            result.add(candidate);
+                        }
                     }
                 }
             }
@@ -282,7 +290,7 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
                 (dataSetFilter != null) ? dataSetFilter.ignoreChangesetData() : null,
                 (dataSetFilter != null) ? dataSetFilter.coordinateReferenceSystem() : null,
                 (dataSetFilter != null) ? dataSetFilter.aggregator() : null,
-                null,
+                (dataSetFilter != null) ? dataSetFilter.osmIds() : null,
                 (dataSetFilter == null || dataSetFilter.criteria() == null) ? boundingBoxLeaf : new All(List.of(dataSetFilter.criteria(), boundingBoxLeaf)),
                 (dataSetFilter != null) ? dataSetFilter.memberFilter() : null);
     }

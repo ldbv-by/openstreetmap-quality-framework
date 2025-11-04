@@ -7,7 +7,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
         "checks": {
             "type": "spatial_compare",
             "operator": "covered_by",
-            "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Fliessgewaesser|AX_Hafenbecken|AX_StehendesGewaesser||AX_Meer" } } }
+            "data_set_filter": { "criteria": { "type": "tag_in", "tag_key": "object_type", "values": ["AX_Fliessgewaesser", "AX_Hafenbecken", "AX_StehendesGewaesser", "AX_Meer" ] } }
         }
     }',
     'Ein ''AX_Gewaessermerkmal'' mit ''art'' 1630, 1640, 1650, 1660 oder 1700 liegen innerhalb eines ''AX_Fliessgewaesser'', ''AX_Hafenbecken'', ''AX_StehendesGewaesser'' oder ''AX_Meer''.')

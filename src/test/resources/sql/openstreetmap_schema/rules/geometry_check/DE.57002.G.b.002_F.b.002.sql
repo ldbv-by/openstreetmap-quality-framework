@@ -1,5 +1,5 @@
 INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error_text) VALUES (
-    'DE.57002.G.b.002',
+    'DE.57002.G.b.002_F.b.002',
     'geometry-check',
     'AX_SchifffahrtslinieFaehrverkehr',
     '{
@@ -14,11 +14,6 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                 "checks": {
                     "any": [
                         {
-                            "type": "spatial_compare",
-                            "operator": "touches",
-                            "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_EinrichtungenFuerDenSchiffsverkehr", "art": "1460" } } }
-                        },
-                        {
                             "all": [
                                 { "type": "tag_equals", "tag_key": "object_type", "value": "AX_EinrichtungenFuerDenSchiffsverkehr" },
                                 { "type": "tag_equals", "tag_key": "art", "value": "1460" }
@@ -27,12 +22,25 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                         {
                             "type": "spatial_compare",
                             "operator": "touches",
-                            "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Gebietsgrenze", "artDerGebietsgrenze": "7101|7102" } } }
-                        },
-                        {
-                            "type": "spatial_compare",
-                            "operator": "touches",
-                            "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_SchifffahrtslinieFaehrverkehr" } } }
+                            "data_set_filter": {
+                                "criteria": {
+                                    "any": [
+                                        {
+                                            "all": [
+                                                { "type": "tag_equals", "tag_key": "object_type", "value": "AX_EinrichtungenFuerDenSchiffsverkehr" },
+                                                { "type": "tag_equals", "tag_key": "art", "value": "1460" }
+                                            ]
+                                        },
+                                        {
+                                            "all": [
+                                                { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Gebietsgrenze" },
+                                                { "type": "tag_in", "tag_key": "artDerGebietsgrenze", "values": ["7101", "7102"] }
+                                            ]
+                                        },
+                                        {   "type": "tag_equals", "tag_key": "object_type", "value": "AX_SchifffahrtslinieFaehrverkehr" }
+                                    ]
+                                }
+                            }
                         }
                     ]
                 }

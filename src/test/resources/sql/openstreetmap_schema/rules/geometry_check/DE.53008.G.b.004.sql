@@ -5,22 +5,23 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
     '{
         "conditions": { "type": "tag_equals", "tag_key": "art", "value": "1470" },
         "checks": {
-            "all": [
-                {
-                    "not": {
-                        "type": "spatial_compare",
-                        "operators": ["covered_by", "intersects"],
-                        "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Hafenbecken" } } }
-                    }
-                },
-                {
-                    "not": {
-                        "type": "spatial_compare",
-                        "operators": ["covered_by", "intersects"],
-                        "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_SonstigesRecht", "artDerFestlegung": "9450" } } }
+            "not": {
+                "type": "spatial_compare",
+                "operators": ["covered_by", "intersects"],
+                "data_set_filter": {
+                    "criteria": {
+                        "all": [
+                            { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Hafenbecken" },
+                            {
+                                "all": [
+                                    { "type": "tag_equals", "tag_key": "object_type", "value": "AX_SonstigesRecht" },
+                                    { "type": "tag_equals", "tag_key": "artDerFestlegung", "value": "9450" }
+                                ]
+                            }
+                        ]
                     }
                 }
-            ]
+            }
         }
     }',
     'Ein Wasserliegeplatz darf nicht in ''AX_Hafenbecken'' oder ''AX_SonstigesRecht'' mit ''artDerFestlegung'' 9450 liegen oder schneiden.')

@@ -14,12 +14,31 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                 {
                     "type": "spatial_compare",
                     "operator": "covered_by",
-                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Fliessgewaesser", "funktion": "8230|not_exists" } } }
+                    "data_set_filter": {
+                        "criteria": {
+                            "all": [
+                                { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Fliessgewaesser" },
+                                {
+                                    "any": [
+                                        { "type": "tag_equals", "tag_key": "funktion", "value": "8230" },
+                                        { "not": { "type": "tag_exists", "tag_key": "funktion" } }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
                 },
                 {
                     "type": "spatial_compare",
                     "operator": "equals_topo",
-                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Gewaesserachse", "funktion": "not_exists" } } }
+                    "data_set_filter": {
+                        "criteria": {
+                            "all": [
+                                { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Gewaesserachse" },
+                                { "not": { "type": "tag_exists", "tag_key": "funktion" } }
+                            ]
+                        }
+                    }
                 }
             ]
         }

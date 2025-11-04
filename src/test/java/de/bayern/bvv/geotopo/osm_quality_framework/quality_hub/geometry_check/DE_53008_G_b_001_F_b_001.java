@@ -48,8 +48,8 @@ class DE_53008_G_b_001_F_b_001 extends DatabaseIntegrationTest {
                   <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
                   <node id='-25359' changeset='-1' lat='49.88413518675' lon='12.32447493031' />
                   <node id='-25358' changeset='-1' lat='49.8841101097' lon='12.31855920723'>
-                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
                     <tag k='art' v='1460' />
@@ -64,62 +64,6 @@ class DE_53008_G_b_001_F_b_001 extends DatabaseIntegrationTest {
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Hafenbecken' />
-                  </way>
-                  <relation id='-70' changeset='-1'>
-                    <member type='way' ref='-663' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
-                  <relation id='-60' changeset='-1'>
-                    <member type='node' ref='-25358' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
-                </create>
-                </osmChange>
-                """;
-
-        // Act
-        MvcResult mvcResult = this.mockMvc.perform(
-                        post("/osm-quality-framework/v1/quality-hub/check/changeset/{id}", CHANGESET_ID)
-                                .contentType(MediaType.APPLICATION_XML)
-                                .content(CHANGESET_XML))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andReturn();
-
-        QualityHubResultDto qualityHubResultDto = this.objectMapper.readValue(mvcResult.getResponse().getContentAsByteArray(), QualityHubResultDto.class);
-
-        // Assert
-        assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
-        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result to be valid, but it was invalid.").isTrue();
-    }
-
-    @Test
-    void createAnlegerBeruehrtHafendamm() throws Exception {
-        // Arrange
-        final Long CHANGESET_ID = 1L;
-        final String CHANGESET_XML = """
-                <osmChange version="0.6" generator="JOSM">
-                <create>
-                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
-                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
-                  <node id='-25359' changeset='-1' lat='49.88413518675' lon='12.32447493031' />
-                  <node id='-25358' changeset='-1' lat='49.8841101097' lon='12.31855920723'>
-                    <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
-                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
-                    <tag k='art' v='1460' />
-                  </node>
-                  <way id='-663' changeset='-1'>
-                    <nd ref='-25358' />
-                    <nd ref='-25359' />
-                    <tag k='identifikator:UUID' v='DEBYBDLM11111111' />
-                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1111111120251014T125300Z' />
-                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_BauwerkImGewaesserbereich' />
-                    <tag k='bauwerksfunktion' v='2133' />
                   </way>
                   <relation id='-70' changeset='-1'>
                     <member type='way' ref='-663' role='' />

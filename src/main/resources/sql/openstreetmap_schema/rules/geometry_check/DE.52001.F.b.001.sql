@@ -7,7 +7,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
             "not": {
                 "type": "spatial_compare",
                 "operator": "overlaps",
-                "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Ortslage" } } }
+                "data_set_filter": { "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Ortslage" } }
             }
         }
     }',

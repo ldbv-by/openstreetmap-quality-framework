@@ -14,12 +14,19 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                 {
                     "type": "spatial_compare",
                     "operator": "covered_by_boundary",
-                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Fliessgewaesser|AX_Hafenbecken|AX_StehendesGewaesser|AX_Meer" } } }
+                    "data_set_filter": { "criteria": { "type": "tag_in", "tag_key": "object_type", "values": [ "AX_Fliessgewaesser", "AX_Hafenbecken", "AX_StehendesGewaesser", "AX_Meer" ] } }
                 },
                 {
                     "type": "spatial_compare",
                     "operator": "covered_by",
-                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_BauwerkImGewaesserbereich", "bauwerksfunktion": "2133" } } }
+                    "data_set_filter": {
+                        "criteria": {
+                            "all": [
+                                { "type": "tag_equals", "tag_key": "object_type", "value": "AX_BauwerkImGewaesserbereich" },
+                                { "type": "tag_equals", "tag_key": "bauwerksfunktion", "value": "2133" }
+                            ]
+                        }
+                    }
                 }
             ]
         }

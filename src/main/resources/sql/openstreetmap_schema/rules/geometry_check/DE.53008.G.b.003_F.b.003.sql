@@ -21,7 +21,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                     "type": "spatial_compare",
                                     "reference_feature_role": "over",
                                     "operator": "equals_topo",
-                                    "data_set_filter": { "featureFilter": { "role": "under" } },
+                                    "data_set_filter": { "memberFilter": { "role": "under" } },
                                     "self_check": true
                                 }
                             }
@@ -38,7 +38,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                     "type": "spatial_compare",
                                     "reference_feature_role": "over",
                                     "operator": "contains",
-                                    "data_set_filter": { "featureFilter": { "role": "under" } },
+                                    "data_set_filter": { "memberFilter": { "role": "under" } },
                                     "self_check": true
                                 }
                             }

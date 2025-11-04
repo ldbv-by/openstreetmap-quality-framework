@@ -27,19 +27,20 @@ public class RuleAlias {
 
         // Add osm id of tagged object
         if (selfCheck) {
+            nodeIds = new HashSet<>();
+            wayIds = new HashSet<>();
+            areaIds = new HashSet<>();
+            relationIds = new HashSet<>();
+
             if (taggedObject instanceof Feature feature) {
                 if (feature.getGeometry() instanceof Point) {
-                    if (nodeIds == null) nodeIds = new HashSet<>();
                     nodeIds.add(feature.getOsmId());
                 } else if (feature.getGeometry() instanceof LineString) {
-                    if (wayIds == null) wayIds = new HashSet<>();
                     wayIds.add(feature.getOsmId());
                 } else if (feature.getGeometry() instanceof Polygon) {
-                    if (areaIds == null) areaIds = new HashSet<>();
                     areaIds.add(feature.getOsmId());
                 }
             } else if (taggedObject instanceof Relation relation) {
-                if (relationIds == null) relationIds = new HashSet<>();
                 relationIds.add(relation.getOsmId());
             }
         }

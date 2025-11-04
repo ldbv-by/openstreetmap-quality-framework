@@ -14,17 +14,29 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                 {
                     "type": "spatial_compare",
                     "operator": "touches",
-                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Fliessgewaesser|AX_Hafenbecken|AX_StehendesGewaesser|AX_Meer" } } }
+                    "data_set_filter": { "criteria": { "type": "tag_in", "tag_key": "object_type", "values": [ "AX_Fliessgewaesser", "AX_Hafenbecken", "AX_StehendesGewaesser", "AX_Meer" ] } }
                 },
                 {
                     "type": "spatial_compare",
                     "operator": "intersects",
-                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_EinrichtungenFuerDenSchiffsverkehr", "art": "1460" } } }
-                },
-                {
-                    "type": "spatial_compare",
-                    "operator": "intersects",
-                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_BauwerkImGewaesserbereich", "art": "2133" } } }
+                    "data_set_filter": {
+                        "criteria": {
+                            "any": [
+                                {
+                                    "all": [
+                                        { "type": "tag_equals", "tag_key": "object_type", "value": "AX_EinrichtungenFuerDenSchiffsverkehr" },
+                                        { "type": "tag_equals", "tag_key": "art", "value": "1460" }
+                                    ]
+                                },
+                                {
+                                    "all": [
+                                        { "type": "tag_equals", "tag_key": "object_type", "value": "AX_BauwerkImGewaesserbereich" },
+                                        { "type": "tag_equals", "tag_key": "art", "value": "2133" }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
                 }
             ]
         }

@@ -30,7 +30,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                         {
                             "all": [
                                 { "type": "tag_equals", "tag_key": "object_type", "value": "AX_SonstigesRecht" },
-                                { "type": "tag_equals", "tag_key": "funktion", "value": "4720" }
+                                { "type": "tag_equals", "tag_key": "artDerFestlegung", "value": "4720" }
                             ]
                         }
                     ]

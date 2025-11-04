@@ -22,15 +22,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * AdV-Beschreibung:
- * Start- oder Endpunkt von 'SchifffahrtslinieFährverkehr' kann nur an einem Objekt
- * 53008 'Einrichtung für den Schiffsverkehr' mit ART 1460 'Anleger' oder 75009 'Gebietsgrenze' mit AGZ 7101
- * 'Grenze der Bundesrepublik Deutschland' oder 7102 'Grenze des Bundeslandes' oder mit einem weiteren
- * Objekt 'SchifffahrtslinieFährverkehr' vorkommen.
+ * SchifffahrtslinieFährverkehr' liegt immer innerhalb eines Objektes 44001 'Fließgewässer',
+ * 44005 'Hafenbecken', 44006 'StehendesGewässer' oder 44007 'Meer'.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(JacksonConfiguration.class)
-class DE_57002_G_b_002 extends DatabaseIntegrationTest {
+class DE_57002_G_b_001_F_b_001 extends DatabaseIntegrationTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -39,7 +37,7 @@ class DE_57002_G_b_002 extends DatabaseIntegrationTest {
     ObjectMapper objectMapper;
 
     @Test
-    void createSchifffahrtslinieMitGebietsgrenzeUndMitAnleger() throws Exception {
+    void createSchifffahrtslinieAufHafenbecken() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
@@ -156,7 +154,7 @@ class DE_57002_G_b_002 extends DatabaseIntegrationTest {
     }
 
     @Test
-    void createSchifffahrtslinieMitGebietsgrenzeOhneAnleger() throws Exception {
+    void createSchifffahrtslinieOhneHafenbecken() throws Exception {
         // Arrange
         final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
@@ -171,7 +169,13 @@ class DE_57002_G_b_002 extends DatabaseIntegrationTest {
                 		<node id="-26" lon="12.331190490657235" lat="49.87970510663869" version="0"/>
                 		<node id="-27" lon="12.33118579739293" lat="49.879026158918776" version="0"/>
                 		<node id="-28" lon="12.3301343014536" lat="49.879045445183195" version="0"/>
-                		<node id="-25" lon="12.33021649328921" lat="49.87970990764771" version="0" />
+                		<node id="-25" lon="12.33021649328921" lat="49.87970990764771" version="0">
+                            <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
+                            <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
+                            <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                            <tag k='object_type' v='AX_EinrichtungenFuerDenSchiffsverkehr' />
+                            <tag k='art' v='1460' />
+                		</node>
                 		<way id="-4" version="0">
                 			<nd ref="-13"/>
                 			<nd ref="-14"/>
@@ -186,6 +190,7 @@ class DE_57002_G_b_002 extends DatabaseIntegrationTest {
                             <tag k='identifikator:UUID' v='DEBYBDLM00000000' />
                             <tag k='identifikator:UUIDundZeit' v='DEBYBDLM0000000020251014T125300Z' />
                             <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                            <tag k='admin_level' v='4' />
                             <tag k="boundary" v="administrative"/>
                             <tag k="admin_level" v="4"/>
                 		</way>
@@ -207,22 +212,6 @@ class DE_57002_G_b_002 extends DatabaseIntegrationTest {
                             <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                             <tag k='art' v='1740' />
                 		</way>
-                		<way id="-7" version="0">
-                			<nd ref="-25"/>
-                			<nd ref="-26"/>
-                			<nd ref="-27"/>
-                			<nd ref="-28"/>
-                			<nd ref="-25"/>
-                			<tag k="object_type" v="AX_Hafenbecken"/>
-                			<tag k='identifikator:UUID' v='DEBYBDLM33333333' />
-                            <tag k='identifikator:UUIDundZeit' v='DEBYBDLM3333333320251014T125300Z' />
-                            <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                		</way>
-                		<relation id='-1' changeset='-1'>
-                            <member type='way' ref='-7' role='' />
-                            <tag k='advStandardModell' v='Basis-DLM' />
-                            <tag k='object_type' v='AA_modellart' />
-                        </relation>
                         <relation id='-2' changeset='-1'>
                             <member type='way' ref='-6' role='' />
                             <tag k='advStandardModell' v='Basis-DLM' />
@@ -235,6 +224,11 @@ class DE_57002_G_b_002 extends DatabaseIntegrationTest {
                         </relation>
                         <relation id='-4' changeset='-1'>
                             <member type='way' ref='-4' role='' />
+                            <tag k='advStandardModell' v='Basis-DLM' />
+                            <tag k='object_type' v='AA_modellart' />
+                        </relation>
+                        <relation id='-5' changeset='-1'>
+                            <member type='node' ref='-25' role='' />
                             <tag k='advStandardModell' v='Basis-DLM' />
                             <tag k='object_type' v='AA_modellart' />
                         </relation>
@@ -273,6 +267,6 @@ class DE_57002_G_b_002 extends DatabaseIntegrationTest {
         assertThat(geometryCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'geometry-check'")
-                .contains("Der Start- und Endpunkt von 'AX_SchifffahrtslinieFaehrverkehr' liegt immer an 'AX_EinrichtungenFuerDenSchiffsverkehr' mit 'art' 1460 , 'AX_Gebietsgrenze' mit 'artDerGebietsgrenze' 7101 oder 7102 oder einem weiteren Objekt 'AX_SchifffahrtslinieFaehrverkehr'.");
+                .contains("Ein Objekt 'AX_SchifffahrtslinieFaehrverkehr' liegt immer innerhalb einem Objekt 'AX_Fliessgewaesser', 'AX_Hafenbecken', 'AX_StehendesGewaesser' oder 'AX_Meer'.");
     }
 }

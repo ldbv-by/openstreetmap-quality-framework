@@ -10,18 +10,26 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
             ]
         },
         "checks": {
-            "any": [
-                {
-                    "type": "spatial_compare",
-                    "operator": "covered_by",
-                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_UnlandVegetationsloseFlaeche", "funktion": "1100" } } }
-                },
-                {
-                    "type": "spatial_compare",
-                    "operator": "covered_by",
-                    "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_IndustrieUndGewerbeflaeche", "funktion": "2530" } } }
+            "type": "spatial_compare",
+            "operator": "covered_by",
+            "data_set_filter": {
+                "criteria": {
+                    "any": [
+                        {
+                            "all": [
+                                { "type": "tag_equals", "tag_key": "object_type", "value": "AX_UnlandVegetationsloseFlaeche" },
+                                { "type": "tag_equals", "tag_key": "funktion", "value": "1100" }
+                            ]
+                        },
+                        {
+                            "all": [
+                                { "type": "tag_equals", "tag_key": "object_type", "value": "AX_IndustrieUndGewerbeflaeche" },
+                                { "type": "tag_equals", "tag_key": "funktion", "value": "2530" }
+                            ]
+                        }
+                    ]
                 }
-            ]
+            }
         }
     }',
     'Ein flächenförmiges Objekt ''AX_BauwerkImGewaesserbereich'' mit ''bauwerksfunktion'' 2030 bis 2040 liegt immer auf einer ''AX_UnlandVegetationsloseFlaeche'' mit ''funktion'' 1100 oder ''AX_IndustrieUndGewerbeflaeche'' mit ''funktion'' 2530.')

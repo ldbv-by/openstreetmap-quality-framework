@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(JacksonConfiguration.class)
-class DE_44002_A_c_001 extends DatabaseIntegrationTest {
+class DE_44002_A_c_001_57003_F_b_002 extends DatabaseIntegrationTest {
 
     @Autowired
     MockMvc mockMvc;
