@@ -62,6 +62,7 @@ class DE_53002_A_b_001_003 extends DatabaseIntegrationTest {
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM4444444420251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Strassenachse' />
+                    <tag k='breiteDerFahrbahn' v='9' />
                   </way>
                   <relation id='-80' changeset='-1'>
                     <member type='way' ref='-802' role='' />

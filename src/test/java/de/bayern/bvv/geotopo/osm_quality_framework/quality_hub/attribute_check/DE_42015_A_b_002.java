@@ -59,6 +59,11 @@ class DE_42015_A_b_002 extends DatabaseIntegrationTest {
                     <tag k='object_type' v='AX_Flugverkehr' />
                     <tag k='art' v='5511' />
                     <tag k='nutzung' v='1000' />
+                    <tag k='name:unverschluesselt' v='Flughafen' />
+                    <tag k='name:verschluesselt:land' v='09' />
+                    <tag k='name:verschluesselt:kreis' v='72' />
+                    <tag k='name:verschluesselt:gemeinde' v='116' />
+                    <tag k='name:verschluesselt:lage' v='01' />
                   </way>
                   <relation id='-70' changeset='-1'>
                     <member type='way' ref='-663' role='' />
@@ -92,10 +97,14 @@ class DE_42015_A_b_002 extends DatabaseIntegrationTest {
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
-                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
-                  <node id='-25359' changeset='-1' lat='49.88413518675' lon='12.32447493031' />
-                  <node id='-25358' changeset='-1' lat='49.8841101097' lon='12.31855920723' />
+                  <node id='-25497' changeset='-1' lat='49.88701683125' lon='12.33093764471' />
+                  <node id='-25496' changeset='-1' lat='49.88134976967' lon='12.33118195619' />
+                  <node id='-25495' changeset='-1' lat='49.88128679858' lon='12.32038338894' />
+                  <node id='-25494' changeset='-1' lat='49.88685942186' lon='12.32023680205' />
+                  <node id='-25361' changeset='-1' lat='49.88225125607' lon='12.32115595486' />
+                  <node id='-25360' changeset='-1' lat='49.88220160258' lon='12.32481623442' />
+                  <node id='-25359' changeset='-1' lat='49.88582617344' lon='12.32489329293' />
+                  <node id='-25358' changeset='-1' lat='49.88572687375' lon='12.32084772079' />
                   <way id='-663' changeset='-1'>
                     <nd ref='-25358' />
                     <nd ref='-25359' />
@@ -106,11 +115,34 @@ class DE_42015_A_b_002 extends DatabaseIntegrationTest {
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Flugverkehr' />
-                    <tag k='funktion' v='1200' />
                     <tag k='istWeitereNutzung' v='1000' />
+                    <tag k='funktion' v='1200' />
+                  </way>
+                  <way id='-793' changeset='-1'>
+                    <nd ref='-25494' />
+                    <nd ref='-25495' />
+                    <nd ref='-25496' />
+                    <nd ref='-25497' />
+                    <nd ref='-25494' />
+                    <tag k='identifikator:UUID' v='DEBYBDLM12345677' />
+                    <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567720251014T125300Z' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_Flugverkehr' />
+                    <tag k='art' v='5511' />
+                    <tag k='nutzung' v='1000' />
+                    <tag k='name:unverschluesselt' v='Flughafen' />
+                    <tag k='name:verschluesselt:land' v='09' />
+                    <tag k='name:verschluesselt:kreis' v='72' />
+                    <tag k='name:verschluesselt:gemeinde' v='116' />
+                    <tag k='name:verschluesselt:lage' v='01' />
                   </way>
                   <relation id='-70' changeset='-1'>
                     <member type='way' ref='-663' role='' />
+                    <tag k='advStandardModell' v='Basis-DLM' />
+                    <tag k='object_type' v='AA_modellart' />
+                  </relation>
+                  <relation id='-65' changeset='-1'>
+                    <member type='way' ref='-793' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -156,6 +188,11 @@ class DE_42015_A_b_002 extends DatabaseIntegrationTest {
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Flugverkehr' />
                     <tag k='art' v='5511' />
+                    <tag k='name:unverschluesselt' v='Flughafen' />
+                    <tag k='name:verschluesselt:land' v='09' />
+                    <tag k='name:verschluesselt:kreis' v='72' />
+                    <tag k='name:verschluesselt:gemeinde' v='116' />
+                    <tag k='name:verschluesselt:lage' v='01' />
                   </way>
                   <relation id='-70' changeset='-1'>
                     <member type='way' ref='-663' role='' />

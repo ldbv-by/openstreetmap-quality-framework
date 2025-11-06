@@ -57,6 +57,7 @@ class DE_42003_B_c_001 extends DatabaseIntegrationTest {
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Strassenachse' />
                     <tag k='breiteDesVerkehrsweges' v='6' />
+                    <tag k='breiteDerFahrbahn' v='9' />
                   </way>
                   <relation id='-81' changeset='-1'>
                     <member type='way' ref='-1308' role='' />
@@ -113,6 +114,7 @@ class DE_42003_B_c_001 extends DatabaseIntegrationTest {
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Strassenachse' />
                     <tag k='breiteDesVerkehrsweges' v='18' />
+                    <tag k='breiteDerFahrbahn' v='9' />
                   </way>
                   <relation id='-81' changeset='-1'>
                     <member type='way' ref='-1308' role='' />
@@ -169,6 +171,7 @@ class DE_42003_B_c_001 extends DatabaseIntegrationTest {
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
                     <tag k='object_type' v='AX_Strassenachse' />
                     <tag k='breiteDesVerkehrsweges' v='2' />
+                    <tag k='breiteDerFahrbahn' v='9' />
                   </way>
                   <relation id='-81' changeset='-1'>
                     <member type='way' ref='-1308' role='' />

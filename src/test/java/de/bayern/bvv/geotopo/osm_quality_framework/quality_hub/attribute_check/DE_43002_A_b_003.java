@@ -59,6 +59,7 @@ class DE_43002_A_b_003 extends DatabaseIntegrationTest {
                     <tag k='nutzung' v='3000' />
                     <tag k='zustand' v='6100' />
                     <tag k='name' v='Waldbestattungsflaeche' />
+                    <tag k='vegatationsmerkmal' v='1100' />
                   </way>
                   <relation id='-70' changeset='-1'>
                     <member type='way' ref='-663' role='' />
@@ -108,6 +109,7 @@ class DE_43002_A_b_003 extends DatabaseIntegrationTest {
                     <tag k='object_type' v='AX_Wald' />
                     <tag k='zustand' v='6100' />
                     <tag k='name' v='Waldbestattungsflaeche' />
+                    <tag k='vegatationsmerkmal' v='1100' />
                   </way>
                   <relation id='-70' changeset='-1'>
                     <member type='way' ref='-663' role='' />

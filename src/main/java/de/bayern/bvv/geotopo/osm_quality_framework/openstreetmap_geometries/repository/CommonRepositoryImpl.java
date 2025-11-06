@@ -174,58 +174,116 @@ public class CommonRepositoryImpl<T> {
             }
 
             case "relation_exists": {
-                String objectType = (String) params.get("object_type");
+                String relationObjectType = ((String) params.get("object_type"));
+                @SuppressWarnings("unchecked")
+                Map<String, Object> memberFilter = (Map<String, Object>) params.get("member_filter");
 
-                if (objectType == null || objectType.isBlank()) {
-                    throw new IllegalArgumentException(type + ": 'object_type' is required.");
+                String memberRole = null;
+                String memberObjectType = null;
+                if (memberFilter != null) {
+                    memberRole = (String) memberFilter.get("role");
+                    memberObjectType = (String) memberFilter.get("object_type");
                 }
 
-                // EXISTS(
-                //   SELECT 1
-                //   FROM changeset_data.relation_members rm
-                //   JOIN changeset_data.relations r ON r.osm_id = rm.relation_osm_id
-                //   WHERE r.object_type = :objectType
-                //     AND rm.member_type = :('n'|'w'|'r')
-                //     AND rm.member_osm_id = :currentOsmId
-                //     [AND rm.changeset_id = :root_changeset_id]
-                // )
+                if (relationObjectType == null || relationObjectType.isBlank()) {
+                    throw new IllegalArgumentException("relation_exists: 'object_type' (for relation) is required.");
+                }
+
+                // EXISTS subquery
                 Subquery<Long> sub = criteriaQuery.subquery(Long.class);
 
                 Root<RelationMemberEntity> rm = sub.from(RelationMemberEntity.class);
-                Root<de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.RelationEntity> r = sub.from(de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.RelationEntity.class);
+                Root<de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.RelationEntity>       rel = sub.from(de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.RelationEntity.class);
 
-                List<Predicate> subPredicates = new ArrayList<>();
+                // Kandidaten-Roots für das Mitglied
+                Root<de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.NodeEntity>     n  = sub.from(de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.NodeEntity.class);
+                Root<de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.WayEntity>      w  = sub.from(de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.WayEntity.class);
+                Root<de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.AreaEntity>     a  = sub.from(de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.AreaEntity.class);
+                Root<de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.RelationEntity> rr = sub.from(de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.RelationEntity.class);
+
+                List<Predicate> subPs = new ArrayList<>();
 
                 // r.osm_id = rm.relation_osm_id
                 Path<Long> rmRelationOsmId = rm.get("memberId").get("relationOsmId");
-                subPredicates.add(criteriaBuilder.equal(r.get("osmId"), rmRelationOsmId));
+                subPs.add(criteriaBuilder.equal(rel.get("osmId"), rmRelationOsmId));
 
-                // r.object_type = :objectType
-                subPredicates.add(criteriaBuilder.equal(criteriaBuilder.lower(r.get("objectType")), objectType));
+                // r.object_type = :relationObjectType
+                subPs.add(criteriaBuilder.equal(criteriaBuilder.lower(rel.get("objectType")),
+                        relationObjectType.toLowerCase()));
 
                 // rm.member_osm_id = :currentOsmId
                 Path<Long> rmMemberOsmId = rm.get("memberId").get("memberOsmId");
-                subPredicates.add(criteriaBuilder.equal(rmMemberOsmId, root.get("osmId")));
+                subPs.add(criteriaBuilder.equal(rmMemberOsmId, root.get("osmId")));
 
-                // rm.member_type
+                // rm.member_type passend zum Root (wie bisher)
                 if (de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.NodeEntity.class.isAssignableFrom(entityType)) {
-                    subPredicates.add(criteriaBuilder.equal(criteriaBuilder.lower(rm.get("memberId").get("memberType")), "n"));
+                    subPs.add(criteriaBuilder.equal(criteriaBuilder.lower(rm.get("memberId").get("memberType")), "n"));
                 } else if (de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.WayEntity.class.isAssignableFrom(entityType)) {
-                    subPredicates.add(criteriaBuilder.equal(criteriaBuilder.lower(rm.get("memberId").get("memberType")), "w"));
+                    subPs.add(criteriaBuilder.equal(criteriaBuilder.lower(rm.get("memberId").get("memberType")), "w"));
                 } else if (de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.RelationEntity.class.isAssignableFrom(entityType)) {
-                    subPredicates.add(criteriaBuilder.equal(criteriaBuilder.lower(rm.get("memberId").get("memberType")), "r"));
+                    subPs.add(criteriaBuilder.equal(criteriaBuilder.lower(rm.get("memberId").get("memberType")), "r"));
                 } else if (de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.entity.AreaEntity.class.isAssignableFrom(entityType)) {
-                    subPredicates.add(criteriaBuilder.equal(criteriaBuilder.lower(rm.get("memberId").get("memberType")),
+                    // Area kann aus 'w' oder 'r' stammen → wie bei dir:
+                    subPs.add(criteriaBuilder.equal(
+                            criteriaBuilder.lower(rm.get("memberId").get("memberType")),
                             criteriaBuilder.lower(root.get("osmGeometryType"))));
                 }
 
+                // optional: gleiches Changeset
                 try {
                     Path<Long> rootChangesetId = root.get("changeset").get("id");
-                    Path<Long> rmChangesetId = rm.get("changeset").get("id");
-                    subPredicates.add(criteriaBuilder.equal(rmChangesetId, rootChangesetId));
+                    Path<Long> rmChangesetId   = rm.get("changeset").get("id");
+                    subPs.add(criteriaBuilder.equal(rmChangesetId, rootChangesetId));
                 } catch (IllegalArgumentException ignored) {}
 
-                sub.select(r.get("osmId")).where(subPredicates.toArray(new Predicate[0]));
+                // optional: Rollenfilter
+                if (memberRole != null && !memberRole.isBlank()) {
+                    Path<String> rmRole = rm.get("memberId").get("memberRole");
+                    subPs.add(criteriaBuilder.equal(criteriaBuilder.lower(rmRole), memberRole.toLowerCase()));
+                }
+
+                // --- Mitglieds-ObjectType-Filter ---
+                // Falls kein member_object_type gefordert ist, brauchen wir keinen Join-OR-Block.
+                if (memberObjectType != null && !memberObjectType.isBlank()) {
+                    Expression<String> rmType = criteriaBuilder.lower(rm.get("memberId").get("memberType"));
+                    String memberObjTypeLc = memberObjectType.toLowerCase();
+
+                    Predicate nodeBranch = criteriaBuilder.and(
+                            criteriaBuilder.equal(rmType, "n"),
+                            criteriaBuilder.equal(n.get("osmId"), rmMemberOsmId),
+                            criteriaBuilder.equal(criteriaBuilder.lower(n.get("objectType")), memberObjTypeLc)
+                    );
+
+                    Predicate wayBranch = criteriaBuilder.and(
+                            criteriaBuilder.equal(rmType, "w"),
+                            criteriaBuilder.equal(w.get("osmId"), rmMemberOsmId),
+                            criteriaBuilder.equal(criteriaBuilder.lower(w.get("objectType")), memberObjTypeLc)
+                    );
+
+                    // Area kann 'w' oder 'r' als source-geom haben → matchen über osmGeometryType = rm.memberType
+                    Predicate areaBranch = criteriaBuilder.and(
+                            criteriaBuilder.or(
+                                    criteriaBuilder.equal(rmType, "w"),
+                                    criteriaBuilder.equal(rmType, "r")
+                            ),
+                            criteriaBuilder.equal(a.get("osmId"), rmMemberOsmId),
+                            criteriaBuilder.equal(
+                                    criteriaBuilder.lower(a.get("osmGeometryType")), rmType
+                            ),
+                            criteriaBuilder.equal(criteriaBuilder.lower(a.get("objectType")), memberObjTypeLc)
+                    );
+
+                    Predicate relBranch = criteriaBuilder.and(
+                            criteriaBuilder.equal(rmType, "r"),
+                            criteriaBuilder.equal(rr.get("osmId"), rmMemberOsmId),
+                            criteriaBuilder.equal(criteriaBuilder.lower(rr.get("objectType")), memberObjTypeLc)
+                    );
+
+                    // mind. ein Branch muss passen
+                    subPs.add(criteriaBuilder.or(nodeBranch, wayBranch, areaBranch, relBranch));
+                }
+
+                sub.select(rel.get("osmId")).where(subPs.toArray(new Predicate[0]));
                 return criteriaBuilder.exists(sub);
             }
 
