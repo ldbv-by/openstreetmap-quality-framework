@@ -1,5 +1,5 @@
 INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error_text) VALUES (
-    'DE.44002.A.c.001',
+    'DE.44002.A.c.001_57003.F.b.002',
     'attribute-check',
     'AX_Wasserlauf',
     '{

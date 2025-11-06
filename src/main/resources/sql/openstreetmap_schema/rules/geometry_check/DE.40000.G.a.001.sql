@@ -1,7 +1,7 @@
 INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error_text) VALUES (
     'DE.40000.G.a.001',
     'geometry-check',
-    'AX_Wohnbauflaeche', /*AX_TatsaechlicheNutzung',*/
+    'AX_Turm', /*AX_TatsaechlicheNutzung',*/
     '{
         "conditions": {
             "all": [

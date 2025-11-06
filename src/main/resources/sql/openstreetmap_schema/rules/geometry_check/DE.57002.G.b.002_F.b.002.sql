@@ -1,5 +1,5 @@
 INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error_text) VALUES (
-    'DE.57002.G.b.002',
+    'DE.57002.G.b.002_F.b.002',
     'geometry-check',
     'AX_SchifffahrtslinieFaehrverkehr',
     '{

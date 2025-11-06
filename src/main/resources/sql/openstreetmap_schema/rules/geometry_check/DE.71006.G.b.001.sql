@@ -9,41 +9,66 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                 {
                     "all": [
                         { "type": "geom_type", "value": "Point" },
-                        { "any": [
-                            { "type": "spatial_compare",
-                              "operator": "covered_by",
-                              "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Vegetationsmerkmal", "bewuchs": "1011|1012" } } }
-                            },
-                            { "type": "spatial_compare",
-                              "operator": "equals_topo",
-                              "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_FelsenFelsblockFelsnadel" } } }
-                            }
-                          ]
+                        {
+                            "any": [
+                                {
+                                    "type": "spatial_compare",
+                                    "operator": "covered_by",
+                                    "data_set_filter": {
+                                        "criteria": {
+                                            "all": [
+                                                { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Vegetationsmerkmal" },
+                                                { "type": "tag_in", "tag_key": "bewuchs", "values": ["1011", "1012"] }
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "spatial_compare",
+                                    "operator": "equals_topo",
+                                    "data_set_filter": {
+                                        "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AX_FelsenFelsblockFelsnadel" }
+                                    }
+                                }
+                            ]
                         }
                     ]
                 },
                 {
                     "all": [
                         { "type": "geom_type", "value": "LineString" },
-                        { "any": [
-                            { "type": "spatial_compare",
-                              "operator": "covered_by",
-                              "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Vegetationsmerkmal", "bewuchs": "1100|1210|1220|1230" } } }
-                            },
-                            { "type": "spatial_compare",
-                              "operator": "equals_topo",
-                              "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_FelsenFelsblockFelsnadel" } } }
-                            }
-                          ]
+                        {
+                            "any": [
+                                {
+                                    "type": "spatial_compare",
+                                    "operator": "covered_by",
+                                    "data_set_filter": {
+                                        "criteria": {
+                                            "all": [
+                                                { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Vegetationsmerkmal" },
+                                                { "type": "tag_in", "tag_key": "bewuchs", "values": ["1100", "1210", "1220", "1230"] }
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "spatial_compare",
+                                    "operator": "equals_topo",
+                                    "data_set_filter": {
+                                        "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AX_FelsenFelsblockFelsnadel" }
+                                    }
+                                }
+                            ]
                         }
                     ]
                 },
                 {
                     "all": [
                         { "type": "geom_type", "value": "Polygon" },
-                        { "type": "spatial_compare",
-                          "operator": "covered_by",
-                          "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_FelsenFelsblockFelsnadel" } } }
+                        {
+                            "type": "spatial_compare",
+                            "operator": "covered_by",
+                            "data_set_filter": { "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AX_FelsenFelsblockFelsnadel" } }
                         }
                     ]
                 }

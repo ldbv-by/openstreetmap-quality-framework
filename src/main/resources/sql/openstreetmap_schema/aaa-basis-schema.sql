@@ -181,7 +181,7 @@ INSERT INTO openstreetmap_schema.datatypes (datatype_id, datatype_type) VALUES
     /* ('Filter_Capabilities', 'COMPLEX'), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('NAS_Filter_Capabilities', 'DICTIONARY'), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('Angle', 'PRIMITIVE'), -- wird nicht in ATKIS Basis-DLM benötigt */
-    ('Real', 'PRIMITIVE'),
+    ('Real', 'PRIMITIVE')
     /* ('AP_HorizontaleAusrichtung', 'DICTIONARY'), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AP_VertikaleAusrichtung', 'DICTIONARY'), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AP_DateiTyp_3D', 'DICTIONARY'), -- wird nicht in ATKIS Basis-DLM benötigt */
@@ -211,7 +211,7 @@ INSERT INTO openstreetmap_schema.datatypes (datatype_id, datatype_type) VALUES
     /* ('GM_Curve', 'PRIMITIVE'), -- entspricht der Geometrie (bzw. den Nodes) in OSM */
     /* ('GM_PolyhedralSurface', 'PRIMITIVE'), -- entspricht der Geometrie (bzw. den Nodes) in OSM */
     /* ('GM_MultiSurface', 'PRIMITIVE'), -- entspricht der Geometrie (bzw. den Nodes) in OSM */
-    ('TS_Face', 'PRIMITIVE')
+    /* ('TS_Face', 'PRIMITIVE') -- entspricht der Geometrie (bzw. den Nodes) in OSM */
     /* ('AU_Geometrie', 'COMPLEX'), -- entspricht der Geometrie (bzw. den Nodes) in OSM */
     /* ('GM_Point', 'PRIMITIVE'), -- entspricht der Geometrie (bzw. den Nodes) in OSM */
     /* ('GM_MultiCurve', 'PRIMITIVE'), -- entspricht der Geometrie (bzw. den Nodes) in OSM */
@@ -467,8 +467,8 @@ INSERT INTO openstreetmap_schema.tags (object_type, tag_key, multiplicity, tag_d
     /* ('AD_Wertematrix', 'werte', '1', 'Sequence<Record>'), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AD_Wertematrix', 'werteReihenfolge', '0..1', 'CV_SequenceRule'), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AD_Wertematrix', 'startPunkt', '0..1', 'CV_GridCoordinate'), -- wird nicht in ATKIS Basis-DLM benötigt */
-    ('AA_PunktLinienThema', 'name', '1', 'CharacterString'),
-    ('TA_MultiSurfaceComponent', 'masche', '1..*', 'TS_Face')
+    ('AA_PunktLinienThema', 'name', '1', 'CharacterString')
+    /* ('TA_MultiSurfaceComponent', 'masche', '1..*', 'TS_Face') -- entspricht der Geometrie (bzw. den Nodes) in OSM */
     /* ('AU_Punktobjekt', 'position', '1', 'GM_Point'), -- entspricht der Geometrie (bzw. den Nodes) in OSM */
     /* ('AU_Linienobjekt', 'position', '1', 'GM_MultiCurve'), -- entspricht der Geometrie (bzw. den Nodes) in OSM */
     /* ('AU_KontinuierlichesLinienobjekt', 'position', '1', 'AA_Liniengeometrie'), -- entspricht der Geometrie (bzw. den Nodes) in OSM */
