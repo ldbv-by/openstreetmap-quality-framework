@@ -27,8 +27,20 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                         },
                                         {
                                             "any": [
-                                                { "not": { "type": "relation_exists", "object_type": "AA_hatDirektUnten" } },
-                                                { "type": "relation_exists", "object_type": "AA_hatDirektUnten", "member_filter": { "object_type": "AX_DammWallDeich", "role": "under" } }
+                                                {
+                                                    "not": {
+                                                        "type": "relation_exists",
+                                                        "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" }
+                                                    }
+                                                },
+                                                {
+                                                    "type": "relation_exists",
+                                                    "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" },
+                                                    "relation_members": {
+                                                        "role": "under",
+                                                        "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AX_DammWallDeich" }
+                                                    }
+                                                }
                                             ]
                                         }
                                     ]
@@ -54,8 +66,20 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                         },
                                         {
                                             "any": [
-                                                { "not": { "type": "relation_exists", "object_type": "AA_hatDirektUnten" } },
-                                                { "type": "relation_exists", "object_type": "AA_hatDirektUnten", "member_filter": { "object_type": "AX_DammWallDeich", "role": "under" } }
+                                                {
+                                                    "not": {
+                                                        "type": "relation_exists",
+                                                        "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" }
+                                                    }
+                                                },
+                                                {
+                                                    "type": "relation_exists",
+                                                    "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" },
+                                                    "relation_members": {
+                                                        "role": "under",
+                                                        "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AX_DammWallDeich" }
+                                                    }
+                                                }
                                             ]
                                         }
                                     ]
@@ -78,8 +102,20 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                     },
                                     {
                                         "any": [
-                                            { "not": { "type": "relation_exists", "object_type": "AA_hatDirektUnten" } },
-                                            { "type": "relation_exists", "object_type": "AA_hatDirektUnten", "member_filter": { "object_type": "AX_DammWallDeich", "role": "under" } }
+                                            {
+                                                "not": {
+                                                    "type": "relation_exists",
+                                                    "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" }
+                                                }
+                                            },
+                                            {
+                                                "type": "relation_exists",
+                                                "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" },
+                                                "relation_members": {
+                                                    "role": "under",
+                                                    "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AX_DammWallDeich" }
+                                                }
+                                            }
                                         ]
                                     }
                                 ]
