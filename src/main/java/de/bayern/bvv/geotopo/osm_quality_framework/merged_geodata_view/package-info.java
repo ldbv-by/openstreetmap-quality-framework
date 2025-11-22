@@ -5,4 +5,4 @@
                 "quality_core::*"
         }
 )
-package de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider;
+package de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view;

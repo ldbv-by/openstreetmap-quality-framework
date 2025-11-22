@@ -12,15 +12,13 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.util.Cri
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.ExpressionFactory;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.util.RuleAlias;
-import de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.api.UnifiedDataProvider;
+import de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view.api.MergedGeodataView;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -30,7 +28,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ObjectExistsExpressionFactory implements ExpressionFactory {
 
-    private final UnifiedDataProvider unifiedDataProvider;
+    private final MergedGeodataView mergedGeodataView;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -44,7 +42,7 @@ public class ObjectExistsExpressionFactory implements ExpressionFactory {
 
         return (taggedObject, baseTaggedObject) -> {
             DataSetFilter preparedDataSetFilter = RuleAlias.replaceDataSetFilter(dataSetFilter, taggedObject);
-            DataSetDto resultDataSetDto = this.unifiedDataProvider.getDataSet(preparedDataSetFilter);
+            DataSetDto resultDataSetDto = this.mergedGeodataView.getDataSet(preparedDataSetFilter);
 
             if (resultDataSetDto == null) return false;
 

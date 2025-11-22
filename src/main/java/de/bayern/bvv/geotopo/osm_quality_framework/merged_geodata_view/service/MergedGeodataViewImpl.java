@@ -1,4 +1,4 @@
-package de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.service;
+package de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view.service;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.api.ChangesetDataService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.ChangesetState;
@@ -6,7 +6,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.Data
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.ChangesetDataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
-import de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.api.UnifiedDataProvider;
+import de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view.api.MergedGeodataView;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.api.OsmGeometriesService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.FeatureDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.FeatureMapper;
@@ -22,11 +22,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Service implementation of {@link UnifiedDataProvider}.
+ * Service implementation of {@link MergedGeodataView}.
  */
 @Service
 @RequiredArgsConstructor
-public class UnifiedDataProviderImpl implements UnifiedDataProvider {
+public class MergedGeodataViewImpl implements MergedGeodataView {
 
     private final OsmGeometriesService osmGeometriesService;
     private final ChangesetDataService changesetDataService;

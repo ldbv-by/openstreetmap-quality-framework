@@ -1,4 +1,4 @@
-package de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.api;
+package de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view.api;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Service Provider Interface (SPI) to get feature infos.
  */
-public interface UnifiedDataProvider {
+public interface MergedGeodataView {
 
     /**
      * Returns features from the data source that match the given filter.

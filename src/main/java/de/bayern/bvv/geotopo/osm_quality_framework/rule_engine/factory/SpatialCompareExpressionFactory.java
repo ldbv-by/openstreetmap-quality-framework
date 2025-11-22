@@ -14,7 +14,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.util.Cri
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.ExpressionFactory;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.util.RuleAlias;
-import de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.api.UnifiedDataProvider;
+import de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view.api.MergedGeodataView;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -32,7 +32,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class SpatialCompareExpressionFactory implements ExpressionFactory {
 
-    private final UnifiedDataProvider unifiedDataProvider;
+    private final MergedGeodataView mergedGeodataView;
 
     /**
      * Defines the unique rule type.
@@ -74,7 +74,7 @@ public class SpatialCompareExpressionFactory implements ExpressionFactory {
             } else if (taggedObject instanceof Relation relation) {
                 // Get reference feature dataset.
                 DataSet referenceFeaturesDataSet = Optional.ofNullable(
-                        this.unifiedDataProvider.getRelationMembers(relation.getOsmId(), params.referenceFeatureRole)
+                        this.mergedGeodataView.getRelationMembers(relation.getOsmId(), params.referenceFeatureRole)
                 ) .map(DataSetMapper::toDomain).orElse(null);
 
                 if (referenceFeaturesDataSet == null) return false;
@@ -161,7 +161,7 @@ public class SpatialCompareExpressionFactory implements ExpressionFactory {
                                           RuleParams params,
                                           DataSetFilter dataSetFilter) {
 
-        DataSetDto spatialResult = this.unifiedDataProvider.getDataSetBySpatialRelation(
+        DataSetDto spatialResult = this.mergedGeodataView.getDataSetBySpatialRelation(
                 FeatureMapper.toDto(feature),
                 params.operators,
                 dataSetFilter,

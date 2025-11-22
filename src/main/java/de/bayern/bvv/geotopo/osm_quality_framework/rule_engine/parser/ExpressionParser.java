@@ -9,18 +9,17 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.D
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.registry.ExpressionRegistry;
-import de.bayern.bvv.geotopo.osm_quality_framework.unified_data_provider.api.UnifiedDataProvider;
+import de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view.api.MergedGeodataView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public final class ExpressionParser {
     private final ExpressionRegistry registry;
-    private final UnifiedDataProvider unifiedDataProvider;
+    private final MergedGeodataView mergedGeodataView;
 
     /**
      * Parse Condition.
@@ -181,7 +180,7 @@ public final class ExpressionParser {
                 Expression checks = parse(jsonNode.path("checks"));
 
                 return (taggedObject, baseTaggedObject) -> {
-                    List<Feature> wayNodes = this.unifiedDataProvider.getWayNodesAsFeature(taggedObject);
+                    List<Feature> wayNodes = this.mergedGeodataView.getWayNodesAsFeature(taggedObject);
                     if (wayNodes.isEmpty()) return false;
 
                     int candidates = 0;
@@ -207,7 +206,7 @@ public final class ExpressionParser {
                     if (!jsonNode.has("loop_info")) expressions.add(parse(jsonNode));
                 }
                 return (taggedObject, baseTaggedObject) -> {
-                    List<Feature> wayNodes = this.unifiedDataProvider.getWayNodesAsFeature(taggedObject);
+                    List<Feature> wayNodes = this.mergedGeodataView.getWayNodesAsFeature(taggedObject);
                     if (wayNodes.isEmpty()) return false;
 
                     int candidates = 0;
@@ -246,7 +245,7 @@ public final class ExpressionParser {
         if (taggedObject instanceof Relation relation) {
             if (relation.getMembers() != null && !relation.getMembers().isEmpty()) {
                 DataSet relationMemberTaggedFeatures = Optional.ofNullable(
-                                this.unifiedDataProvider.getRelationMembers(relation.getOsmId(), null, null))
+                                this.mergedGeodataView.getRelationMembers(relation.getOsmId(), null, null))
                         .map(DataSetMapper::toDomain)
                         .orElse(null);
 
