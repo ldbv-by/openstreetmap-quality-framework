@@ -19,6 +19,7 @@ import org.locationtech.jts.operation.union.UnaryUnionOp;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service implementation of {@link UnifiedDataProvider}.
@@ -380,5 +381,48 @@ public class UnifiedDataProviderImpl implements UnifiedDataProvider {
         return (list == null || list.isEmpty())
                 ? java.util.Collections.emptySet()
                 : list.stream().map(TaggedObject::getOsmId).collect(java.util.stream.Collectors.toSet());
+    }
+
+    /**
+     * Get way nodes as feature list.
+     */
+    @Override
+    public List<Feature> getWayNodesAsFeature(TaggedObject taggedObject) {
+        List<Feature> wayNodeFeatures = new ArrayList<>();
+
+        if (taggedObject instanceof Feature way) {
+            if (way.getGeometryNodes() != null && !way.getGeometryNodes().isEmpty()) {
+                Set<Long> osmIds = way.getGeometryNodes().stream().map(GeometryNode::getOsmId).collect(Collectors.toSet());
+
+                DataSet wayNodeTaggedFeatures = Optional.ofNullable(
+                                this.getDataSet(
+                                        new DataSetFilter(null, null, null,
+                                                new OsmIds(osmIds, null, null, null), null, null)))
+                        .map(DataSetMapper::toDomain)
+                        .orElse(null);
+
+                for (GeometryNode geometryNode : way.getGeometryNodes()) {
+                    Feature wayNodeFeature = null;
+                    if (wayNodeTaggedFeatures != null && wayNodeTaggedFeatures.getNodes() != null) {
+                        wayNodeFeature = wayNodeTaggedFeatures.getNodes()
+                                .stream().filter(n -> n.getOsmId().equals(geometryNode.getOsmId())).findFirst().orElse(null);
+                    }
+
+                    if (wayNodeFeature == null) {
+                        wayNodeFeature = new Feature(
+                                geometryNode.getGeometry(),
+                                geometryNode.getGeometryTransformed(),
+                                List.of(geometryNode)
+                        );
+
+                        wayNodeFeature.setOsmId(geometryNode.getOsmId());
+                    }
+
+                    wayNodeFeatures.add(wayNodeFeature);
+                }
+            }
+        }
+
+        return wayNodeFeatures;
     }
 }

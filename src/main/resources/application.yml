@@ -40,11 +40,18 @@ spring:
 quality:
   pipeline:
     steps:
-      - id: "attribute-check"
+      - id: "overhead-line-mast"
         waitsFor: []
 
+      - id: "attribute-check"
+        waitsFor: [
+          "overhead-line-mast"
+        ]
+
       - id: "geometry-check"
-        waitsFor: []
+        waitsFor: [
+          "overhead-line-mast"
+        ]
 
 openstreetmap-tools:
   osm2pgsql: ${OSM2PGSQL_EXECUTABLE}

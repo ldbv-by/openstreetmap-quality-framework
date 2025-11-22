@@ -1,6 +1,7 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.component;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.api.ChangesetDataService;
+import de.bayern.bvv.geotopo.osm_quality_framework.changeset_prepare.api.ChangesetPrepareService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.ChangesetDataSetDto;
@@ -33,6 +34,7 @@ public class Orchestrator {
     private final Map<String, QualityService> qualityServices;
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
     private final ChangesetDataService changesetDataService;
+    private final ChangesetPrepareService changesetPrepareService;
 
     /**
      * Starts the pipeline for the given {@link Changeset} and blocks until:
@@ -123,7 +125,11 @@ public class Orchestrator {
 
                             // Add result of quality service to response list
                             if (qualityServiceResultDto.modifiedChangesetDto() != null) {
-                                qualityHubResult.setChangeset(ChangesetMapper.toDomain(changeset.getId(), qualityServiceResultDto.modifiedChangesetDto()));
+                                this.changesetPrepareService.prepareChangeset(
+                                        changeset.getId(), qualityServiceResultDto.modifiedChangesetDto());
+
+                                qualityHubResult.setChangeset(ChangesetMapper.toDomain(
+                                        changeset.getId(), qualityServiceResultDto.modifiedChangesetDto()));
                             }
 
                             if (qualityHubResult.isValid() && !qualityServiceResultDto.isValid()) {

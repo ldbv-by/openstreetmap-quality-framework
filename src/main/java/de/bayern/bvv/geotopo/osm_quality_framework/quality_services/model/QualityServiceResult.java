@@ -1,10 +1,8 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.model;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.dto.ChangesetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceErrorDto;
-import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +16,8 @@ public class QualityServiceResult {
     private final String qualityServiceId;
     private final Long changesetId;
     private final List<QualityServiceError> errors = new ArrayList<>();
+
+    @Setter
     private Changeset modifiedChangeset;
 
     public QualityServiceResult(String qualityServiceId, Long changesetId) {

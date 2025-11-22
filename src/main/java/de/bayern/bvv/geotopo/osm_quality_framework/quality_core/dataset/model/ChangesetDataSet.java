@@ -5,7 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,4 +21,15 @@ public class ChangesetDataSet {
     private DataSet create = new DataSet();
     private DataSet modify = new DataSet();
     private DataSet delete = new DataSet();
+
+    public Set<TaggedObject> getCreatedAndModified() {
+        return Stream.concat(
+                        Optional.ofNullable(this.create)
+                                .map(DataSet::getAll).stream().flatMap(Collection::stream),
+                        Optional.ofNullable(this.modify)
+                                .map(DataSet::getAll).stream().flatMap(Collection::stream)
+                )
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
 }
