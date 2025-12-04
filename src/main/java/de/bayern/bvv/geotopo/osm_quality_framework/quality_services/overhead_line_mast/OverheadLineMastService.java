@@ -12,7 +12,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.mapper.Quali
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.model.QualityServiceError;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.model.QualityServiceResult;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.spi.QualityService;
-import de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view.api.MergedGeodataView;
+import de.bayern.bvv.geotopo.osm_quality_framework.geodata_view.api.GeodataViewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class OverheadLineMastService implements QualityService {
 
-    private final MergedGeodataView mergedGeodataView;
+    private final GeodataViewService geodataViewService;
 
     /**
      * Executes the quality check for the given request.
@@ -55,7 +55,7 @@ public class OverheadLineMastService implements QualityService {
                 .collect(Collectors.toSet())
         ) {
 
-            List<Feature> taggedWayNodes = this.mergedGeodataView.getWayNodesAsFeature(overheadLine);
+            List<Feature> taggedWayNodes = this.geodataViewService.getWayNodesAsFeature(overheadLine);
 
             for (GeometryNode overheadLineNode : overheadLine.getGeometryNodes()) {
 

@@ -1,4 +1,4 @@
-package de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view.service;
+package de.bayern.bvv.geotopo.osm_quality_framework.geodata_view.service;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.api.ChangesetManagementService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.ChangesetState;
@@ -6,7 +6,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.Data
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.ChangesetDataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
-import de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view.api.MergedGeodataView;
+import de.bayern.bvv.geotopo.osm_quality_framework.geodata_view.api.GeodataViewService;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.api.OsmGeometriesService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.FeatureDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.FeatureMapper;
@@ -22,17 +22,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Service implementation of {@link MergedGeodataView}.
+ * The Geodata-View service provides a unified, read-only view on geospatial data
+ * by combining the current OSM geometries with the content of relevant changesets.
+ * It serves as a central query layer for quality checks and spatial validation.
  */
 @Service
 @RequiredArgsConstructor
-public class MergedGeodataViewImpl implements MergedGeodataView {
+public class GeodataViewServiceImpl implements GeodataViewService {
 
     private final OsmGeometriesService osmGeometriesService;
     private final ChangesetManagementService changesetManagementService;
 
     /**
-     * Returns features from the data source that match the given filter.
+     * Returns all features from the unified geodata view that match the given filter.
      */
     @Override
     public DataSetDto getDataSet(DataSetFilter dataSetFilter) {
@@ -76,8 +78,12 @@ public class MergedGeodataViewImpl implements MergedGeodataView {
     }
 
     /**
-     * Returns all features from the dataset that satisfy the given spatial relation
-     * (e.g., contains, within, intersects) with the provided feature.
+     * Performs a spatial query on the unified geodata view.
+     * <p>
+     * Returns all features that satisfy at least one of the specified spatial operators
+     * (e.g. CONTAINS, WITHIN, INTERSECTS) with respect to the given reference feature.
+     * Optionally, a bounding box is automatically derived from the reference geometry
+     * and injected into the dataset filter to limit the search space.
      */
     @Override
     public DataSetDto getDataSetBySpatialRelation(FeatureDto referenceFeatureDto,
@@ -298,7 +304,8 @@ public class MergedGeodataViewImpl implements MergedGeodataView {
 
 
     /**
-     * Aggregate Features.
+     * Aggregates the geometries of the given features using the specified spatial
+     * aggregator and returns a synthetic feature representing the result.
      */
     private Feature aggregateFeatures(List<Feature> features, SpatialAggregator aggregator) {
         if (aggregator == SpatialAggregator.UNION) {
@@ -310,7 +317,7 @@ public class MergedGeodataViewImpl implements MergedGeodataView {
     }
 
     /**
-     * Get outer boundary.
+     * Computes the outer boundary geometry for the given geometry.
      */
     private Geometry getOuterBoundary(Geometry geometry) {
         GeometryFactory geometryFactory = new GeometryFactory();
@@ -333,13 +340,17 @@ public class MergedGeodataViewImpl implements MergedGeodataView {
     }
 
     /**
-     * Returns a data set of all relation members.
+     * Returns a dataset containing all members of the specified relation.
+     * Uses the default coordinate reference system.
      */
     @Override
     public DataSetDto getRelationMembers(Long relationId, String role) {
         return this.getRelationMembers(relationId, role, null);
     }
 
+    /**
+     * Returns a dataset containing all members of the specified relation.
+     */
     @Override
     public DataSetDto getRelationMembers(Long relationId, String role, String coordinateReferenceSystem) {
         DataSetDto relationMembers = this.changesetManagementService.getRelationMembers(1L, relationId, role, coordinateReferenceSystem);
@@ -352,39 +363,8 @@ public class MergedGeodataViewImpl implements MergedGeodataView {
         return relationMembers;
     }
 
-    /* ---------- Helpers ---------- */
-    private static <T extends TaggedObject> void addAll(List<T> target, List<T> src) {
-        if (src != null && !src.isEmpty()) target.addAll(src);
-    }
-
-    private static <T extends TaggedObject> void upsertAll(List<T> target, List<T> src) {
-        if (src == null || src.isEmpty()) return;
-        for (T obj : src) {
-            int idx = indexOfId(target, obj.getOsmId());
-            if (idx >= 0) target.set(idx, obj); else target.add(obj);
-        }
-    }
-
-    private static <T extends TaggedObject> void removeAll(List<T> target, Set<Long> ids) {
-        if (ids == null || ids.isEmpty()) return;
-        target.removeIf(o -> ids.contains(o.getOsmId()));
-    }
-
-    private static int indexOfId(List<? extends TaggedObject> list, Long id) {
-        for (int i = 0; i < list.size(); i++) {
-            if (id != null && id.equals(list.get(i).getOsmId())) return i;
-        }
-        return -1;
-    }
-
-    private static Set<Long> idsOf(List<? extends TaggedObject> list) {
-        return (list == null || list.isEmpty())
-                ? java.util.Collections.emptySet()
-                : list.stream().map(TaggedObject::getOsmId).collect(java.util.stream.Collectors.toSet());
-    }
-
     /**
-     * Get way nodes as feature list.
+     * Returns the geometry nodes of the given way.
      */
     @Override
     public List<Feature> getWayNodesAsFeature(TaggedObject taggedObject) {
@@ -425,4 +405,37 @@ public class MergedGeodataViewImpl implements MergedGeodataView {
 
         return wayNodeFeatures;
     }
+
+    /* ---------- Helpers for set operations on feature lists ---------- */
+    private static <T extends TaggedObject> void addAll(List<T> target, List<T> src) {
+        if (src != null && !src.isEmpty()) target.addAll(src);
+    }
+
+    private static <T extends TaggedObject> void upsertAll(List<T> target, List<T> src) {
+        if (src == null || src.isEmpty()) return;
+        for (T obj : src) {
+            int idx = indexOfId(target, obj.getOsmId());
+            if (idx >= 0) target.set(idx, obj); else target.add(obj);
+        }
+    }
+
+    private static <T extends TaggedObject> void removeAll(List<T> target, Set<Long> ids) {
+        if (ids == null || ids.isEmpty()) return;
+        target.removeIf(o -> ids.contains(o.getOsmId()));
+    }
+
+    private static int indexOfId(List<? extends TaggedObject> list, Long id) {
+        for (int i = 0; i < list.size(); i++) {
+            if (id != null && id.equals(list.get(i).getOsmId())) return i;
+        }
+        return -1;
+    }
+
+    private static Set<Long> idsOf(List<? extends TaggedObject> list) {
+        return (list == null || list.isEmpty())
+                ? java.util.Collections.emptySet()
+                : list.stream().map(TaggedObject::getOsmId).collect(java.util.stream.Collectors.toSet());
+    }
+
+
 }

@@ -11,7 +11,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.util.CriteriaDeserializer;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.util.RuleAlias;
-import de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view.api.MergedGeodataView;
+import de.bayern.bvv.geotopo.osm_quality_framework.geodata_view.api.GeodataViewService;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
@@ -27,7 +27,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ObjectExistsExpressionFactory implements ExpressionFactory {
 
-    private final MergedGeodataView mergedGeodataView;
+    private final GeodataViewService geodataViewService;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -41,7 +41,7 @@ public class ObjectExistsExpressionFactory implements ExpressionFactory {
 
         return (taggedObject, baseTaggedObject) -> {
             DataSetFilter preparedDataSetFilter = RuleAlias.replaceDataSetFilter(dataSetFilter, taggedObject);
-            DataSetDto resultDataSetDto = this.mergedGeodataView.getDataSet(preparedDataSetFilter);
+            DataSetDto resultDataSetDto = this.geodataViewService.getDataSet(preparedDataSetFilter);
 
             if (resultDataSetDto == null) return false;
 

@@ -1,4 +1,4 @@
-package de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view.api;
+package de.bayern.bvv.geotopo.osm_quality_framework.geodata_view.api;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
@@ -8,18 +8,22 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Service Provider Interface (SPI) to get feature infos.
+ * Public API of the Geodata-View bounded context.
+ * <p>
+ * Provides access to a unified geospatial view that combines OSM base data with changeset content.
+ * This view serves as a queryable data source for quality checks and spatial validation workflows.
  */
-public interface MergedGeodataView {
+public interface GeodataViewService {
 
     /**
-     * Returns features from the data source that match the given filter.
+     * Retrieves all features matching the specified filter criteria.
      */
     DataSetDto getDataSet(DataSetFilter dataSetFilter);
 
     /**
-     * Returns all tagged objects from the dataset that satisfy the given spatial relation
-     * (e.g., contains, within, intersects) with the provided feature.
+     * Performs a spatial query against the geodata view to retrieve all features
+     * that satisfy the specified topological relations (e.g., CONTAINS, WITHIN, INTERSECTS)
+     * relative to the provided feature.
      */
     DataSetDto getDataSetBySpatialRelation(FeatureDto featureDto,
                                            Set<SpatialOperator> operators,
@@ -27,14 +31,14 @@ public interface MergedGeodataView {
                                            boolean selfCheck);
 
     /**
-     * Returns a data set of all relation members.
+     * Returns all members of the specified OSM relation, including their current
+     * geometry and attributes as represented in the unified geodata view.
      */
     DataSetDto getRelationMembers(Long relationId, String role);
     DataSetDto getRelationMembers(Long relationId, String role, String coordinateReferenceSystem);
 
-
     /**
-     * Get way nodes as feature.
+     * Retrieves the geometry nodes of a way.
      */
     List<Feature> getWayNodesAsFeature(TaggedObject taggedObject);
 }

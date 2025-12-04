@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.registry.ExpressionRegistry;
-import de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view.api.MergedGeodataView;
+import de.bayern.bvv.geotopo.osm_quality_framework.geodata_view.api.GeodataViewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +18,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public final class ExpressionParser {
     private final ExpressionRegistry registry;
-    private final MergedGeodataView mergedGeodataView;
+    private final GeodataViewService geodataViewService;
 
     /**
      * Parse Condition.
@@ -179,7 +179,7 @@ public final class ExpressionParser {
                 Expression checks = parse(jsonNode.path("checks"));
 
                 return (taggedObject, baseTaggedObject) -> {
-                    List<Feature> wayNodes = this.mergedGeodataView.getWayNodesAsFeature(taggedObject);
+                    List<Feature> wayNodes = this.geodataViewService.getWayNodesAsFeature(taggedObject);
                     if (wayNodes.isEmpty()) return false;
 
                     int candidates = 0;
@@ -205,7 +205,7 @@ public final class ExpressionParser {
                     if (!jsonNode.has("loop_info")) expressions.add(parse(jsonNode));
                 }
                 return (taggedObject, baseTaggedObject) -> {
-                    List<Feature> wayNodes = this.mergedGeodataView.getWayNodesAsFeature(taggedObject);
+                    List<Feature> wayNodes = this.geodataViewService.getWayNodesAsFeature(taggedObject);
                     if (wayNodes.isEmpty()) return false;
 
                     int candidates = 0;
@@ -244,7 +244,7 @@ public final class ExpressionParser {
         if (taggedObject instanceof Relation relation) {
             if (relation.getMembers() != null && !relation.getMembers().isEmpty()) {
                 DataSet relationMemberTaggedFeatures = Optional.ofNullable(
-                                this.mergedGeodataView.getRelationMembers(relation.getOsmId(), null, null))
+                                this.geodataViewService.getRelationMembers(relation.getOsmId(), null, null))
                         .map(DataSetMapper::toDomain)
                         .orElse(null);
 

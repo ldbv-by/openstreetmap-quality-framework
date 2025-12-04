@@ -1,11 +1,11 @@
-package de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view;
+package de.bayern.bvv.geotopo.osm_quality_framework.geodata_view;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.api.OsmGeometriesService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.FeatureDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.test_core.DatabaseIntegrationTest;
-import de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view.api.MergedGeodataView;
+import de.bayern.bvv.geotopo.osm_quality_framework.geodata_view.api.GeodataViewService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,9 +13,9 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MergedGeodataViewIntegrationTest extends DatabaseIntegrationTest {
+class GeodataViewServiceIntegrationTest extends DatabaseIntegrationTest {
     @Autowired
-    private MergedGeodataView mergedGeodataView;
+    private GeodataViewService geodataViewService;
 
     @Autowired
     private OsmGeometriesService osmGeometriesService;
@@ -30,7 +30,7 @@ class MergedGeodataViewIntegrationTest extends DatabaseIntegrationTest {
         FeatureDto featureDto = dataSetDto.ways().getFirst();
 
         // Act
-        DataSetDto resultDataSet = this.mergedGeodataView
+        DataSetDto resultDataSet = this.geodataViewService
                 .getDataSetBySpatialRelation(featureDto, Set.of(SpatialOperator.WITHIN),
                         new DataSetFilter(null, null, null, null, null, null), false);
 
