@@ -1,15 +1,9 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.factory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSetFilter;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.FeatureFilter;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.TaggedObject;
-import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
-import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.ExpressionFactory;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.Expression;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Evaluates whether a tag value equals to a fixed value.

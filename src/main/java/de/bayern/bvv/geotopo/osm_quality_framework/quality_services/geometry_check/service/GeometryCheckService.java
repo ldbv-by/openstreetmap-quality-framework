@@ -3,7 +3,6 @@ package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.geometry_ch
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.api.OsmSchemaService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.ChangesetDataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.ChangesetDataSet;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSet;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Feature;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.TaggedObject;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.mapper.ObjectTypeMapper;
@@ -15,74 +14,59 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.mapper.Quali
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.model.QualityServiceError;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.model.QualityServiceResult;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.spi.QualityService;
-import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.RuleEngine;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.dto.RuleEvaluationDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.ExpressionParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Objects;
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-@Service("geometry-check")
+@Service(GeometryCheckService.QUALITY_SERVICE_NAME)
 @RequiredArgsConstructor
-@Slf4j
 public class GeometryCheckService implements QualityService {
 
-    private final OsmSchemaService osmSchemaService;
-    private final ExpressionParser expressionParser;
+    public static final String QUALITY_SERVICE_NAME = "geometry-check";
     private QualityServiceResult qualityServiceResult;
+
+    private final OsmSchemaService osmSchemaService;
+    private final RuleEngine ruleEngine;
 
     /**
      * Executes the quality check for the given request.
-     * Check overlays.
+     * Performs geometric checks, e.g. for overlaps.
      */
     @Override
-    public QualityServiceResultDto checkChangesetQuality(QualityServiceRequestDto qualityServiceRequestDto) {
+    public QualityServiceResultDto checkChangesetQuality(
+            QualityServiceRequestDto qualityServiceRequestDto) {
+
         // ----- Initialize result of quality service.
         this.qualityServiceResult = new QualityServiceResult(
                 qualityServiceRequestDto.qualityServiceId(), qualityServiceRequestDto.changesetId());
 
-        // ----- Get tagged objects.
-        ChangesetDataSet changesetDataSet = ChangesetDataSetMapper.toDomain(qualityServiceRequestDto.changesetDataSetDto());
+        // ----- Check the geometric consistency for each new or modified changeset object.
+        ChangesetDataSet changesetDataSet =
+                ChangesetDataSetMapper.toDomain(qualityServiceRequestDto.changesetDataSetDto());
 
-        // ----- Check for each tagged object the geometry consistency.
-        for (TaggedObject taggedObject : Stream.concat(
-                        Optional.ofNullable(changesetDataSet.getCreate())
-                                .map(DataSet::getAll).stream().flatMap(Collection::stream),
-                        Optional.ofNullable(changesetDataSet.getModify())
-                                .map(DataSet::getAll).stream().flatMap(Collection::stream)
-                )
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet())
-        ) {
+        for (TaggedObject changedObject : changesetDataSet.getCreatedAndModified()) {
 
-            // ----- Get schema configuration for tagged object.
-            ObjectType objectType = Optional.ofNullable(this.osmSchemaService.getObjectTypeInfo(taggedObject.getObjectType()))
+            // ----- Get rules from openstreetmap-schema for the object_type.
+            List<Rule> rules = Optional.ofNullable(
+                            this.osmSchemaService.getObjectTypeInfo(changedObject.getObjectType()))
                     .map(ObjectTypeMapper::toDomain)
-                    .orElse(null);
+                    .map(ObjectType::getRules)
+                    .orElse(List.of());
 
-            if (objectType != null) {
-                // ----- Check schema rules "geometry-check" for tagged object.
-                for (Rule rule : objectType.getRules().stream().filter(r -> r.getType().equals("geometry-check")).toList()) {
-                    log.info("geometry-check({}): start rule={}",
-                            qualityServiceRequestDto.changesetId(), rule.getId());
+            // ----- Check geometry-check rules for changed object.
+            for (Rule rule : rules.stream()
+                    .filter(r -> QUALITY_SERVICE_NAME.equals(r.getType()))
+                    .toList()) {
 
-                    long ruleStartTime = System.currentTimeMillis();
-                    Expression conditions = this.expressionParser.parse(rule.getExpression().path("conditions"));
-                    Expression checks = this.expressionParser.parse(rule.getExpression().path("checks"));
-
-                    if (conditions.evaluate(taggedObject, taggedObject)) {
-                        if (!checks.evaluate(taggedObject, taggedObject)) {
-                            this.setError(taggedObject, rule.getErrorText());
-                        }
-                    }
-
-                    log.info("geometry-check({}): finish rule={}, time={} ms",
-                            qualityServiceRequestDto.changesetId(), rule.getId(), System.currentTimeMillis() - ruleStartTime);
+                if (!this.ruleEngine.evaluate(new RuleEvaluationDto(changedObject, rule))) {
+                    this.setError(changedObject, rule.getErrorText());
                 }
             }
         }

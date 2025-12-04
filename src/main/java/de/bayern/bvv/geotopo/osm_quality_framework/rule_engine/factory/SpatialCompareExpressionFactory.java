@@ -11,8 +11,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.D
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.FeatureMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.util.CriteriaDeserializer;
-import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.Expression;
-import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.ExpressionFactory;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.util.RuleAlias;
 import de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view.api.MergedGeodataView;
 import lombok.RequiredArgsConstructor;
