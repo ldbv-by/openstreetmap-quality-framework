@@ -1,7 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.component;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.api.ChangesetDataService;
-import de.bayern.bvv.geotopo.osm_quality_framework.changeset_prepare.api.ChangesetPrepareService;
+import de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.api.ChangesetManagementService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.ChangesetDataSetDto;
@@ -33,8 +32,7 @@ public class Orchestrator {
     private final QualityPipeline qualityPipeline;
     private final Map<String, QualityService> qualityServices;
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-    private final ChangesetDataService changesetDataService;
-    private final ChangesetPrepareService changesetPrepareService;
+    private final ChangesetManagementService changesetManagementService;
 
     /**
      * Starts the pipeline for the given {@link Changeset} and blocks until:
@@ -77,7 +75,7 @@ public class Orchestrator {
                                       AtomicInteger cntRemainingSteps,
                                       CompletableFuture<Void> allStepsDone) {
 
-        ChangesetDataSetDto changesetDataSetDto = this.changesetDataService.getDataSet(
+        ChangesetDataSetDto changesetDataSetDto = this.changesetManagementService.getDataSet(
                 changeset.getId(), null);
 
         Set<QualityPipeline.Step> runnableSteps = this.getRunnableSteps(publishedPipelineSteps);
@@ -125,7 +123,7 @@ public class Orchestrator {
 
                             // Add result of quality service to response list
                             if (qualityServiceResultDto.modifiedChangesetDto() != null) {
-                                this.changesetPrepareService.prepareChangeset(
+                                this.changesetManagementService.persistChangeset(
                                         changeset.getId(), qualityServiceResultDto.modifiedChangesetDto());
 
                                 qualityHubResult.setChangeset(ChangesetMapper.toDomain(

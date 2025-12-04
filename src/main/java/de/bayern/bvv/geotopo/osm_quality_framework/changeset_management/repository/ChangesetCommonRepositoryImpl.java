@@ -1,4 +1,4 @@
-package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.repository;
+package de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.repository;
 
 import de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class CommonRepositoryImpl<T> {
+public class ChangesetCommonRepositoryImpl<T> {
 
     public TypedQuery<T> getTypedQuery(EntityManager entityManager, CriteriaQuery<T> criteriaQuery, Root<T> root, OsmIds osmIds, Criteria criteria) {
         return this.getTypedQuery(entityManager, criteriaQuery, root, osmIds, criteria, null);
@@ -220,7 +220,7 @@ public class CommonRepositoryImpl<T> {
                 // optional: filter relation criteria
                 if (relationCriteria != null) {
                     Predicate relCriteriaPred = this.criteriaToPredicate(criteriaQuery, criteriaBuilder,
-                            (Root<T>) target, entityType, rel, RelationEntity.class, relationCriteria);
+                                    (Root<T>) target, entityType, rel, RelationEntity.class, relationCriteria);
 
                     if (relCriteriaPred != null) {
                         subPs.add(relCriteriaPred);

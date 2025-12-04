@@ -1,6 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.merged_geodata_view.service;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.changeset_data.api.ChangesetDataService;
+import de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.api.ChangesetManagementService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.ChangesetState;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.ChangesetDataSetMapper;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public class MergedGeodataViewImpl implements MergedGeodataView {
 
     private final OsmGeometriesService osmGeometriesService;
-    private final ChangesetDataService changesetDataService;
+    private final ChangesetManagementService changesetManagementService;
 
     /**
      * Returns features from the data source that match the given filter.
@@ -44,9 +44,9 @@ public class MergedGeodataViewImpl implements MergedGeodataView {
 
         // Optionally load features from specified changesets and merge them into the current dataset.
         if (dataSetFilter.ignoreChangesetData() == null || !dataSetFilter.ignoreChangesetData()) {
-            for (Long changesetId : this.changesetDataService.getChangesetIds(Set.of(ChangesetState.OPEN, ChangesetState.CHECKED))) {
+            for (Long changesetId : this.changesetManagementService.getChangesetIds(Set.of(ChangesetState.OPEN, ChangesetState.CHECKED))) {
 
-                ChangesetDataSet cs = Optional.ofNullable(this.changesetDataService.getDataSet(changesetId, dataSetFilter))
+                ChangesetDataSet cs = Optional.ofNullable(this.changesetManagementService.getDataSet(changesetId, dataSetFilter))
                         .map(ChangesetDataSetMapper::toDomain)
                         .orElse(null);
 
@@ -342,7 +342,7 @@ public class MergedGeodataViewImpl implements MergedGeodataView {
 
     @Override
     public DataSetDto getRelationMembers(Long relationId, String role, String coordinateReferenceSystem) {
-        DataSetDto relationMembers = this.changesetDataService.getRelationMembers(1L, relationId, role, coordinateReferenceSystem);
+        DataSetDto relationMembers = this.changesetManagementService.getRelationMembers(1L, relationId, role, coordinateReferenceSystem);
 
         if (relationMembers.nodes().isEmpty() && relationMembers.ways().isEmpty() &&
                 relationMembers.areas().isEmpty() && relationMembers.relations().isEmpty()) {

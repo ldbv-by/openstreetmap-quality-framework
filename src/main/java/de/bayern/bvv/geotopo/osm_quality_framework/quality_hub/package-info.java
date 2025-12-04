@@ -2,8 +2,7 @@
         allowedDependencies = {
                 "quality_core::*",
                 "quality_services::*",
-                "changeset_prepare::*",
-                "changeset_data::*",
+                "changeset_management::*",
                 "openstreetmap_tools::*"
         }
 )

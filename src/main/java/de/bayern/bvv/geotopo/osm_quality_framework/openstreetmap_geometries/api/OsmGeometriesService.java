@@ -10,6 +10,11 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Fe
 public interface OsmGeometriesService {
 
     /**
+     * Append finished changeset to the schema.
+     */
+    void appendChangeset(Long changesetId);
+
+    /**
      * Returns the current tagged objects.
      */
     DataSetDto getDataSet(DataSetFilter dataSetFilter);

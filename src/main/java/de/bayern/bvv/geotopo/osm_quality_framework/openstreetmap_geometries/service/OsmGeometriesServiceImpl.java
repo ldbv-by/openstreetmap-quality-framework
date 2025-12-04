@@ -1,5 +1,7 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.service;
 
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.component.Osm2PgSqlClient;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.component.OsmApiClient;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.mapper.AreaNodeEntityMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.mapper.WayNodeEntityMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.entity.AreaEntity;
@@ -12,6 +14,9 @@ import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.mapp
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.mapper.WayEntityMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.repository.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.api.OsmGeometriesService;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.ChangesetState;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
@@ -20,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +38,22 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
 
     private final AreaNodeRepository areaNodeRepository;
     private final WayNodeRepository wayNodeRepository;
+
+    private final OsmApiClient osmApiClient;
+    private final Osm2PgSqlClient osm2PgSqlClient;
+
+    @Override
+    public void appendChangeset(Long changesetId) {
+        // ----- Read the persisted changeset from the OSM-DB.
+        Changeset changeset = Optional.ofNullable(this.osmApiClient.getChangesetById(changesetId))
+                .map(cs -> ChangesetMapper.toDomain(changesetId, cs))
+                .orElse(null);
+
+        // ----- Persist the changeset in the OpenStreetMap-Geometries schema
+        if (changesetId != null) {
+            this.osm2PgSqlClient.appendChangeset(changeset);
+        }
+    }
 
     /**
      * Returns the current tagged objects.
