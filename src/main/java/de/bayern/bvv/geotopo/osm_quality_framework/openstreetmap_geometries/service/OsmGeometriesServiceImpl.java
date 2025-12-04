@@ -16,7 +16,6 @@ import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.repo
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.api.OsmGeometriesService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.ChangesetState;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
@@ -27,6 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * This service provides access to the authoritative OpenStreetMap geometry
+ * dataset stored in the openstreetmap_geometries schema. It is
+ * responsible for applying finalized changesets to the geometry store and
+ * exposing the current nodes, ways, areas and relations for read access.
+ */
 @Service
 @RequiredArgsConstructor
 public class OsmGeometriesServiceImpl implements OsmGeometriesService {
@@ -42,6 +47,9 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     private final OsmApiClient osmApiClient;
     private final Osm2PgSqlClient osm2PgSqlClient;
 
+    /**
+     * Applies the given changeset to the OpenStreetMap-Geometries dataset.
+     **/
     @Override
     public void appendChangeset(Long changesetId) {
         // ----- Read the persisted changeset from the OSM-DB.
@@ -56,7 +64,7 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     }
 
     /**
-     * Returns the current tagged objects.
+     * Returns the current OSM objects that match the given filter.
      */
     @Override
     public DataSetDto getDataSet(DataSetFilter dataSetFilter) {
@@ -81,7 +89,7 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     }
 
     /**
-     * Returns a data set of all relation members.
+     * Returns all members of the given OSM relation in the current geometry dataset.
      */
     @Override
     public DataSetDto getRelationMembers(Long relationId, String role, String coordinateReferenceSystem) {
@@ -96,7 +104,7 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     }
 
     /**
-     * Returns the current nodes by feature filter.
+     * Retrieves node features matching the given filter from the geometry store.
      */
     private List<Feature> getNodesByFeatureFilter(OsmIds osmIds, Criteria criteria, String coordinateReferenceSystem, List<Relation> relations) {
         List<Feature> nodes = new ArrayList<>();
@@ -114,7 +122,7 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     }
 
     /**
-     * Returns the current relation member nodes for a relation id.
+     * Retrieves all node members of the given relation.
      */
     private List<Feature> getRelationMemberNodes(Long relationId, String role, String coordinateReferenceSystem) {
         List<Feature> nodes = new ArrayList<>();
@@ -131,7 +139,7 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     }
 
     /**
-     * Returns the current ways by feature filter.
+     * Retrieves way features matching the given filter from the geometry store.
      */
     private List<Feature> getWaysByFeatureFilter(OsmIds osmIds, Criteria criteria, String coordinateReferenceSystem, List<Relation> relations) {
         List<Feature> ways = new ArrayList<>();
@@ -150,7 +158,7 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     }
 
     /**
-     * Returns the current relation member ways for a relation id.
+     * Retrieves all way members of the given relation.
      */
     private List<Feature> getRelationMemberWays(Long relationId, String role, String coordinateReferenceSystem) {
         List<Feature> ways = new ArrayList<>();
@@ -168,7 +176,7 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     }
 
     /**
-     * Returns the current areas by feature filter.
+     * Retrieves area features matching the given filter from the geometry store.
      */
     private List<Feature> getAreasByFeatureFilter(OsmIds osmIds, Criteria criteria, String coordinateReferenceSystem, List<Relation> relations) {
         List<Feature> areas = new ArrayList<>();
@@ -187,7 +195,7 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     }
 
     /**
-     * Returns the current relation member areas for a relation id.
+     * Retrieves all area members of the given relation.
      */
     private List<Feature> getRelationMemberAreas(Long relationId, String role, String coordinateReferenceSystem) {
         List<Feature> areas = new ArrayList<>();
@@ -205,7 +213,7 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     }
 
     /**
-     * Returns the current relations by feature filter.
+     * Retrieves relation features matching the given filter from the geometry store.
      */
     private List<Relation> getRelationsByFeatureFilter(OsmIds osmIds, Criteria criteria) {
         List<Relation> relations = new ArrayList<>();
@@ -222,7 +230,7 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     }
 
     /**
-     * Returns the current relation member relations for a relation id.
+     * Retrieves all relation members that are themselves relations for the given relation.
      */
     private List<Relation> getRelationMemberRelations(Long relationId, String role) {
         List<Relation> relations = new ArrayList<>();
@@ -239,7 +247,8 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     }
 
     /**
-     * Returns the current relations for an osm object.
+     * Resolves all relations that reference the given OSM object (node/way/area/relation)
+     * as a member.
      */
     private List<Relation> getRelationsForOsmObject(String memberType, Long memberOsmId) {
         List<Relation> relations = new ArrayList<>();
@@ -253,9 +262,9 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
         return relations;
     }
 
-
     /**
-     * Get Geometry Nodes for Area Entity.
+     * Retrieves the geometry nodes belonging to the given area and converts them
+     * into GeometryNode instances in the requested CRS.
      */
     private List<GeometryNode> getGeometryNodes(AreaEntity areaEntity, String coordinateReferenceSystem) {
         return this.areaNodeRepository.findById_AreaOsmIdOrderById_Seq(areaEntity.getOsmId())
@@ -264,7 +273,8 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     }
 
     /**
-     * Get Geometry Nodes for Way Entity.
+     * Retrieves the geometry nodes belonging to the given way and converts them
+     * into GeometryNode instances in the requested CRS.
      */
     private List<GeometryNode> getGeometryNodes(WayEntity wayEntity, String coordinateReferenceSystem) {
         return this.wayNodeRepository.findById_WayOsmIdOrderById_Seq(wayEntity.getOsmId())

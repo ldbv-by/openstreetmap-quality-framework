@@ -14,7 +14,7 @@ import java.nio.file.Path;
 /**
  * Client to call osm2pgsql from openstreetmap_tools module.
  */
-@Component("qualityHubOsm2PgSqlClient")
+@Component("osmGeomOsm2PgSqlClient")
 @RequiredArgsConstructor
 public class Osm2PgSqlClient {
 

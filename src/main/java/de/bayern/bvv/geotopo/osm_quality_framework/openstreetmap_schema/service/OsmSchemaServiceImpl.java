@@ -13,7 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service for OpenStreetMap schema.
+ * Provides access to the institutional target schema definitions
+ * (e.g. GeoInfoDok of the AdV) that describe how OSM object types
+ * must be interpreted and represented in the OSM database.
+ * <p>
+ * The retrieved schema metadata includes semantic classification rules
+ * required by the Rule Engine for quality validation.
  */
 @Service
 @RequiredArgsConstructor
@@ -23,7 +28,7 @@ public class OsmSchemaServiceImpl implements OsmSchemaService {
     private final ObjectTypeRepository objectTypeRepository;
 
     /**
-     * Get Object Type Info.
+     * Loads the institutional schema definition for the specified OSM object type.
      */
     @Override
     @Transactional(readOnly = true)
