@@ -20,11 +20,15 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.Data
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * This service provides access to the authoritative OpenStreetMap geometry
@@ -323,5 +327,37 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     @Override
     public Long getNextIdentifierSequence() {
         return this.sequenceRepository.getNextIdentifierSequence();
+    }
+
+    /**
+     * Retrieve the original tagged object from a changeset using a given tagged object.
+     */
+    @Override
+    public TaggedObject getTaggedObject(TaggedObject taggedObjectAfter) {
+
+        TaggedObject taggedObjectBefore;
+        if (taggedObjectAfter instanceof Feature feature) {
+            taggedObjectBefore = switch (feature.getGeometry()) {
+                case Point _ -> this.getNodesByFeatureFilter(
+                        new OsmIds(Set.of(taggedObjectAfter.getOsmId()), null, null, null), null, null, new ArrayList<>()
+                ).getFirst();
+
+                case LineString _ -> this.getWaysByFeatureFilter(
+                        new OsmIds(null, Set.of(taggedObjectAfter.getOsmId()), null, null), null, null, new ArrayList<>()
+                ).getFirst();
+
+                case Polygon _ -> this.getAreasByFeatureFilter(
+                        new OsmIds(null, null, Set.of(taggedObjectAfter.getOsmId()), null), null, null, new ArrayList<>()
+                ).getFirst();
+
+                case null, default -> throw new IllegalArgumentException("Unsupported geometry type");
+            };
+        } else {
+            taggedObjectBefore = this.getRelationsByFeatureFilter(
+                    new OsmIds(null, null, null, Set.of(taggedObjectAfter.getOsmId())), null
+            ).getFirst();
+        }
+
+        return taggedObjectBefore;
     }
 }

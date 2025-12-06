@@ -2,6 +2,7 @@ package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.api
 
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSetFilter;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.TaggedObject;
 
 /**
  * Public API of the OpenStreetMap-Geometries bounded context.
@@ -31,4 +32,9 @@ public interface OsmGeometriesService {
      * Get next identifier sequence.
      */
     Long getNextIdentifierSequence();
+
+    /**
+     * Retrieve the original tagged object from a changeset using a given tagged object.
+     */
+    TaggedObject getTaggedObject(TaggedObject taggedObjectAfter);
 }

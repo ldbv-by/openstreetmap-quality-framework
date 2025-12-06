@@ -1,5 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.object_number_assignment;
 
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.api.OsmGeometriesService;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.api.OsmSchemaService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
@@ -28,14 +29,15 @@ import java.time.format.DateTimeFormatter;
 public class ObjectNumberAssignmentService implements QualityService {
 
     private final OsmSchemaService osmSchemaService;
+    private final OsmGeometriesService osmGeometriesService;
     private final ObjectNumberGenerator objectNumberGenerator;
 
     private static final String IDENTIFIER_TAG_KEY = "identifikator";
     private static final String IDENTIFIER_UUID_TAG_KEY = IDENTIFIER_TAG_KEY + ":UUID";
     private static final String IDENTIFIER_UUID_AND_TIME_TAG_KEY = IDENTIFIER_TAG_KEY + ":UUIDundZeit";
-
     private static final String OBJECT_START_TIME_TAG_KEY = "lebenszeitintervall:beginnt";
     private static final String OBJECT_END_TIME_TAG_KEY = "lebenszeitintervall:endet";
+    private static final String OBJECT_TYPE_TAG_KEY = "object_type";
 
     private static final DateTimeFormatter IDENTIFIER_TIME_UUID_FORMAT =
             DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'");
@@ -69,8 +71,32 @@ public class ObjectNumberAssignmentService implements QualityService {
             }
         }
 
-        qualityServiceResult.setModifiedChangeset(modifiedChangeset);
+        // ----- Set identifier on modified objects.
+        for (TaggedObject modifyObject : changesetDataSet.getModify().getAll()) {
+            if (identifierIsNecessary(modifyObject)) {
+                TaggedObject modifyObjectBefore = this.osmGeometriesService.getTaggedObject(modifyObject);
 
+                String identifierUUIDBefore = modifyObjectBefore.getTags().getOrDefault(IDENTIFIER_UUID_TAG_KEY, "");
+                String identifierTimeUUIDBefore = modifyObjectBefore.getTags().getOrDefault(IDENTIFIER_UUID_AND_TIME_TAG_KEY, "");
+                String objectStartTimeBefore = modifyObjectBefore.getTags().getOrDefault(OBJECT_START_TIME_TAG_KEY, "");
+                String objectTypeBefore = modifyObjectBefore.getTags().getOrDefault(OBJECT_TYPE_TAG_KEY, "");
+
+                // Identifier has changed manually -> set old identifier.
+                if (!(modifyObject.getTags().getOrDefault(IDENTIFIER_UUID_TAG_KEY, "").equals(identifierUUIDBefore)) ||
+                    !(modifyObject.getTags().getOrDefault(IDENTIFIER_UUID_AND_TIME_TAG_KEY, "").equals(identifierTimeUUIDBefore)) ||
+                    !(modifyObject.getTags().getOrDefault(OBJECT_START_TIME_TAG_KEY, "").equals(objectStartTimeBefore))) {
+
+                    setOldIdentifier(modifyObject, modifiedChangeset, identifierUUIDBefore, identifierTimeUUIDBefore, objectStartTimeBefore);
+                }
+
+                // Object Type has changed -> set new identifier.
+                if (!(modifyObject.getTags().getOrDefault(OBJECT_TYPE_TAG_KEY, "").equals(objectTypeBefore))) {
+                    setNewIdentifier(modifyObject, modifiedChangeset, nowUtc);
+                }
+            }
+        }
+
+        qualityServiceResult.setModifiedChangeset(modifiedChangeset);
         return QualityServiceResultMapper.toDto(qualityServiceResult);
     }
 
