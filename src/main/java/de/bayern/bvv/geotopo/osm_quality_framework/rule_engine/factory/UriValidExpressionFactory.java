@@ -1,6 +1,7 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.factory;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.util.JsonUtils;
+import tools.jackson.databind.JsonNode;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.Expression;
 import org.springframework.stereotype.Component;
 
@@ -33,38 +34,60 @@ public class UriValidExpressionFactory implements ExpressionFactory {
         HTTP = b.build();
     }
 
+    /**
+     * Defines the unique rule type.
+     */
     @Override
     public String type() {
         return "uri_valid";
     }
 
+    /**
+     * Defines the possible rule parameters.
+     */
+    private record RuleParams (
+            String tagKey,
+            String urnPattern
+    ) {}
+
+    /**
+     * Defines the rule parameters and the execution block of a rule.
+     */
     @Override
     public Expression create(JsonNode json) {
-        String tagKey = json.path("tag_key").asText();
-        String urnPattern = json.path("urn_pattern").asText();
 
-        if (tagKey == null || tagKey.isBlank()) {
-            throw new IllegalArgumentException("uri_valid: 'tag_key' is required");
-        }
+        // ----- Parse rule params ------
+        RuleParams params = this.parseParams(json);
 
+        // ----- Execute rule ------
         return (taggedObject, baseTaggedObject) -> {
-            String uri = taggedObject.getTags().get(tagKey);
+            String uri = taggedObject.getTags().get(params.tagKey);
 
             if (uri.startsWith("http://") || uri.startsWith("https://")) {
                 return isValidHttpUrl(uri);
             }
 
-            if (!(urnPattern == null || urnPattern.isBlank())) {
+            if (!(params.urnPattern.isEmpty())) {
                 try {
-                    Pattern pattern = Pattern.compile(urnPattern);
+                    Pattern pattern = Pattern.compile(params.urnPattern);
                     return pattern.matcher(uri).matches();
                 } catch (PatternSyntaxException e) {
-                    throw new IllegalArgumentException("uri_valid: invalid pattern: " + e.getMessage(), e);
+                    throw new IllegalArgumentException(type() + ": invalid pattern: " + e.getMessage(), e);
                 }
             }
 
             return false;
         };
+    }
+
+    /**
+     * Parse rule parameters.
+     */
+    private RuleParams parseParams(JsonNode json) {
+        String tagKey = JsonUtils.asString(json, "tag_key", type());
+        String urnPattern = JsonUtils.asOptionalString(json, "urn_pattern");
+
+        return new RuleParams(tagKey, urnPattern);
     }
 
     /**

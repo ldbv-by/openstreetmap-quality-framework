@@ -1,66 +1,114 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.util;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.All;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Any;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Criteria;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Leaf;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Not;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class CriteriaDeserializer extends StdDeserializer<Criteria> {
-
-    public CriteriaDeserializer() {
-        super(Criteria.class);
-    }
+public class CriteriaDeserializer extends ValueDeserializer<Criteria> {
 
     @Override
-    public Criteria deserialize(JsonParser p, DeserializationContext ctx) throws IOException {
-        ObjectCodec codec = p.getCodec();
-        JsonNode n = codec.readTree(p);
+    public Criteria deserialize(JsonParser p, DeserializationContext ctx) {
+        // Jackson 3: Tree über das Context lesen
+        JsonNode n = ctx.readTree(p);
 
-        if (n == null || n.isNull() || n.isMissingNode()) return null;
+        if (n == null || n.isNull() || n.isMissingNode()) {
+            return null;
+        }
 
-        ObjectMapper om = (codec instanceof ObjectMapper)
-                ? (ObjectMapper) codec
-                : new ObjectMapper();
+        return parseCriteria(n);
+    }
 
-        TypeFactory tf = om.getTypeFactory();
-
+    private Criteria parseCriteria(JsonNode n) {
+        // ----- all -----
         if (n.has("all")) {
-            JavaType listType = tf.constructCollectionType(List.class, Criteria.class);
-            List<Criteria> items = om.convertValue(n.get("all"), listType);
+            List<Criteria> items = new ArrayList<>();
+            for (JsonNode child : n.get("all")) {
+                items.add(parseCriteria(child));
+            }
             return new All(items);
         }
+
+        // ----- any -----
         if (n.has("any")) {
-            JavaType listType = tf.constructCollectionType(List.class, Criteria.class);
-            List<Criteria> items = om.convertValue(n.get("any"), listType);
+            List<Criteria> items = new ArrayList<>();
+            for (JsonNode child : n.get("any")) {
+                items.add(parseCriteria(child));
+            }
             return new Any(items);
         }
+
+        // ----- not -----
         if (n.has("not")) {
-            Criteria expr = om.convertValue(n.get("not"), Criteria.class);
+            Criteria expr = parseCriteria(n.get("not"));
             return new Not(expr);
         }
 
-        String type = n.path("type").asText(null);
+        // ----- leaf -----
+        JsonNode typeNode = n.get("type");
+        String type = (typeNode != null && !typeNode.isNull())
+                ? typeNode.asText()
+                : null;
+
         if (type == null || type.isBlank()) {
             throw new IllegalArgumentException("criteria leaf requires 'type'");
         }
 
         Map<String, Object> params;
         if (n.has("params") && n.get("params").isObject()) {
-            params = om.convertValue(n.get("params"), new TypeReference<>() {
-            });
+            params = toPlainMap(n.get("params"));
         } else {
-            params = om.convertValue(n, new TypeReference<>() {
-            });
+            params = toPlainMap(n);
             params.remove("type");
         }
 
         return new Leaf(type, params);
+    }
+
+    private Map<String, Object> toPlainMap(JsonNode objNode) {
+        Map<String, Object> result = new HashMap<>();
+
+        for (var prop : objNode.properties()) {
+            String key = prop.getKey();
+            JsonNode value = prop.getValue();
+            result.put(key, toPlainValue(value));
+        }
+
+        return result;
+    }
+
+
+    private Object toPlainValue(JsonNode node) {
+        if (node == null || node.isNull()) {
+            return null;
+        }
+        if (node.isTextual()) {
+            return node.asText();
+        }
+        if (node.isIntegralNumber()) {
+            return node.asLong();
+        }
+        if (node.isFloatingPointNumber()) {
+            return node.asDouble();
+        }
+        if (node.isBoolean()) {
+            return node.asBoolean();
+        }
+        if (node.isArray()) {
+            List<Object> list = new ArrayList<>();
+            node.forEach(child -> list.add(toPlainValue(child)));
+            return list;
+        }
+        if (node.isObject()) {
+            return toPlainMap(node);
+        }
+        return node.toString();
     }
 }

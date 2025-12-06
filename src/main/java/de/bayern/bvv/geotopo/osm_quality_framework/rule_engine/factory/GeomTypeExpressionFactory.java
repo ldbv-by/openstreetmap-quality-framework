@@ -1,16 +1,14 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.factory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSetFilter;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.util.JsonUtils;
+import tools.jackson.databind.JsonNode;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Feature;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.SpatialOperator;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.Expression;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -63,8 +61,8 @@ public class GeomTypeExpressionFactory implements ExpressionFactory {
      * Parse rule parameters.
      */
     private RuleParams parseParams(JsonNode json) {
-        String value = json.path("value").asText();
-        if (value == null || value.isBlank() || !Set.of("Point", "LineString", "Polygon").contains(value)) {
+        String value = JsonUtils.asOptionalString(json, "value");
+        if (!Set.of("Point", "LineString", "Polygon").contains(value)) {
             throw new IllegalArgumentException(type() + ": ''value' is required. Possible values are Point, LineString and Polygon.");
         }
 

@@ -1,9 +1,9 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.registry;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.factory.ExpressionFactory;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.JsonNode;
 
 import java.util.List;
 import java.util.Map;

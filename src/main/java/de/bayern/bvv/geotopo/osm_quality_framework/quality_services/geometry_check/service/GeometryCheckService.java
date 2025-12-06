@@ -16,10 +16,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.model.Qualit
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.spi.QualityService;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.RuleEngine;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.dto.RuleEvaluationDto;
-import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.Expression;
-import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.ExpressionParser;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

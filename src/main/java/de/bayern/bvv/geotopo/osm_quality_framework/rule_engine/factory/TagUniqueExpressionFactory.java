@@ -1,6 +1,7 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.factory;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.util.JsonUtils;
+import tools.jackson.databind.JsonNode;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Relation;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.TaggedObject;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.Expression;
@@ -16,31 +17,52 @@ import java.util.Map;
 @Component
 public class TagUniqueExpressionFactory implements ExpressionFactory {
 
+    /**
+     * Defines the unique rule type.
+     */
     @Override
     public String type() {
         return "tag_unique";
     }
 
+    /**
+     * Defines the possible rule parameters.
+     */
+    private record RuleParams (
+            String tagKey,
+            Integer maxLevel
+    ) {}
+
+    /**
+     * Defines the rule parameters and the execution block of a rule.
+     */
     @Override
     public Expression create(JsonNode json) {
-        String tagKey = json.path("tag_key").asText();
-        String maxLevelStr = json.path("max_level").asText();
 
-        if (tagKey == null || tagKey.isBlank()) {
-            throw new IllegalArgumentException("tag_unique: 'tag_key' is required");
-        }
+        // ----- Parse rule params ------
+        RuleParams params = this.parseParams(json);
 
-        Integer maxLevel;
-        if (!(maxLevelStr == null) && !(maxLevelStr.isBlank())) {
-            maxLevel = parseInt(maxLevelStr, "max_level");
-        } else {
-            maxLevel = null;
-        }
-
+        // ----- Execute rule ------
         return (taggedObject, baseTaggedObject) -> {
             int level = 0;
-            return this.compareTags(taggedObject, tagKey, new ArrayList<>(), level, maxLevel);
+            return this.compareTags(taggedObject, params.tagKey,
+                    new ArrayList<>(), level, params.maxLevel);
         };
+    }
+
+    /**
+     * Parse rule parameters.
+     */
+    private RuleParams parseParams(JsonNode json) {
+        String tagKey = JsonUtils.asString(json, "tag_key", type());
+        String maxLevelStr = JsonUtils.asOptionalString(json, "max_level");
+
+        Integer maxLevel = null;
+        if (!maxLevelStr.isEmpty()) {
+            maxLevel = parseInt(maxLevelStr, "max_level");
+        }
+
+        return new RuleParams(tagKey, maxLevel);
     }
 
     /**

@@ -14,6 +14,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class GeodataViewServiceIntegrationTest extends DatabaseIntegrationTest {
+
     @Autowired
     private GeodataViewService geodataViewService;
 
@@ -48,8 +49,8 @@ class GeodataViewServiceIntegrationTest extends DatabaseIntegrationTest {
                 .isEqualTo(0);
 
         assertThat(resultDataSet.relations().size())
-                .withFailMessage("Dataset composition: expected relations=0 but was %d", resultDataSet.relations().size())
-                .isEqualTo(0);
+                .withFailMessage("Dataset composition: expected relations=2 but was %d", resultDataSet.relations().size())
+                .isEqualTo(2);
 
         FeatureDto resultFeatureDto = resultDataSet.ways().getFirst();
         assertThat(resultFeatureDto.osmId()).isEqualTo(3640L);

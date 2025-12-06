@@ -23,7 +23,7 @@ class OsmGeometriesIntegrationTest extends DatabaseIntegrationTest {
         // Arrange
         DataSetFilter dataSetFilter = new DataSetFilter(
                 null, null, null,
-                new OsmIds(null, Set.of(10727L), null, null), null,null);
+                new OsmIds(null, null, Set.of(10727L), null), null,null);
 
         // Act
         DataSetDto dataSetDto = this.osmGeometriesService.getDataSet(dataSetFilter);
@@ -76,8 +76,8 @@ class OsmGeometriesIntegrationTest extends DatabaseIntegrationTest {
                 .isEqualTo(0);
 
         assertThat(dataSetDto.relations().size())
-                .withFailMessage("Dataset composition: expected relations=0 but was %d", dataSetDto.relations().size())
-                .isEqualTo(0);
+                .withFailMessage("Dataset composition: expected relations=1 but was %d", dataSetDto.relations().size())
+                .isEqualTo(1);
 
         FeatureDto featureDto = dataSetDto.ways().getFirst();
         assertThat(featureDto.osmId()).isEqualTo(3660L);

@@ -7,8 +7,8 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.mapp
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.ObjectType;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Rule;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Tag;
-import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.Expression;
-import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.ExpressionParser;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.RuleEngine;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.dto.RuleEvaluationDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceRequestDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceResultDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.mapper.QualityServiceResultMapper;
@@ -20,17 +20,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service("attribute-check")
 @RequiredArgsConstructor
 @Slf4j
 public class AttributeCheckService implements QualityService {
 
-    private final OsmSchemaService osmSchemaService;
-    private final ExpressionParser expressionParser;
+    public static final String QUALITY_SERVICE_NAME = "attribute-check";
     private QualityServiceResult qualityServiceResult;
+
+    private final OsmSchemaService osmSchemaService;
+    private final RuleEngine ruleEngine;
 
     /**
      * Executes the quality check for the given request.
@@ -43,59 +43,40 @@ public class AttributeCheckService implements QualityService {
         // ----- Initialize result of quality service.
         this.qualityServiceResult = new QualityServiceResult(qualityServiceRequestDto.qualityServiceId(), qualityServiceRequestDto.changesetId());
 
-        // ----- Get tagged objects.
+        // ----- Check the attribute consistency for each new or modified changeset object.
         ChangesetDataSet changesetDataSet = ChangesetDataSetMapper.toDomain(qualityServiceRequestDto.changesetDataSetDto());
 
-        // ----- Check for each tagged object the attribute consistency.
-        for (TaggedObject taggedObject : Stream.concat(
-                        Optional.ofNullable(changesetDataSet.getCreate())
-                                .map(DataSet::getAll).stream().flatMap(Collection::stream),
-                        Optional.ofNullable(changesetDataSet.getModify())
-                                .map(DataSet::getAll).stream().flatMap(Collection::stream)
-                )
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet())
-        ) {
+        for (TaggedObject changedObject : changesetDataSet.getCreatedAndModified()) {
 
             // ----- Get schema configuration for tagged object.
             long checkSchemaStartTime = System.currentTimeMillis();
-            ObjectType objectType = Optional.ofNullable(this.osmSchemaService.getObjectTypeInfo(taggedObject.getObjectType()))
+            ObjectType objectType = Optional.ofNullable(this.osmSchemaService.getObjectTypeInfo(changedObject.getObjectType()))
                     .map(ObjectTypeMapper::toDomain)
                     .orElse(null);
 
             if (objectType != null) {
 
                 // ----- Check schema for tagged object.
-
-                this.checkSchema(taggedObject, objectType);
+                this.checkSchema(changedObject, objectType);
 
                 log.info("attribute-check({}): object-type={}, checkSchemaTime={} ms",
                         qualityServiceRequestDto.changesetId(), objectType.getName(), System.currentTimeMillis() - checkSchemaStartTime);
 
                 // ----- Check schema rules "attribute-check" for tagged object.
                 if (this.qualityServiceResult.getErrors().isEmpty()) {
-                    for (Rule rule : objectType.getRules().stream().filter(r -> r.getType().equals("attribute-check")).toList()) {
-                        log.info("attribute-check({}): start rule={}",
-                                qualityServiceRequestDto.changesetId(), rule.getId());
+                    for (Rule rule : objectType.getRules().stream()
+                            .filter(r -> QUALITY_SERVICE_NAME.equals(r.getType()))
+                            .toList()) {
 
-                        long ruleStartTime = System.currentTimeMillis();
-                        Expression conditions = this.expressionParser.parse(rule.getExpression().path("conditions"));
-                        Expression checks = this.expressionParser.parse(rule.getExpression().path("checks"));
-
-                        if (conditions.evaluate(taggedObject, taggedObject)) {
-                            if (!checks.evaluate(taggedObject, taggedObject)) {
-                                this.setError(taggedObject, rule.getErrorText());
-                            }
+                        if (!this.ruleEngine.evaluate(new RuleEvaluationDto(changedObject, rule))) {
+                            this.setError(changedObject, rule.getErrorText());
                         }
-
-                        log.info("attribute-check({}): finish rule={}, time={} ms",
-                                qualityServiceRequestDto.changesetId(), rule.getId(), System.currentTimeMillis() - ruleStartTime);
                     }
                 }
 
             } else {
                 // ----- No schema configuration found for feature.
-                this.setError(taggedObject,"Keine Schemaeinträge für '" + taggedObject.getObjectType() + "' gefunden.");
+                this.setError(changedObject,"Keine Schemaeinträge für '" + changedObject.getObjectType() + "' gefunden.");
             }
         }
 

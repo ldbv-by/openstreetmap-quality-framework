@@ -1,6 +1,7 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.factory;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.util.JsonUtils;
+import tools.jackson.databind.JsonNode;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.TaggedObject;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.Expression;
 import org.springframework.stereotype.Component;
@@ -38,6 +39,7 @@ public class TagRegexMatchExpressionFactory implements ExpressionFactory {
      */
     @Override
     public Expression create(JsonNode json) {
+
         // ----- Parse rule params ------
         RuleParams params = this.parseParams(json);
 
@@ -63,28 +65,19 @@ public class TagRegexMatchExpressionFactory implements ExpressionFactory {
      * Parse rule parameters.
      */
     private RuleParams parseParams(JsonNode json) {
-        String tagKey = json.path("tag_key").asText();
-        String patternStr = json.path("pattern").asText();
-        Integer minCount = tryParseInt(json.path("min_count").asText());
+        String tagKey = JsonUtils.asString(json, "tag_key", type());
+        String patternStr = JsonUtils.asString(json, "pattern", type());
+        Integer minCount = tryParseInt(JsonUtils.asOptionalString(json, "min_count"));
 
-        if (tagKey == null || tagKey.isBlank()) {
-            throw new IllegalArgumentException("regex_match: 'tag_key' is required");
+        try {
+            Pattern pattern = Pattern.compile(patternStr);
+
+            return new RuleParams(
+                    tagKey, pattern, minCount
+            );
+        } catch (PatternSyntaxException e) {
+            throw new IllegalArgumentException(type() + ": invalid pattern: " + e.getMessage(), e);
         }
-
-        Pattern pattern;
-        if (patternStr == null || patternStr.isBlank()) {
-            throw new IllegalArgumentException("regex_match: 'pattern' is required");
-        } else {
-            try {
-                pattern = Pattern.compile(patternStr);
-            } catch (PatternSyntaxException e) {
-                throw new IllegalArgumentException("regex_match: invalid pattern: " + e.getMessage(), e);
-            }
-        }
-
-        return new RuleParams(
-                tagKey, pattern, minCount
-        );
     }
 
     private static Integer tryParseInt(String s) {

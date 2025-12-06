@@ -1,6 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.repository;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.*;
+import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.entity.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;

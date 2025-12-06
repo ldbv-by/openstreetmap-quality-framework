@@ -1,6 +1,7 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.factory;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.util.JsonUtils;
+import tools.jackson.databind.JsonNode;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.Expression;
 import org.springframework.stereotype.Component;
 
@@ -10,43 +11,40 @@ import org.springframework.stereotype.Component;
 @Component
 public class NumberCompareExpressionFactory implements ExpressionFactory {
 
+    /**
+     * Defines the unique rule type.
+     */
     @Override
     public String type() {
         return "number_compare";
     }
 
+    /**
+     * Defines the possible rule parameters.
+     */
+    private record RuleParams (
+            String tagKey,
+            String operator,
+            String compareTagKey,
+            String compareValue
+    ) {}
+
+    /**
+     * Defines the rule parameters and the execution block of a rule.
+     */
     @Override
     public Expression create(JsonNode json) {
-        String tagKey = json.path("tag_key").asText();
-        String operator = json.path("operator").asText();
-        String compareTagKey = json.path("compare_tag_key").asText();
-        String compareValue = json.path("compare_value").asText();
 
-        if (tagKey == null || tagKey.isBlank()) {
-            throw new IllegalArgumentException("number_compare: 'tag_key' is required");
-        }
+        // ----- Parse rule params ------
+        RuleParams params = this.parseParams(json);
 
-        if (operator == null || operator.isBlank()) {
-            throw new IllegalArgumentException("number_compare: 'operator' is required");
-        }
-
-        boolean hasCompareTagKey = !(compareTagKey == null || compareTagKey.isBlank());
-        boolean hasCompareValue = !(compareValue == null || compareValue.isBlank());
-
-        if (!hasCompareTagKey && !hasCompareValue) {
-            throw new IllegalArgumentException("number_compare: 'compare_tag_key' or 'compare_value' is required");
-        }
-
-        if (hasCompareTagKey && hasCompareValue) {
-            throw new IllegalArgumentException("number_compare: 'compare_tag_key' and 'compare_value' together are not allowed");
-        }
-
+        // ----- Execute rule ------
         return (taggedObject, baseTaggedObject) -> {
-            int tagNumber = parseInt(taggedObject.getTags().get(tagKey), tagKey);
-            int compareNumber = hasCompareValue ? parseInt(compareValue, "compare_value") :
-                    parseInt(taggedObject.getTags().get(compareTagKey), compareTagKey);
+            int tagNumber = parseInt(taggedObject.getTags().get(params.tagKey), params.tagKey);
+            int compareNumber = !(params.compareValue.isEmpty()) ? parseInt(params.compareValue, "compare_value") :
+                    parseInt(taggedObject.getTags().get(params.compareTagKey), "compare_tag_key");
 
-            return switch (operator) {
+            return switch (params.operator) {
                 case "<" -> tagNumber < compareNumber;
                 case "<=" -> tagNumber <= compareNumber;
                 case ">" -> tagNumber > compareNumber;
@@ -55,14 +53,39 @@ public class NumberCompareExpressionFactory implements ExpressionFactory {
                 case "!=" -> tagNumber != compareNumber;
                 case "%" -> {
                     if (compareNumber == 0) {
-                        throw new IllegalArgumentException("number_compare: modulo by zero");
+                        throw new IllegalArgumentException(type() + ": modulo by zero");
                     }
 
                     yield (tagNumber % compareNumber) == 0;
                 }
-                default -> throw new IllegalArgumentException("date_compare: unsupported operator: " + operator);
+                default -> throw new IllegalArgumentException(type() + ": unsupported operator: " + params.operator);
             };
         };
+    }
+
+    /**
+     * Parse rule parameters.
+     */
+    private RuleParams parseParams(JsonNode json) {
+        String tagKey = JsonUtils.asString(json, "tag_key", type());
+        String operator = JsonUtils.asString(json,"operator", type());
+        String compareTagKey = JsonUtils.asOptionalString(json, "compare_tag_key");
+        String compareValue = JsonUtils.asOptionalString(json, "compare_value");
+
+        boolean hasCompareTagKey = !(compareTagKey.isEmpty());
+        boolean hasCompareValue = !(compareValue.isEmpty());
+
+        if (!hasCompareTagKey && !hasCompareValue) {
+            throw new IllegalArgumentException(type() + ": 'compare_tag_key' or 'compare_value' is required");
+        }
+
+        if (hasCompareTagKey && hasCompareValue) {
+            throw new IllegalArgumentException(type() + ": 'compare_tag_key' and 'compare_value' together are not allowed");
+        }
+
+        return new RuleParams(
+                tagKey, operator, compareTagKey, compareValue
+        );
     }
 
     /**

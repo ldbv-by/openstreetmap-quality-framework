@@ -1,12 +1,12 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.entity;
 
-import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import java.util.List;
 public class RelationEntity extends OsmObjectEntity {
 
     @Column(name = "members", columnDefinition = "jsonb")
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private List<Member> members;
 
     @Data

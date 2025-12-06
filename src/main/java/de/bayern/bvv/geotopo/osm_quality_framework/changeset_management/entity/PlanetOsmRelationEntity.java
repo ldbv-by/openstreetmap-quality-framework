@@ -1,6 +1,5 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity;
 
-import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -21,7 +20,7 @@ public class PlanetOsmRelationEntity {
     private Long id;
 
     @Column(name = "members", columnDefinition = "jsonb")
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private List<Member> members;
 
     @Column(name = "tags")

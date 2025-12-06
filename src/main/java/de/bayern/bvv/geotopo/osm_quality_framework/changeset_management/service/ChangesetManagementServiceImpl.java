@@ -182,9 +182,20 @@ public class ChangesetManagementServiceImpl implements ChangesetManagementServic
 
         if (nodeEntities != null) {
             for (NodeEntity nodeEntity : nodeEntities) {
-                List<Relation> nodeRelations = this.getRelationsForOsmObject(changesetId,"n", nodeEntity.getOsmId());
+                List<Relation> loadedNodeRelations = this.getRelationsForOsmObject(changesetId,"n", nodeEntity.getOsmId());
+
+                List<Relation> nodeRelations = new ArrayList<>();
+                for (Relation nodeRelation : loadedNodeRelations) {
+                    int idx = relations.indexOf(nodeRelation);
+                    if (idx < 0) {
+                        relations.add(nodeRelation);
+                    } else {
+                        nodeRelation = relations.get(idx);
+                    }
+                    nodeRelations.add(nodeRelation);
+                }
+
                 nodes.add(NodeEntityMapper.toFeature(nodeEntity, nodeRelations, coordinateReferenceSystem));
-                relations.addAll(nodeRelations);
             }
         }
 
@@ -217,10 +228,21 @@ public class ChangesetManagementServiceImpl implements ChangesetManagementServic
 
         if (wayEntities != null) {
             for (WayEntity wayEntity : wayEntities) {
-                List<Relation> wayRelations = this.getRelationsForOsmObject(changesetId,"w", wayEntity.getOsmId());
+                List<Relation> loadedWayRelations = this.getRelationsForOsmObject(changesetId,"w", wayEntity.getOsmId());
+
+                List<Relation> wayRelations = new ArrayList<>();
+                for (Relation wayRelation : loadedWayRelations) {
+                    int idx = relations.indexOf(wayRelation);
+                    if (idx < 0) {
+                        relations.add(wayRelation);
+                    } else {
+                        wayRelation = relations.get(idx);
+                    }
+                    wayRelations.add(wayRelation);
+                }
+
                 List<GeometryNode> geometryNodes = this.getGeometryNodes(wayEntity, coordinateReferenceSystem);
                 ways.add(WayEntityMapper.toFeature(wayEntity, geometryNodes, wayRelations, coordinateReferenceSystem));
-                relations.addAll(wayRelations);
             }
         }
 
@@ -254,10 +276,21 @@ public class ChangesetManagementServiceImpl implements ChangesetManagementServic
 
         if (areaEntities != null) {
             for (AreaEntity areaEntity : areaEntities) {
-                List<Relation> areaRelations = this.getRelationsForOsmObject(changesetId, areaEntity.getOsmGeometryType().toString(), areaEntity.getOsmId());
+                List<Relation> loadedAreaRelations = this.getRelationsForOsmObject(changesetId, areaEntity.getOsmGeometryType().toString(), areaEntity.getOsmId());
+
+                List<Relation> areaRelations = new ArrayList<>();
+                for (Relation areaRelation : loadedAreaRelations) {
+                    int idx = relations.indexOf(areaRelation);
+                    if (idx < 0) {
+                        relations.add(areaRelation);
+                    } else {
+                        areaRelation = relations.get(idx);
+                    }
+                    areaRelations.add(areaRelation);
+                }
+
                 List<GeometryNode> geometryNodes = this.getGeometryNodes(areaEntity, coordinateReferenceSystem);
                 areas.add(AreaEntityMapper.toFeature(areaEntity, geometryNodes, areaRelations, coordinateReferenceSystem));
-                relations.addAll(areaRelations);
             }
         }
 

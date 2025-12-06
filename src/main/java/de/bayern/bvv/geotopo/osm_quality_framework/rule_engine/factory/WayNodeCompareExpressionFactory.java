@@ -1,6 +1,7 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.factory;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.util.JsonUtils;
+import tools.jackson.databind.JsonNode;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.Feature;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.GeometryNode;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.Expression;
@@ -20,20 +21,31 @@ import java.util.Objects;
 @Component
 public class WayNodeCompareExpressionFactory implements ExpressionFactory {
 
+    /**
+     * Defines the unique rule type.
+     */
     @Override
     public String type() {
         return "way_node_compare";
     }
 
+    /**
+     * Defines the possible rule parameters.
+     */
+    private record RuleParams (
+            Integer index
+    ) {}
+
+    /**
+     * Defines the rule parameters and the execution block of a rule.
+     */
     @Override
     public Expression create(JsonNode json) {
-        String indexStr = json.path("index").asText();
-        int index = parseInt(indexStr, "index");
 
-        if (index == 0) {
-            throw new IllegalArgumentException("way_node_compare: 'index' > 0 or index < 0 is required.");
-        }
+        // ----- Parse rule params ------
+        RuleParams params = this.parseParams(json);
 
+        // ----- Execute rule ------
         return (taggedObject, baseTaggedObject) -> {
 
             if (!(baseTaggedObject instanceof Feature way) ||
@@ -41,10 +53,10 @@ public class WayNodeCompareExpressionFactory implements ExpressionFactory {
                 return false;
             }
 
-            if (Math.abs(index) > way.getGeometryNodes().size()) return false;
+            if (Math.abs(params.index) > way.getGeometryNodes().size()) return false;
 
             GeometryNode geometryNode = way.getGeometryNodes().get(
-                    (index > 0) ? (index -1) : (way.getGeometryNodes().size() + index));
+                    (params.index > 0) ? (params.index -1) : (way.getGeometryNodes().size() + params.index));
 
             if (geometryNode == null) return false;
 
@@ -53,7 +65,21 @@ public class WayNodeCompareExpressionFactory implements ExpressionFactory {
     }
 
     /**
-     * Number helper.
+     * Parse rule parameters.
+     */
+    private RuleParams parseParams(JsonNode json) {
+        String indexStr = JsonUtils.asOptionalString(json, "index");
+        int index = parseInt(indexStr, "index");
+
+        if (index == 0) {
+            throw new IllegalArgumentException(type() + ": 'index' > 0 or index < 0 is required.");
+        }
+
+        return new RuleParams(index);
+    }
+
+    /**
+     * Number Helper.
      */
     private static int parseInt(String s, String field) {
         try {

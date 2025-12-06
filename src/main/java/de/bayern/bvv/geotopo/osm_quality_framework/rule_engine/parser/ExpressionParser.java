@@ -1,16 +1,16 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.registry.ExpressionRegistry;
 import de.bayern.bvv.geotopo.osm_quality_framework.geodata_view.api.GeodataViewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.*;
 
@@ -282,7 +282,7 @@ public final class ExpressionParser {
             }
 
             return loopInfo;
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalArgumentException("'loop_info' parse error.");
         }
     }

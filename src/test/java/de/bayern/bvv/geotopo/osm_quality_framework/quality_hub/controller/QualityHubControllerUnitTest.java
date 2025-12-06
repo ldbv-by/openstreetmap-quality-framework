@@ -1,11 +1,10 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.controller;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.JacksonConfiguration;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.service.QualityHubService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -15,13 +14,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
-@WebMvcTest(QualityHubController.class)
-@Import(JacksonConfiguration.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 class QualityHubControllerUnitTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    MockMvc mockMvc;
 
     @MockitoBean
     QualityHubService qualityHubService;

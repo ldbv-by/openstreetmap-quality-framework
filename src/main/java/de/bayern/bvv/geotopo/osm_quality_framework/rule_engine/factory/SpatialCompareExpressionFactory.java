@@ -1,16 +1,11 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.factory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.util.JsonUtils;
+import tools.jackson.databind.JsonNode;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.FeatureMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.util.CriteriaDeserializer;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.util.RuleAlias;
 import de.bayern.bvv.geotopo.osm_quality_framework.geodata_view.api.GeodataViewService;
@@ -92,64 +87,14 @@ public class SpatialCompareExpressionFactory implements ExpressionFactory {
      * Parse rule parameters.
      */
     private RuleParams parseParams(JsonNode json) {
-        Set<SpatialOperator> operators = this.parseOperators(json);
-        DataSetFilter dataSetFilter = this.parseDataSetFilter(json);
-        String referenceFeatureRole = json.path("reference_feature_role").asText();
-        boolean selfCheck = Optional.of(json.path("self_check").asBoolean()).orElse(false);
+        Set<SpatialOperator> operators = JsonUtils.asSpatialOperators(json, type());
+        DataSetFilter dataSetFilter = JsonUtils.asOptionalDataSetFilter(json);
+        String referenceFeatureRole = JsonUtils.asOptionalString(json,"reference_feature_role");
+        boolean selfCheck = JsonUtils.asOptionalBoolean(json, "self_check");
 
         return new RuleParams(
                 operators, dataSetFilter, referenceFeatureRole, selfCheck
         );
-    }
-
-    // ------ Helper function to parse operator/s.
-    private Set<SpatialOperator> parseOperators(JsonNode json) {
-        EnumSet<SpatialOperator> operators = EnumSet.noneOf(SpatialOperator.class);
-
-        JsonNode operatorsJsonNode = json.path("operators");
-
-        if (operatorsJsonNode == null || operatorsJsonNode.isEmpty()) {
-            operatorsJsonNode = json.path("operator");
-            if (operatorsJsonNode == null) throw new IllegalArgumentException(type() + ": 'operator(s)' is required.");
-        }
-
-        try {
-            if (!operatorsJsonNode.isArray()) {
-                SpatialOperator operator = SpatialOperator.valueOf(operatorsJsonNode.asText().trim().toUpperCase());
-                operators.add(operator);
-            } else {
-                for (JsonNode operatorJson : operatorsJsonNode) {
-                    SpatialOperator operator = SpatialOperator.valueOf(operatorJson.asText().trim().toUpperCase());
-                    operators.add(operator);
-                }
-            }
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(type() + ": 'operator(s)' not found.");
-        }
-
-        return operators;
-    }
-
-    // ----- Helper function to parse data set filter.
-    private DataSetFilter parseDataSetFilter(JsonNode json) {
-        JsonNode dataSetFilterJsonNode = json.path("data_set_filter");
-        if (dataSetFilterJsonNode == null || dataSetFilterJsonNode.isEmpty()) {
-            return new DataSetFilter(null, null, null, null, null, null);
-        }
-
-        try {
-            ObjectMapper objectMapper = JsonMapper.builder()
-                    .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
-                    .build();
-
-            SimpleModule criteriaModule = new SimpleModule();
-            criteriaModule.addDeserializer(Criteria.class, new CriteriaDeserializer());
-            objectMapper.registerModule(criteriaModule);
-
-            return objectMapper.treeToValue(dataSetFilterJsonNode, DataSetFilter.class);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException(type() + ": 'data_set_filter' parse error.");
-        }
     }
 
     /**

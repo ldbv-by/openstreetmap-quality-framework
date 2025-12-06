@@ -1,19 +1,20 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.attribute_check;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.JacksonConfiguration;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.config.JtsJackson3Module;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.dto.QualityHubResultDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceErrorDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceResultDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.test_core.DatabaseIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -27,14 +28,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import(JacksonConfiguration.class)
 class DE_41002_A_b_004 extends DatabaseIntegrationTest {
 
     @Autowired
     MockMvc mockMvc;
 
-    @Autowired
-    ObjectMapper objectMapper;
+    ObjectMapper objectMapper = JsonMapper.builder()
+            .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+            .addModule(new JtsJackson3Module())
+            .build();
 
     @Test
     void createVersorgungsanlageMitPrimaerenergie() throws Exception {

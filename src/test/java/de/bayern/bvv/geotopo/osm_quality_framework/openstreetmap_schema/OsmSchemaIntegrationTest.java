@@ -43,7 +43,7 @@ class OsmSchemaIntegrationTest extends DatabaseIntegrationTest {
         {
             var t = tag.apply("artDerBebauung");
             assertThat(t.type()).isEqualTo(Tag.Type.DICTIONARY);
-            assertThat(t.multiplicity().min()).isEqualTo(0);
+            assertThat(t.multiplicity().min()).isEqualTo(1);
             assertThat(t.multiplicity().max()).isEqualTo(1);
             assertThat(t.dictionary()).containsExactlyInAnyOrderEntriesOf(
                     Map.ofEntries(

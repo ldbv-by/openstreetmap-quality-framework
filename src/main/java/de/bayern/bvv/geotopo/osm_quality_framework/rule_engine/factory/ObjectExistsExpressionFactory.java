@@ -1,14 +1,9 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.factory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.util.JsonUtils;
+import tools.jackson.databind.JsonNode;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.util.CriteriaDeserializer;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.parser.Expression;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.util.RuleAlias;
 import de.bayern.bvv.geotopo.osm_quality_framework.geodata_view.api.GeodataViewService;
@@ -28,19 +23,33 @@ import java.util.Objects;
 public class ObjectExistsExpressionFactory implements ExpressionFactory {
 
     private final GeodataViewService geodataViewService;
-    private final ObjectMapper objectMapper;
 
+    /**
+     * Defines the unique rule type.
+     */
     @Override
     public String type() {
         return "object_exists";
     }
 
+    /**
+     * Defines the possible rule parameters.
+     */
+    private record RuleParams (
+            DataSetFilter dataSetFilter
+    ) {}
+
+    /**
+     * Defines the rule parameters and the execution block of a rule.
+     */
     @Override
     public Expression create(JsonNode json) {
-        DataSetFilter dataSetFilter = this.parseDataSetFilter(json);
+        // ----- Parse rule params ------
+        RuleParams params = this.parseParams(json);
 
+        // ----- Execute rule ------
         return (taggedObject, baseTaggedObject) -> {
-            DataSetFilter preparedDataSetFilter = RuleAlias.replaceDataSetFilter(dataSetFilter, taggedObject);
+            DataSetFilter preparedDataSetFilter = RuleAlias.replaceDataSetFilter(params.dataSetFilter, taggedObject);
             DataSetDto resultDataSetDto = this.geodataViewService.getDataSet(preparedDataSetFilter);
 
             if (resultDataSetDto == null) return false;
@@ -95,25 +104,11 @@ public class ObjectExistsExpressionFactory implements ExpressionFactory {
         };
     }
 
-    private DataSetFilter parseDataSetFilter(JsonNode json) {
-        JsonNode dataSetFilterJsonNode = json.path("data_set_filter");
-        if (dataSetFilterJsonNode == null || dataSetFilterJsonNode.isEmpty()) {
-            return new DataSetFilter(null, null, null, null, null, null);
-        }
-
-        try {
-            ObjectMapper objectMapper = JsonMapper.builder()
-                    .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
-                    .build();
-
-            SimpleModule criteriaModule = new SimpleModule();
-            criteriaModule.addDeserializer(Criteria.class, new CriteriaDeserializer());
-            objectMapper.registerModule(criteriaModule);
-
-            return objectMapper.treeToValue(dataSetFilterJsonNode, DataSetFilter.class);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException(type() + ": 'data_set_filter' parse error.");
-        }
+    /**
+     * Parse rule parameters.
+     */
+    private RuleParams parseParams(JsonNode json) {
+        DataSetFilter dataSetFilter = JsonUtils.asOptionalDataSetFilter(json);
+        return new RuleParams(dataSetFilter);
     }
-
 }

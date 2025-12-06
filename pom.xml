@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.5</version>
+		<version>4.0.0</version>
 		<relativePath/>
 	</parent>
 
@@ -18,14 +18,12 @@
 
 	<properties>
 		<java.version>24</java.version>
-		<spring-modulith.version>1.4.1</spring-modulith.version>
+		<spring-modulith.version>2.0.0</spring-modulith.version>
 		<jakarta-xml-bind.version>4.0.4</jakarta-xml-bind.version>
-		<glassfish-jaxb.version>4.0.5</glassfish-jaxb.version>
+		<glassfish-jaxb.version>4.0.6</glassfish-jaxb.version>
 		<jts-core.version>1.20.0</jts-core.version>
-		<hypersistence.version>3.11.0</hypersistence.version>
-		<jackson-datatype-jts.version>2.19.2</jackson-datatype-jts.version>
 		<proj4j.version>1.4.1</proj4j.version>
-		<testcontainers.version>1.21.3</testcontainers.version>
+		<testcontainers.version>2.0.2</testcontainers.version>
 	</properties>
 
 	<dependencies>
@@ -78,9 +76,20 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.modulith</groupId>
 			<artifactId>spring-modulith-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse</groupId>
+			<artifactId>yasson</artifactId>
 		</dependency>
 
 		<dependency>
@@ -99,18 +108,13 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.locationtech.jts.io</groupId>
+			<artifactId>jts-io-common</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-spatial</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>io.hypersistence</groupId>
-			<artifactId>hypersistence-utils-hibernate-63</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.graphhopper.external</groupId>
-			<artifactId>jackson-datatype-jts</artifactId>
 		</dependency>
 
 		<dependency>
@@ -125,13 +129,13 @@
 
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>postgresql</artifactId>
+			<artifactId>testcontainers-postgresql</artifactId>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>junit-jupiter</artifactId>
+			<artifactId>testcontainers-junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
 
@@ -170,15 +174,9 @@
 			</dependency>
 
 			<dependency>
-				<groupId>io.hypersistence</groupId>
-				<artifactId>hypersistence-utils-hibernate-63</artifactId>
-				<version>${hypersistence.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.graphhopper.external</groupId>
-				<artifactId>jackson-datatype-jts</artifactId>
-				<version>${jackson-datatype-jts.version}</version>
+				<groupId>org.locationtech.jts.io</groupId>
+				<artifactId>jts-io-common</artifactId>
+				<version>${jts-core.version}</version>
 			</dependency>
 
 			<dependency>

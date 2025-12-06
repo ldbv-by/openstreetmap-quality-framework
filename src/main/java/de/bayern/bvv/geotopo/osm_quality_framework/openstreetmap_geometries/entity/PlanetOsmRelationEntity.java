@@ -1,6 +1,5 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.entity;
 
-import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -10,7 +9,6 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,7 +20,7 @@ public class PlanetOsmRelationEntity {
     private Long id;
 
     @Column(name = "members", columnDefinition = "jsonb")
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private List<Member> members;
 
     @Column(name = "tags")

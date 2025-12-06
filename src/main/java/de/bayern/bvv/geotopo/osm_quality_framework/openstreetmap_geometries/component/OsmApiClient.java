@@ -13,9 +13,8 @@ public class OsmApiClient {
 
     private final WebClient webClient;
 
-    public OsmApiClient(WebClient.Builder webClientBuilder,
-                        @Value("${openstreetmap-api}") String osmApiBaseUrl) {
-        this.webClient = webClientBuilder
+    public OsmApiClient(@Value("${openstreetmap-api}") String osmApiBaseUrl) {
+        this.webClient = WebClient.builder()
                 .baseUrl(osmApiBaseUrl)
                 .build();
     }

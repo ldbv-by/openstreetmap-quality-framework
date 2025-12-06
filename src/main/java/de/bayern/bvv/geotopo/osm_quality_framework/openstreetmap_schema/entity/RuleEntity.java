@@ -1,11 +1,13 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.sun.istack.NotNull;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+
+import java.util.Map;
 
 /**
  * Represents a rule for an object type.
@@ -39,7 +41,7 @@ public class RuleEntity {
     @NotNull
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "expression")
-    private JsonNode expression;
+    private Map<String, Object> expression;
 
     @NotNull
     @Column(name = "error_text", length = 4000)
