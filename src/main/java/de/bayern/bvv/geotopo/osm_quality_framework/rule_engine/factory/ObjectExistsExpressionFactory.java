@@ -96,7 +96,12 @@ public class ObjectExistsExpressionFactory implements ExpressionFactory {
                     return resultDataSetDto.relations().stream()
                             .anyMatch(a -> !Objects.equals(a.osmId(), relation.getOsmId()));
                 } else {
-                    return true;
+                    return resultDataSetDto.relations().stream()
+                            .anyMatch(r ->
+                                    r.members() == null
+                                            || r.members().stream()
+                                            .noneMatch(m -> Objects.equals(m.ref(), taggedObject.getOsmId()))
+                            );
                 }
             }
 
