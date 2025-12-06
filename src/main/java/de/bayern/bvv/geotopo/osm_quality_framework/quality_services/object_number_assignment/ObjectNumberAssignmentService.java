@@ -55,6 +55,7 @@ public class ObjectNumberAssignmentService implements QualityService {
         QualityServiceResult qualityServiceResult = new QualityServiceResult(
                 qualityServiceRequestDto.qualityServiceId(), qualityServiceRequestDto.changesetId());
 
+        boolean changesetIsModified = false;
         Changeset modifiedChangeset = ChangesetMapper.toDomain(
                 qualityServiceRequestDto.changesetId(), qualityServiceRequestDto.changesetDto());
 
@@ -68,6 +69,7 @@ public class ObjectNumberAssignmentService implements QualityService {
         for (TaggedObject createdObject : changesetDataSet.getCreate().getAll()) {
             if (identifierIsNecessary(createdObject)) {
                 setNewIdentifier(createdObject, modifiedChangeset, nowUtc);
+                changesetIsModified = true;
             }
         }
 
@@ -87,16 +89,21 @@ public class ObjectNumberAssignmentService implements QualityService {
                     !(modifyObject.getTags().getOrDefault(OBJECT_START_TIME_TAG_KEY, "").equals(objectStartTimeBefore))) {
 
                     setOldIdentifier(modifyObject, modifiedChangeset, identifierUUIDBefore, identifierTimeUUIDBefore, objectStartTimeBefore);
+                    changesetIsModified = true;
                 }
 
                 // Object Type has changed -> set new identifier.
                 if (!(modifyObject.getTags().getOrDefault(OBJECT_TYPE_TAG_KEY, "").equals(objectTypeBefore))) {
                     setNewIdentifier(modifyObject, modifiedChangeset, nowUtc);
+                    changesetIsModified = true;
                 }
             }
         }
 
-        qualityServiceResult.setModifiedChangeset(modifiedChangeset);
+        if (changesetIsModified) {
+            qualityServiceResult.setModifiedChangeset(modifiedChangeset);
+        }
+
         return QualityServiceResultMapper.toDto(qualityServiceResult);
     }
 
