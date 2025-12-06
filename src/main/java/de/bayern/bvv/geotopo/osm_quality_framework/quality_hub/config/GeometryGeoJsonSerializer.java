@@ -1,4 +1,4 @@
-package de.bayern.bvv.geotopo.osm_quality_framework.quality_core.config;
+package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.geojson.GeoJsonWriter;
 import tools.jackson.core.JacksonException;
