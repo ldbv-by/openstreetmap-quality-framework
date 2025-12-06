@@ -19,6 +19,7 @@ public interface ChangesetRelationRepository extends JpaRepository<RelationEntit
          WHERE rm.member_osm_id = :memberOsmId
            AND lower(rm.member_type) = lower(:memberType)
            AND rm.changeset_id = :changesetId
+           AND r.changeset_id = :changesetId
         """, nativeQuery = true)
     List<RelationEntity> findAllByMember(@Param("changesetId") Long changesetId, @Param("memberType") String memberType, @Param("memberOsmId")Long memberOsmId);
 
@@ -34,6 +35,7 @@ public interface ChangesetRelationRepository extends JpaRepository<RelationEntit
         SELECT r.*
           FROM changeset_data.relations r
           JOIN v_relation_members rm ON rm.member_osm_id = r.osm_id
+         WHERE r.changeset_id = :changesetId
         """, nativeQuery = true)
     List<RelationEntity> fetchByRelationIdAndRole(@Param("changesetId")Long changesetId,
                                                   @Param("relationOsmId")Long relationOsmId,
