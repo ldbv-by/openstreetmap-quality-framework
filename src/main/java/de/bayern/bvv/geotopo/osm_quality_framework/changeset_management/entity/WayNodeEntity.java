@@ -15,6 +15,7 @@ import org.hibernate.annotations.Subselect;
 @Subselect(value = """
     SELECT way.osm_id AS way_osm_id,
            node.id AS node_osm_id,
+           way.changeset_id AS changeset_id,
            node.lat::double precision / '10000000'::bigint::double precision AS lat,
            node.lon::double precision / '10000000'::bigint::double precision AS lon,
            node.seq

@@ -127,7 +127,7 @@ public class ChangesetManagementServiceImpl implements ChangesetManagementServic
         osmIds = this.getOsmIds(changesetObjects, W, OperationType.MODIFY, new int[]{0,1,0,0}, wayOsmIds);
         result.getModify().getWays().addAll(getWaysByFeatureFilter(changesetId, osmIds, criteria, coordinateReferenceSystem, relations));
 
-        osmIds = this.getOsmIds(changesetObjects, A, OperationType.MODIFY, new int[]{0,1,0,0}, areaOsmIds);
+        osmIds = this.getOsmIds(changesetObjects, A, OperationType.MODIFY, new int[]{0,0,1,0}, areaOsmIds);
         result.getModify().getAreas().addAll(getAreasByFeatureFilter(changesetId, osmIds, criteria, coordinateReferenceSystem, relations));
 
         osmIds = this.getOsmIds(changesetObjects, R, OperationType.MODIFY, new int[]{0,0,0,1}, relationOsmIds);
@@ -241,7 +241,7 @@ public class ChangesetManagementServiceImpl implements ChangesetManagementServic
                     wayRelations.add(wayRelation);
                 }
 
-                List<GeometryNode> geometryNodes = this.getGeometryNodes(wayEntity, coordinateReferenceSystem);
+                List<GeometryNode> geometryNodes = this.getGeometryNodes(changesetId, wayEntity, coordinateReferenceSystem);
                 ways.add(WayEntityMapper.toFeature(wayEntity, geometryNodes, wayRelations, coordinateReferenceSystem));
             }
         }
@@ -259,7 +259,7 @@ public class ChangesetManagementServiceImpl implements ChangesetManagementServic
         if (wayEntities != null) {
             for (WayEntity wayEntity : wayEntities) {
                 List<Relation> relations = this.getRelationsForOsmObject(changesetId,"w", wayEntity.getOsmId());
-                List<GeometryNode> geometryNodes = this.getGeometryNodes(wayEntity, coordinateReferenceSystem);
+                List<GeometryNode> geometryNodes = this.getGeometryNodes(changesetId, wayEntity, coordinateReferenceSystem);
                 ways.add(WayEntityMapper.toFeature(wayEntity, geometryNodes, relations, coordinateReferenceSystem));
             }
         }
@@ -289,7 +289,7 @@ public class ChangesetManagementServiceImpl implements ChangesetManagementServic
                     areaRelations.add(areaRelation);
                 }
 
-                List<GeometryNode> geometryNodes = this.getGeometryNodes(areaEntity, coordinateReferenceSystem);
+                List<GeometryNode> geometryNodes = this.getGeometryNodes(changesetId, areaEntity, coordinateReferenceSystem);
                 areas.add(AreaEntityMapper.toFeature(areaEntity, geometryNodes, areaRelations, coordinateReferenceSystem));
             }
         }
@@ -307,7 +307,7 @@ public class ChangesetManagementServiceImpl implements ChangesetManagementServic
         if (areaEntities != null) {
             for (AreaEntity areaEntity : areaEntities) {
                 List<Relation> relations = this.getRelationsForOsmObject(changesetId, areaEntity.getOsmGeometryType().toString(), areaEntity.getOsmId());
-                List<GeometryNode> geometryNodes = this.getGeometryNodes(areaEntity, coordinateReferenceSystem);
+                List<GeometryNode> geometryNodes = this.getGeometryNodes(changesetId, areaEntity, coordinateReferenceSystem);
                 areas.add(AreaEntityMapper.toFeature(areaEntity, geometryNodes, relations, coordinateReferenceSystem));
             }
         }
@@ -395,8 +395,8 @@ public class ChangesetManagementServiceImpl implements ChangesetManagementServic
     /**
      * Returns the geometry nodes for the given area in the requested coordinate reference system.
      */
-    private List<GeometryNode> getGeometryNodes(AreaEntity areaEntity, String coordinateReferenceSystem) {
-        return this.areaNodeRepository.findById_AreaOsmIdOrderById_Seq(areaEntity.getOsmId())
+    private List<GeometryNode> getGeometryNodes(Long changesetId, AreaEntity areaEntity, String coordinateReferenceSystem) {
+        return this.areaNodeRepository.findByIdAreaOsmIdAndIdChangesetIdOrderByIdSeq(areaEntity.getOsmId(), changesetId)
                 .stream().map(n  -> AreaNodeEntityMapper.toGeometryNode(n, coordinateReferenceSystem))
                 .toList();
     }
@@ -404,8 +404,8 @@ public class ChangesetManagementServiceImpl implements ChangesetManagementServic
     /**
      * Returns the geometry nodes for the given way in the requested coordinate reference system.
      */
-    private List<GeometryNode> getGeometryNodes(WayEntity wayEntity, String coordinateReferenceSystem) {
-        return this.wayNodeRepository.findById_WayOsmIdOrderById_Seq(wayEntity.getOsmId())
+    private List<GeometryNode> getGeometryNodes(Long changesetId, WayEntity wayEntity, String coordinateReferenceSystem) {
+        return this.wayNodeRepository.findByIdWayOsmIdAndIdChangesetIdOrderByIdSeq(wayEntity.getOsmId(), changesetId)
                 .stream().map(n  -> WayNodeEntityMapper.toGeometryNode(n, coordinateReferenceSystem))
                 .toList();
     }

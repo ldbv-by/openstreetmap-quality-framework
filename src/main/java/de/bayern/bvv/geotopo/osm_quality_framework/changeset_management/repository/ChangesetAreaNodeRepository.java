@@ -8,5 +8,8 @@ import java.util.List;
 
 @Repository
 public interface ChangesetAreaNodeRepository extends JpaRepository<AreaNodeEntity,Long> {
-    List<AreaNodeEntity> findById_AreaOsmIdOrderById_Seq(Long id_areaOsmId);
+    List<AreaNodeEntity> findByIdAreaOsmIdAndIdChangesetIdOrderByIdSeq(
+            Long areaOsmId,
+            Long changesetId
+    );
 }

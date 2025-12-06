@@ -16,5 +16,6 @@ import java.io.Serializable;
 public class AreaNodeId implements Serializable {
     private Long nodeOsmId;
     private Long areaOsmId;
+    private Long changesetId;
     private Integer seq;
 }

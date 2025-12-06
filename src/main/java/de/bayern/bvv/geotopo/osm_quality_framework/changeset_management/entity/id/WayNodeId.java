@@ -16,5 +16,6 @@ import java.io.Serializable;
 public class WayNodeId implements Serializable {
     private Long nodeOsmId;
     private Long wayOsmId;
+    private Long changesetId;
     private Integer seq;
 }

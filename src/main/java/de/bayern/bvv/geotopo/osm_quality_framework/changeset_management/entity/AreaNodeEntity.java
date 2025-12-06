@@ -15,6 +15,7 @@ import org.hibernate.annotations.Subselect;
 @Subselect(value = """
             SELECT area.osm_id AS area_osm_id,
                    node.id AS node_osm_id,
+                   area.changeset_id AS changeset_id,
                    NULL::bigint AS member_osm_id,
                    node.lat::double precision / '10000000'::bigint::double precision AS lat,
                    node.lon::double precision / '10000000'::bigint::double precision AS lon,
@@ -34,6 +35,7 @@ import org.hibernate.annotations.Subselect;
             UNION ALL
             SELECT area.osm_id AS area_osm_id,
                    node.id AS node_osm_id,
+                   area.changeset_id AS changeset_id,
                    planet_way.id AS member_osm_id,
                    node.lat::double precision / '10000000'::bigint::double precision AS lat,
                    node.lon::double precision / '10000000'::bigint::double precision AS lon,
