@@ -13,6 +13,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.model.Qualit
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.model.QualityServiceResult;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.spi.QualityService;
 import de.bayern.bvv.geotopo.osm_quality_framework.geodata_view.api.GeodataViewService;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.util.ChangesetEditor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -83,21 +84,9 @@ public class OverheadLineMastService implements QualityService {
                 }
 
                 // Set overhead line mast tags.
-                OsmPrimitive osmPrimitive;
-                if (overheadLineNode.getOsmId() < 0) {
-                    osmPrimitive = modifiedChangeset.getCreatePrimitives().stream()
-                            .filter(osm -> osm.getId().equals(overheadLineNode.getOsmId()))
-                            .findFirst()
-                            .orElseThrow(() -> new IllegalArgumentException("Way node %d in changeset not found".formatted(overheadLineNode.getOsmId())));
-                } else {
-                    osmPrimitive = modifiedChangeset.getModifyPrimitives().stream()
-                            .filter(osm -> osm.getId().equals(overheadLineNode.getOsmId()))
-                            .findFirst()
-                            .orElseThrow(() -> new IllegalArgumentException("Way node %d in changeset not found".formatted(overheadLineNode.getOsmId())));
-                }
-
-                upsertTag(osmPrimitive, "object_type", "AX_BauwerkOderAnlageFuerIndustrieUndGewerbe");
-                upsertTag(osmPrimitive, "bauwerksfunktion", "1251");
+                OsmPrimitive osmPrimitive = ChangesetEditor.getOsmPrimitive(taggedWayNode, modifiedChangeset);
+                ChangesetEditor.upsertTag(osmPrimitive, "object_type", "AX_BauwerkOderAnlageFuerIndustrieUndGewerbe");
+                ChangesetEditor.upsertTag(osmPrimitive, "bauwerksfunktion", "1251");
 
                 qualityServiceResult.setModifiedChangeset(modifiedChangeset);
             }
@@ -105,15 +94,5 @@ public class OverheadLineMastService implements QualityService {
         }
 
         return QualityServiceResultMapper.toDto(qualityServiceResult);
-    }
-
-    private static void upsertTag(OsmPrimitive prim, String key, String value) {
-        List<Tag> tags = prim.getTags();
-        if (!(tags instanceof ArrayList)) {
-            tags = new ArrayList<>(tags == null ? List.of() : tags);
-            prim.setTags(tags);
-        }
-        tags.removeIf(t -> Objects.equals(t.getK(), key));
-        tags.add(new Tag(key, value));
     }
 }
