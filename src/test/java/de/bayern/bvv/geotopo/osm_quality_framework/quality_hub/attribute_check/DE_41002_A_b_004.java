@@ -1,6 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.attribute_check;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.config.JtsJackson3Module;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.JtsJackson3Module;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.dto.QualityHubResultDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceErrorDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceResultDto;
