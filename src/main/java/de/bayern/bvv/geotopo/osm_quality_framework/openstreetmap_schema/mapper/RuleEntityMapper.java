@@ -2,7 +2,7 @@ package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.mapper;
 
 
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity.*;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.config.JtsJackson3Module;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.JtsJackson3Module;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Rule;
 import lombok.experimental.UtilityClass;
 import tools.jackson.databind.MapperFeature;

@@ -89,13 +89,18 @@ public abstract class DatabaseIntegrationTest {
 
         this.osm2PgSqlService.createSchema(createSchemaDto);
 
-        String sql = """
+        String sqlSequence = """
+                CREATE SEQUENCE IF NOT EXISTS openstreetmap_geometries.identifier_seq;
+                """;
+        this.jdbcTemplate.execute(sqlSequence);
+
+        String sqlIndex = """
                 CREATE INDEX IF NOT EXISTS planet_osm_rels_rel_members_idx
                         ON openstreetmap_geometries.planet_osm_rels
                         USING gin (openstreetmap_geometries.planet_osm_member_ids(members, 'R'::character(1)))
                         WITH (fastupdate = off);
                 """;
-        this.jdbcTemplate.execute(sql);
+        this.jdbcTemplate.execute(sqlIndex);
     }
 
     private void createSchemaChangesetData() {

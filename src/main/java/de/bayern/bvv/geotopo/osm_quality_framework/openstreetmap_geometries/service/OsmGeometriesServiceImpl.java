@@ -44,6 +44,8 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
     private final AreaNodeRepository areaNodeRepository;
     private final WayNodeRepository wayNodeRepository;
 
+    private final SequenceRepository sequenceRepository;
+
     private final OsmApiClient osmApiClient;
     private final Osm2PgSqlClient osm2PgSqlClient;
 
@@ -315,4 +317,11 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
                 .toList();
     }
 
+    /**
+     * Get next identifier sequence.
+     */
+    @Override
+    public Long getNextIdentifierSequence() {
+        return this.sequenceRepository.getNextIdentifierSequence();
+    }
 }

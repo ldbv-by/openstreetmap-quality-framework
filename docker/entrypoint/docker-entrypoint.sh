@@ -53,6 +53,9 @@ if [ "$HAS_SCHEMA" != "1" ]; then
     echo "No import is necessary. New Project!"
   fi
 
+  # ---- Ensure IDENTIFIER_SEQ in OPENSTREETMAP_GEOMETRIES ----
+  psql -v ON_ERROR_STOP=1 -c "CREATE SEQUENCE IF NOT EXISTS ${SCHEMA_NAME}.identifier_seq;"
+
   psql -v ON_ERROR_STOP=1 -c "CREATE INDEX IF NOT EXISTS planet_osm_rels_rel_members_idx
                               ON ${SCHEMA_NAME}.planet_osm_rels
                               USING gin (${SCHEMA_NAME}.planet_osm_member_ids(members, 'R'::character(1)))

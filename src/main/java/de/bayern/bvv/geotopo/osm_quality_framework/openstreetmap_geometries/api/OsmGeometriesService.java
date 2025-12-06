@@ -26,4 +26,9 @@ public interface OsmGeometriesService {
      * Resolves the members of the specified OSM relation, including their geometry and attributes.
      **/
     DataSetDto getRelationMembers(Long relationId, String role, String coordinateReferenceSystem);
+
+    /**
+     * Get next identifier sequence.
+     */
+    Long getNextIdentifierSequence();
 }

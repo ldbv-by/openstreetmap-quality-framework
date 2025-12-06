@@ -40,17 +40,22 @@ spring:
 quality:
   pipeline:
     steps:
-      - id: "overhead-line-mast"
+      - id: "object-number-assignment"
         waitsFor: []
+
+      - id: "overhead-line-mast"
+        waitsFor: [
+          "object-number-assignment"
+        ]
 
       - id: "attribute-check"
         waitsFor: [
-          "overhead-line-mast"
+          "object-number-assignment", "overhead-line-mast"
         ]
 
       - id: "geometry-check"
         waitsFor: [
-          "overhead-line-mast"
+          "object-number-assignment", "overhead-line-mast"
         ]
 
 openstreetmap-tools:
