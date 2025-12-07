@@ -188,10 +188,6 @@ public class CommonRepositoryImpl<T> {
 
                 Root<RelationMemberEntity> rm = sub.from(RelationMemberEntity.class);
                 Root<RelationEntity>       rel = sub.from(RelationEntity.class);
-                Root<NodeEntity>           n  = sub.from(NodeEntity.class);
-                Root<WayEntity>            w  = sub.from(WayEntity.class);
-                Root<AreaEntity>           a  = sub.from(AreaEntity.class);
-                Root<RelationEntity>       rr = sub.from(RelationEntity.class);
 
                 List<Predicate> subPs = new ArrayList<>();
 
@@ -232,6 +228,8 @@ public class CommonRepositoryImpl<T> {
                     Path<Long> targetChangesetId = target.get("changeset").get("id");
                     Path<Long> rmChangesetId   = rm.get("changeset").get("id");
                     subPs.add(criteriaBuilder.equal(rmChangesetId, targetChangesetId));
+                    Path<Long> relChangesetId   = rel.get("changeset").get("id");
+                    subPs.add(criteriaBuilder.equal(relChangesetId, targetChangesetId));
                 } catch (IllegalArgumentException ignored) {}
 
                 // optional: filter role
@@ -241,41 +239,49 @@ public class CommonRepositoryImpl<T> {
                 }
 
                 // optional: filter member criteria
-                Expression<String> rmType = criteriaBuilder.lower(rm.get("memberId").get("memberType"));
+                if (relationMemberFilter != null) {
+                    // Todo: Check functionality!
+                    Root<NodeEntity>           n  = sub.from(NodeEntity.class);
+                    Root<WayEntity>            w  = sub.from(WayEntity.class);
+                    Root<AreaEntity>           a  = sub.from(AreaEntity.class);
+                    Root<RelationEntity>       rr = sub.from(RelationEntity.class);
 
-                Predicate nodeBranch = criteriaBuilder.and(
-                        criteriaBuilder.equal(rmType, "n"),
-                        criteriaBuilder.equal(n.get("osmId"), rmMemberOsmId),
-                        (relationMemberCriteria == null ? criteriaBuilder.conjunction()
-                                : criteriaToPredicate(criteriaQuery, criteriaBuilder, (Root<T>) target, entityType, n, NodeEntity.class, relationMemberCriteria))
-                );
+                    Expression<String> rmType = criteriaBuilder.lower(rm.get("memberId").get("memberType"));
 
-                Predicate wayBranch = criteriaBuilder.and(
-                        criteriaBuilder.equal(rmType, "w"),
-                        criteriaBuilder.equal(w.get("osmId"), rmMemberOsmId),
-                        (relationMemberCriteria == null ? criteriaBuilder.conjunction()
-                                : criteriaToPredicate(criteriaQuery, criteriaBuilder, (Root<T>) target, entityType, w, WayEntity.class, relationMemberCriteria))
-                );
+                    Predicate nodeBranch = criteriaBuilder.and(
+                            criteriaBuilder.equal(rmType, "n"),
+                            criteriaBuilder.equal(n.get("osmId"), rmMemberOsmId),
+                            (relationMemberCriteria == null ? criteriaBuilder.conjunction()
+                                    : criteriaToPredicate(criteriaQuery, criteriaBuilder, (Root<T>) target, entityType, n, NodeEntity.class, relationMemberCriteria))
+                    );
 
-                Predicate areaBranch = criteriaBuilder.and(
-                        criteriaBuilder.or(
-                                criteriaBuilder.equal(rmType, "w"),
-                                criteriaBuilder.equal(rmType, "r")
-                        ),
-                        criteriaBuilder.equal(a.get("osmId"), rmMemberOsmId),
-                        criteriaBuilder.equal(criteriaBuilder.lower(a.get("osmGeometryType")), rmType),
-                        (relationMemberCriteria == null ? criteriaBuilder.conjunction()
-                                : criteriaToPredicate(criteriaQuery, criteriaBuilder, (Root<T>) target, entityType, a, AreaEntity.class, relationMemberCriteria))
-                );
+                    Predicate wayBranch = criteriaBuilder.and(
+                            criteriaBuilder.equal(rmType, "w"),
+                            criteriaBuilder.equal(w.get("osmId"), rmMemberOsmId),
+                            (relationMemberCriteria == null ? criteriaBuilder.conjunction()
+                                    : criteriaToPredicate(criteriaQuery, criteriaBuilder, (Root<T>) target, entityType, w, WayEntity.class, relationMemberCriteria))
+                    );
 
-                Predicate relBranch = criteriaBuilder.and(
-                        criteriaBuilder.equal(rmType, "r"),
-                        criteriaBuilder.equal(rr.get("osmId"), rmMemberOsmId),
-                        (relationMemberCriteria == null ? criteriaBuilder.conjunction()
-                                : criteriaToPredicate(criteriaQuery, criteriaBuilder, (Root<T>) target, entityType, rr, RelationEntity.class, relationMemberCriteria))
-                );
+                    Predicate areaBranch = criteriaBuilder.and(
+                            criteriaBuilder.or(
+                                    criteriaBuilder.equal(rmType, "w"),
+                                    criteriaBuilder.equal(rmType, "r")
+                            ),
+                            criteriaBuilder.equal(a.get("osmId"), rmMemberOsmId),
+                            criteriaBuilder.equal(criteriaBuilder.lower(a.get("osmGeometryType")), rmType),
+                            (relationMemberCriteria == null ? criteriaBuilder.conjunction()
+                                    : criteriaToPredicate(criteriaQuery, criteriaBuilder, (Root<T>) target, entityType, a, AreaEntity.class, relationMemberCriteria))
+                    );
 
-                subPs.add(criteriaBuilder.or(nodeBranch, wayBranch, areaBranch, relBranch));
+                    Predicate relBranch = criteriaBuilder.and(
+                            criteriaBuilder.equal(rmType, "r"),
+                            criteriaBuilder.equal(rr.get("osmId"), rmMemberOsmId),
+                            (relationMemberCriteria == null ? criteriaBuilder.conjunction()
+                                    : criteriaToPredicate(criteriaQuery, criteriaBuilder, (Root<T>) target, entityType, rr, RelationEntity.class, relationMemberCriteria))
+                    );
+
+                    subPs.add(criteriaBuilder.or(nodeBranch, wayBranch, areaBranch, relBranch));
+                }
 
                 sub.select(rel.get("osmId")).where(subPs.toArray(new Predicate[0]));
                 return criteriaBuilder.exists(sub);
