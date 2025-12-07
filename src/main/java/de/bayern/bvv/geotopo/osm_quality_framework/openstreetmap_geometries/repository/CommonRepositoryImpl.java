@@ -123,6 +123,31 @@ public class CommonRepositoryImpl<T> {
                 return criteriaBuilder.equal(tagExpr.apply(key), value);
             }
 
+            case "tag_regex_match": {
+                String key     = (String) params.get("tag_key");
+                String pattern = (String) params.get("pattern");
+
+                if (key == null) {
+                    throw new IllegalArgumentException(type + ": 'tag_key' is required.");
+                }
+                if (pattern == null || pattern.isBlank()) {
+                    throw new IllegalArgumentException(type + ": 'pattern' is required.");
+                }
+
+                Expression<String> tagValue = tagExpr.apply(key);
+
+                Expression<Object> regexpResult = criteriaBuilder.function(
+                        "regexp_match",
+                        Object.class,
+                        tagValue,
+                        criteriaBuilder.literal(pattern)
+                );
+
+                Predicate tagNotNull = criteriaBuilder.isNotNull(tagValue);
+                Predicate matchNotNull = criteriaBuilder.isNotNull(regexpResult);
+
+                return criteriaBuilder.and(tagNotNull, matchNotNull);
+            }
 
             case "tag_in": {
                 String key = (String) params.get("tag_key");
