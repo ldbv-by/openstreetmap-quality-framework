@@ -239,8 +239,8 @@ INSERT INTO openstreetmap_schema.datatypes_complex (datatype_id, tag_key, multip
     ('AA_UUID', 'UUIDundZeit', '1', 'CharacterString'),
     /* ('AA_Fachdatenverbindung', 'art', '1', 'URI'), -- wird als Relation (eigener object_type) geführt */
     /* ('AA_Fachdatenverbindung', 'fachdatenobjekt', '1', 'AA_Fachdatenobjekt'), -- wird als Relation (eigener object_type) geführt */
-    ('AA_Fachdatenobjekt', 'name', '1', 'CharacterString'),
-    ('AA_Fachdatenobjekt', 'uri', '1', 'URI'),
+    ('AA_Fachdatenobjekt', 'name', '0..1', 'CharacterString'),
+    ('AA_Fachdatenobjekt', 'uri', '0..1', 'URI'),
     ('AA_Lebenszeitintervall', 'beginnt', '1', 'DateTime'),
     ('AA_Lebenszeitintervall', 'endet', '0..1', 'DateTime'),
     /* ('AA_Modellart', 'advStandardModell', '1', 'AA_AdVStandardModell'), -- wird als Relation (eigener object_type) geführt */
