@@ -40,15 +40,26 @@ public class Orchestrator {
      * - Any service failed, or
      * - The overall timeout is reached.
      **/
-    public QualityHubResult start(Changeset changeset) {
+    public QualityHubResult start(Changeset changeset, Set<String> stepsToValidate, Set<String> rulesToValidate) {
         QualityHubResult qualityHubResult = new QualityHubResult(changeset);
 
+        Set<String> allowedStepIds;
+        if (stepsToValidate == null || stepsToValidate.isEmpty()) {
+            allowedStepIds = this.qualityPipeline.getSteps().stream()
+                    .map(QualityPipeline.Step::getId)
+                    .collect(Collectors.toSet());
+        } else {
+            allowedStepIds = stepsToValidate;
+        }
+
         final Map<String, QualityPipeline.Step.State> publishedPipelineSteps = new ConcurrentHashMap<>();
-        final AtomicInteger cntRemainingSteps = new AtomicInteger(this.qualityPipeline.getSteps().size());
+        final AtomicInteger cntRemainingSteps = new AtomicInteger((int) this.qualityPipeline.getSteps().stream()
+                .filter(step -> allowedStepIds.contains(step.getId()))
+                .count());
         final CompletableFuture<Void> allStepsDone = new CompletableFuture<>();
 
         // Execute pipeline
-        this.publishRunnableSteps(changeset, publishedPipelineSteps, qualityHubResult, cntRemainingSteps, allStepsDone);
+        this.publishRunnableSteps(changeset, publishedPipelineSteps, qualityHubResult, cntRemainingSteps, allStepsDone, allowedStepIds, rulesToValidate);
 
         // Wait for completion (maximum 5 minutes)
         try {
@@ -73,12 +84,14 @@ public class Orchestrator {
                                       Map<String, QualityPipeline.Step.State> publishedPipelineSteps,
                                       QualityHubResult qualityHubResult,
                                       AtomicInteger cntRemainingSteps,
-                                      CompletableFuture<Void> allStepsDone) {
+                                      CompletableFuture<Void> allStepsDone,
+                                      Set<String> allowedStepIds,
+                                      Set<String> rulesToValidate) {
 
         ChangesetDataSetDto changesetDataSetDto = this.changesetManagementService.getDataSet(
                 changeset.getId(), null);
 
-        Set<QualityPipeline.Step> runnableSteps = this.getRunnableSteps(publishedPipelineSteps);
+        Set<QualityPipeline.Step> runnableSteps = this.getRunnableSteps(publishedPipelineSteps, allowedStepIds);
 
         for (QualityPipeline.Step step : runnableSteps) {
 
@@ -103,7 +116,8 @@ public class Orchestrator {
                                     step.getId(),
                                     changeset.getId(),
                                     ChangesetMapper.toDto(changeset),
-                                    changesetDataSetDto);
+                                    changesetDataSetDto,
+                                    rulesToValidate);
 
                     QualityServiceResultDto qualityServiceResultDto =
                             qualityServiceBean.checkChangesetQuality(qualityServiceRequestDto);
@@ -142,7 +156,9 @@ public class Orchestrator {
                                     publishedPipelineSteps,
                                     qualityHubResult,
                                     cntRemainingSteps,
-                                    allStepsDone
+                                    allStepsDone,
+                                    allowedStepIds,
+                                    rulesToValidate
                             );
 
                         } else {
@@ -170,10 +186,12 @@ public class Orchestrator {
      * Get all quality services that are ready for execution.
      * Executable quality services are all those that have not startet yet and are not waiting for any other service.
      */
-    private Set<QualityPipeline.Step> getRunnableSteps(Map<String, QualityPipeline.Step.State> publishedPipelineSteps) {
+    private Set<QualityPipeline.Step> getRunnableSteps(Map<String, QualityPipeline.Step.State> publishedPipelineSteps,
+                                                       Set<String> allowedStepIds) {
         return this.qualityPipeline.getSteps().stream()
+                .filter(step -> allowedStepIds.contains(step.getId()))
                 .filter(step -> !publishedPipelineSteps.containsKey(step.getId()) &&
-                        !this.isWaitingOnAnotherQualityService(publishedPipelineSteps, step))
+                        !this.isWaitingOnAnotherQualityService(publishedPipelineSteps, step, allowedStepIds))
                 .collect(Collectors.toSet());
     }
 
@@ -181,12 +199,14 @@ public class Orchestrator {
      * Check if quality service is waiting on other service that has either not startet yes or has not finished.
      */
     private boolean isWaitingOnAnotherQualityService(Map<String, QualityPipeline.Step.State> publishedPipelineSteps,
-                                                     QualityPipeline.Step step) {
+                                                     QualityPipeline.Step step,
+                                                     Set<String> allowedStepIds) {
         if (step.getWaitsFor().isEmpty()) {
             return false;
         }
 
         return step.getWaitsFor().stream()
+                .filter(allowedStepIds::contains)
                 .anyMatch(waitForQualityServiceId -> this.qualityPipeline.getSteps().stream()
                         .filter(waitForStep -> waitForStep.getId().equals(waitForQualityServiceId))
                         .anyMatch(waitForStep -> !publishedPipelineSteps.containsKey(waitForStep.getId()) ||

@@ -43,6 +43,9 @@ public class AttributeCheckService implements QualityService {
         // ----- Initialize result of quality service.
         this.qualityServiceResult = new QualityServiceResult(qualityServiceRequestDto.qualityServiceId(), qualityServiceRequestDto.changesetId());
 
+        Set<String> rulesToValidate = qualityServiceRequestDto.rulesToValidate();
+        boolean hasRuleFilter = rulesToValidate != null && !rulesToValidate.isEmpty();
+
         // ----- Check the attribute consistency for each new or modified changeset object.
         ChangesetDataSet changesetDataSet = ChangesetDataSetMapper.toDomain(qualityServiceRequestDto.changesetDataSetDto());
 
@@ -66,6 +69,7 @@ public class AttributeCheckService implements QualityService {
                 if (this.qualityServiceResult.getErrors().isEmpty()) {
                     for (Rule rule : objectType.getRules().stream()
                             .filter(r -> QUALITY_SERVICE_NAME.equals(r.getType()))
+                            .filter(r -> !hasRuleFilter || rulesToValidate.contains(r.getId()))
                             .toList()) {
 
                         if (!this.ruleEngine.evaluate(new RuleEvaluationDto(changedObject, rule))) {

@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 /**
  * Central service component of the Quality-Hub bounded context.
  * <p>
@@ -34,7 +36,8 @@ public class QualityHubService {
     /**
      * Prepares a changeset for validation and triggers the domain-specific quality checks.
      */
-    public QualityHubResultDto checkChangesetQuality(Long changesetId, ChangesetDto changesetDto) {
+    public QualityHubResultDto checkChangesetQuality(Long changesetId, ChangesetDto changesetDto,
+                                                     Set<String> stepsToValidate, Set<String> rulesToValidate) {
 
         // ----- Persist and normalize changeset for internal processing.
         final long startTime = System.currentTimeMillis();
@@ -43,7 +46,7 @@ public class QualityHubService {
 
         // ----- Invoke the Orchestrator to distribute the changeset to all registered quality modules.
         Changeset changeset = ChangesetMapper.toDomain(changesetId, changesetDto);
-        QualityHubResult qualityHubResult = this.orchestrator.start(changeset);
+        QualityHubResult qualityHubResult = this.orchestrator.start(changeset, stepsToValidate, rulesToValidate);
 
         // ----- Update lifecycle status based on validation outcome.
         if (qualityHubResult.isValid()) {

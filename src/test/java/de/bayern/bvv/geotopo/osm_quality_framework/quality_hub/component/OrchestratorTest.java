@@ -73,7 +73,7 @@ class OrchestratorTest {
         Changeset changeset = mock(Changeset.class);
 
         // Act
-        QualityHubResult qualityHubResult = orchestrator.start(changeset);
+        QualityHubResult qualityHubResult = orchestrator.start(changeset, null, null);
 
         // Assert
         assertEquals(3, qualityHubResult.getQualityServiceResults().size(), "All three steps should produce a result");
@@ -122,7 +122,7 @@ class OrchestratorTest {
         Orchestrator orchestrator = orchestratorWith(pipeline, new HashMap<>(services), mock(ChangesetManagementService.class));
 
         // Act
-        QualityHubResult qualityHubResult = orchestrator.start(mock(Changeset.class));
+        QualityHubResult qualityHubResult = orchestrator.start(mock(Changeset.class), null, null);
 
         // Assert
         assertEquals(3, qualityHubResult.getQualityServiceResults().size(), "All three steps should produce a result");
@@ -159,7 +159,7 @@ class OrchestratorTest {
 
         // Act / Assert
         QualityServiceException ex = assertThrows(QualityServiceException.class,
-                () -> orchestrator.start(mock(Changeset.class)));
+                () -> orchestrator.start(mock(Changeset.class), null, null));
 
         assertTrue(ex.getMessage().contains("failed")
                         || ex.getMessage().contains("Pipeline failed"),

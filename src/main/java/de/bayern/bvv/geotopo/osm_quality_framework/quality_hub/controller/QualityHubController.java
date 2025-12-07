@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 /**
  * REST controller of the central Quality Hub component.
  * <p>
@@ -38,10 +40,12 @@ public class QualityHubController {
     )
     public ResponseEntity<QualityHubResultDto> checkChangesetQuality(
             @PathVariable Long changesetId,
-            @RequestBody ChangesetDto changesetDto) {
+            @RequestBody ChangesetDto changesetDto,
+            @RequestParam(required = false) Set<String> steps,
+            @RequestParam(required = false) Set<String> rules) {
 
         QualityHubResultDto qualityHubResultDto =
-                this.qualityHubService.checkChangesetQuality(changesetId, changesetDto);
+                this.qualityHubService.checkChangesetQuality(changesetId, changesetDto, steps, rules);
 
         return ResponseEntity.ok(qualityHubResultDto);
     }

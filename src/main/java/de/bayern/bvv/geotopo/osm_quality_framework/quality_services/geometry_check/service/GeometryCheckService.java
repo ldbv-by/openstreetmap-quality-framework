@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service(GeometryCheckService.QUALITY_SERVICE_NAME)
 @RequiredArgsConstructor
@@ -44,6 +45,9 @@ public class GeometryCheckService implements QualityService {
         this.qualityServiceResult = new QualityServiceResult(
                 qualityServiceRequestDto.qualityServiceId(), qualityServiceRequestDto.changesetId());
 
+        Set<String> rulesToValidate = qualityServiceRequestDto.rulesToValidate();
+        boolean hasRuleFilter = rulesToValidate != null && !rulesToValidate.isEmpty();
+
         // ----- Check the geometric consistency for each new or modified changeset object.
         ChangesetDataSet changesetDataSet =
                 ChangesetDataSetMapper.toDomain(qualityServiceRequestDto.changesetDataSetDto());
@@ -60,6 +64,7 @@ public class GeometryCheckService implements QualityService {
             // ----- Check geometry-check rules for changed object.
             for (Rule rule : rules.stream()
                     .filter(r -> QUALITY_SERVICE_NAME.equals(r.getType()))
+                    .filter(r -> !hasRuleFilter || rulesToValidate.contains(r.getId()))
                     .toList()) {
 
                 if (!this.ruleEngine.evaluate(new RuleEvaluationDto(changedObject, rule))) {
