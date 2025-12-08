@@ -14,5 +14,5 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
             }
         }
     }',
-    'Es existiert bereits ein Objekt mit dem Tag ''identifikator:UUID''.')
+    'Der Objektidentifikator ist bereits vorhanden.')
 ON CONFLICT (id) DO NOTHING;
