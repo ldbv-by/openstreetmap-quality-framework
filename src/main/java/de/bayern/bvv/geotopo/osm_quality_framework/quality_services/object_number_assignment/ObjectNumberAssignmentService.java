@@ -5,6 +5,8 @@ import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.api.OsmS
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.OsmPrimitive;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Relation;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Tag;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.ChangesetDataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.dto.ObjectTypeDto;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service("object-number-assignment")
 @RequiredArgsConstructor
@@ -38,6 +41,9 @@ public class ObjectNumberAssignmentService implements QualityService {
     private static final String OBJECT_START_TIME_TAG_KEY = "lebenszeitintervall:beginnt";
     private static final String OBJECT_END_TIME_TAG_KEY = "lebenszeitintervall:endet";
     private static final String OBJECT_TYPE_TAG_KEY = "object_type";
+    private static final String STANDARD_MODELL_TAG_KEY = "advStandardModell";
+    private static final String STANDARD_MODELL_TAG_VALUE = "Basis-DLM";
+    private static final String MODELLART_OBJECT_TYPE_TAG_KEY = "AA_modellart";
 
     private static final DateTimeFormatter IDENTIFIER_TIME_UUID_FORMAT =
             DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'");
@@ -69,6 +75,11 @@ public class ObjectNumberAssignmentService implements QualityService {
         for (TaggedObject createdObject : changesetDataSet.getCreate().getAll()) {
             if (identifierIsNecessary(createdObject)) {
                 setNewIdentifier(createdObject, modifiedChangeset, nowUtc);
+                changesetIsModified = true;
+            }
+
+            if (modellartIsNecessary(createdObject)) {
+                setDefaultModellart(createdObject, modifiedChangeset);
                 changesetIsModified = true;
             }
         }
@@ -145,5 +156,43 @@ public class ObjectNumberAssignmentService implements QualityService {
         ChangesetEditor.upsertTag(osmPrimitive, IDENTIFIER_UUID_TAG_KEY, identifierUUID);
         ChangesetEditor.upsertTag(osmPrimitive, IDENTIFIER_UUID_AND_TIME_TAG_KEY, identifierTimeUUID);
         ChangesetEditor.upsertTag(osmPrimitive, OBJECT_START_TIME_TAG_KEY, objectStartTime);
+    }
+
+    /**
+     * Check if modellart is necessary.
+     */
+    private boolean modellartIsNecessary(TaggedObject taggedObject) {
+        if (taggedObject.getRelations().stream().noneMatch(
+                relation -> relation.getObjectType().equals(MODELLART_OBJECT_TYPE_TAG_KEY))) {
+            ObjectTypeDto schemaInfo = this.osmSchemaService.getObjectTypeInfo(taggedObject.getObjectType());
+
+            if (schemaInfo == null || schemaInfo.relations() == null) {
+                return false;
+            } else {
+                return schemaInfo.relations().stream().anyMatch(
+                        relation -> MODELLART_OBJECT_TYPE_TAG_KEY.equals(relation.objectType().name()));
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Set default model to Basis-DLM.
+     */
+    private void setDefaultModellart(TaggedObject taggedObject, Changeset changeset) {
+        List<OsmPrimitive> createdPrimitives = changeset.getCreatePrimitives();
+
+        Relation modellartRelation = new Relation();
+        modellartRelation.setId(ChangesetEditor.getNextNegativeCreationId(changeset));
+        modellartRelation.setChangesetId(changeset.getId());
+        modellartRelation.setTags(List.of(
+                new Tag(OBJECT_TYPE_TAG_KEY, MODELLART_OBJECT_TYPE_TAG_KEY),
+                new Tag(STANDARD_MODELL_TAG_KEY, STANDARD_MODELL_TAG_VALUE)));
+        modellartRelation.setMembers(List.of(
+                new Relation.Member(ChangesetEditor.getMemberType(taggedObject, changeset), taggedObject.getOsmId(), "")
+        ));
+
+        createdPrimitives.add(modellartRelation);
     }
 }

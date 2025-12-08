@@ -10,6 +10,8 @@ import org.locationtech.jts.geom.Polygon;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public class ChangesetEditor {
@@ -76,5 +78,31 @@ public class ChangesetEditor {
 
         tags.removeIf(tag -> tag.getK().equals(key));
         tags.add(new Tag(key, value));
+    }
+
+    public Long getNextNegativeCreationId(Changeset changeset) {
+        Set<Long> creationIds = changeset.getCreatePrimitives().stream()
+                .map(OsmPrimitive::getId)
+                .collect(Collectors.toSet());
+
+
+        long nextId = -1L;
+        while (creationIds.contains(nextId)) {
+            nextId--;
+        }
+
+        return nextId;
+    }
+
+    public String getMemberType(TaggedObject taggedObject, Changeset changeset) {
+        OsmPrimitive osmPrimitive = getOsmPrimitive(taggedObject, changeset);
+
+        return switch (osmPrimitive) {
+            case Node _     -> "node";
+            case Way _      -> "way";
+            case Relation _ -> "relation";
+            default         ->
+                    throw new IllegalArgumentException("Unknown OSM primitive: " + osmPrimitive);
+        };
     }
 }

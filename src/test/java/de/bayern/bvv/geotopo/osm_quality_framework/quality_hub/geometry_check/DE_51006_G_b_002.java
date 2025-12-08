@@ -95,21 +95,6 @@ class DE_51006_G_b_002 extends DatabaseIntegrationTest {
                     <tag k='object_type' v='AX_SportFreizeitUndErholungsflaeche' />
                     <tag k='funktion' v='4100' />
                   </way>
-                  <relation id='-50' changeset='-1'>
-                    <member type='way' ref='-741' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
-                  <relation id='-60' changeset='-1'>
-                    <member type='way' ref='-809' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
-                  <relation id='-70' changeset='-1'>
-                    <member type='way' ref='-903' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
                   <relation id='-80' changeset='-1'>
                     <member type='way' ref='-809' role='' />
                     <tag k='object_type' v='AX_objekthoehe' />
@@ -179,16 +164,6 @@ class DE_51006_G_b_002 extends DatabaseIntegrationTest {
                     <tag k='object_type' v='AX_SportFreizeitUndErholungsflaeche' />
                     <tag k='funktion' v='4320' />
                   </way>
-                  <relation id='-50' changeset='-1'>
-                    <member type='way' ref='-741' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
-                  <relation id='-70' changeset='-1'>
-                    <member type='way' ref='-903' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
                   <relation id='-90' changeset='-1'>
                     <member type='way' ref='-903' role='' />
                     <tag k='object_type' v='AX_objekthoehe' />
@@ -259,16 +234,6 @@ class DE_51006_G_b_002 extends DatabaseIntegrationTest {
                     <tag k='object_type' v='AX_SportFreizeitUndErholungsflaeche' />
                     <tag k='funktion' v='4320' />
                   </way>
-                  <relation id='-50' changeset='-1'>
-                    <member type='way' ref='-741' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
-                  <relation id='-70' changeset='-1'>
-                    <member type='way' ref='-903' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
                   <relation id='-90' changeset='-1'>
                     <member type='way' ref='-903' role='' />
                     <tag k='object_type' v='AX_objekthoehe' />
@@ -350,16 +315,6 @@ class DE_51006_G_b_002 extends DatabaseIntegrationTest {
                     <tag k='object_type' v='AX_SportFreizeitUndErholungsflaeche' />
                     <tag k='funktion' v='4210' />
                   </way>
-                  <relation id='-50' changeset='-1'>
-                    <member type='way' ref='-741' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
-                  <relation id='-70' changeset='-1'>
-                    <member type='way' ref='-903' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
                   <relation id='-90' changeset='-1'>
                     <member type='way' ref='-903' role='' />
                     <tag k='object_type' v='AX_objekthoehe' />
@@ -423,11 +378,6 @@ class DE_51006_G_b_002 extends DatabaseIntegrationTest {
                     <tag k='object_type' v='AX_BauwerkOderAnlageFuerSportFreizeitUndErholung' />
                     <tag k='bauwerksfunktion' v='1441' />
                   </way>
-                  <relation id='-70' changeset='-1'>
-                    <member type='way' ref='-903' role='' />
-                    <tag k='advStandardModell' v='Basis-DLM' />
-                    <tag k='object_type' v='AA_modellart' />
-                  </relation>
                   <relation id='-90' changeset='-1'>
                     <member type='way' ref='-903' role='' />
                     <tag k='object_type' v='AX_objekthoehe' />
