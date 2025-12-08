@@ -1,6 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.attribute_check;
 
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.JtsJackson3Module;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.config.JtsJackson3Module;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.dto.QualityHubResultDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceErrorDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.dto.QualityServiceResultDto;
@@ -13,8 +13,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import tools.jackson.databind.MapperFeature;
-import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,47 +25,41 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * AdV-Beschreibung:
- * Die Attributart 'Primärenergie' kann nur in Verbindung mit der
- * Attributart 'Funktion' und den Wertearten 2500, 2530 und 2570 vorkommen.
+ * Das Attribut 'endet' muss zeitlich nach dem Attribut 'beginnt' liegen.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-class DE_41002_A_b_004 extends DatabaseIntegrationTest {
+class DE_00001_A_a_002 extends DatabaseIntegrationTest {
+
+    final Long CHANGESET_ID = 1L;
+
+    Set<String> stepsToValidate = new HashSet<>(Set.of("attribute-check"));
+    Set<String> rulesToValidate = new HashSet<>(Set.of("DE.00001.A.a.002"));
 
     @Autowired
     MockMvc mockMvc;
 
-    ObjectMapper objectMapper = JsonMapper.builder()
+    tools.jackson.databind.ObjectMapper objectMapper = JsonMapper.builder()
             .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
             .addModule(new JtsJackson3Module())
             .build();
 
     @Test
-    void createVersorgungsanlageMitPrimaerenergie() throws Exception {
+    void createLebenszeitintervallBeginntVorEndet() throws Exception {
         // Arrange
-        final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
-                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
-                  <node id='-25359' changeset='-1' lat='49.88413518675' lon='12.32447493031' />
-                  <node id='-25358' changeset='-1' lat='49.8841101097' lon='12.31855920723' />
-                  <way id='-663' changeset='-1'>
-                    <nd ref='-25358' />
-                    <nd ref='-25359' />
-                    <nd ref='-25360' />
-                    <nd ref='-25361' />
-                    <nd ref='-25358' />
-                    <tag k='funktion' v='2500' />
-                    <tag k='primaerenergie' v='1000' />
+                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
                     <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_IndustrieUndGewerbeflaeche' />
-                  </way>
-                  <relation id='-70' changeset='-1'>
-                    <member type='way' ref='-663' role='' />
+                    <tag k='lebenszeitintervall:endet' v='2025-10-15T12:53:00Z' />
+                    <tag k='object_type' v='AX_Turm' />
+                    <tag k='bauwerksfunktion' v='1003' />
+                  </node>
+                  <relation id='-63' changeset='-1'>
+                    <member type='node' ref='-25402' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -75,7 +71,9 @@ class DE_41002_A_b_004 extends DatabaseIntegrationTest {
         MvcResult mvcResult = this.mockMvc.perform(
                         post("/osm-quality-framework/v1/quality-hub/check/changeset/{id}", CHANGESET_ID)
                                 .contentType(MediaType.APPLICATION_XML)
-                                .content(CHANGESET_XML))
+                                .content(CHANGESET_XML)
+                                .param("steps", String.join(",", stepsToValidate))
+                                .param("rules", String.join(",", rulesToValidate)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -88,31 +86,21 @@ class DE_41002_A_b_004 extends DatabaseIntegrationTest {
     }
 
     @Test
-    void createBeherbergungMitPrimaerenergie() throws Exception {
+    void createLebenszeitintervallBeginntNachEndet() throws Exception {
         // Arrange
-        final Long CHANGESET_ID = 1L;
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
                 <create>
-                  <node id='-25361' changeset='-1' lat='49.87977158487' lon='12.31859812646' />
-                  <node id='-25360' changeset='-1' lat='49.87977158487' lon='12.32451384954' />
-                  <node id='-25359' changeset='-1' lat='49.88413518675' lon='12.32447493031' />
-                  <node id='-25358' changeset='-1' lat='49.8841101097' lon='12.31855920723' />
-                  <way id='-663' changeset='-1'>
-                    <nd ref='-25358' />
-                    <nd ref='-25359' />
-                    <nd ref='-25360' />
-                    <nd ref='-25361' />
-                    <nd ref='-25358' />
-                    <tag k='funktion' v='1460' />
-                    <tag k='primaerenergie' v='1000' />
+                  <node id='-25402' changeset='-1' lat='49.88567721142' lon='12.33907207933'>
                     <tag k='identifikator:UUID' v='DEBYBDLM12345678' />
                     <tag k='identifikator:UUIDundZeit' v='DEBYBDLM1234567820251014T125300Z' />
-                    <tag k='lebenszeitintervall:beginnt' v='2025-10-14T12:53:00Z' />
-                    <tag k='object_type' v='AX_IndustrieUndGewerbeflaeche' />
-                  </way>
-                  <relation id='-70' changeset='-1'>
-                    <member type='way' ref='-663' role='' />
+                    <tag k='lebenszeitintervall:beginnt' v='2025-10-15T12:53:00Z' />
+                    <tag k='lebenszeitintervall:endet' v='2025-10-14T12:53:00Z' />
+                    <tag k='object_type' v='AX_Turm' />
+                    <tag k='bauwerksfunktion' v='1003' />
+                  </node>
+                  <relation id='-63' changeset='-1'>
+                    <member type='node' ref='-25402' role='' />
                     <tag k='advStandardModell' v='Basis-DLM' />
                     <tag k='object_type' v='AA_modellart' />
                   </relation>
@@ -124,7 +112,9 @@ class DE_41002_A_b_004 extends DatabaseIntegrationTest {
         MvcResult mvcResult = this.mockMvc.perform(
                         post("/osm-quality-framework/v1/quality-hub/check/changeset/{id}", CHANGESET_ID)
                                 .contentType(MediaType.APPLICATION_XML)
-                                .content(CHANGESET_XML))
+                                .content(CHANGESET_XML)
+                                .param("steps", String.join(",", stepsToValidate))
+                                .param("rules", String.join(",", rulesToValidate)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -149,6 +139,6 @@ class DE_41002_A_b_004 extends DatabaseIntegrationTest {
         assertThat(attributeCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'attribut-check'")
-                .contains("Das Tag 'primaerenergie' darf nur bei der 'funktion' 2500, 2530 und 2570 vorkommen.");
+                .contains("Das Tag 'lebenszeitintervall:endet' muss zeitlich nach dem Tag 'lebenszeitintervall:beginnt' liegen.");
     }
 }
