@@ -61,6 +61,13 @@ if [ "$HAS_SCHEMA" != "1" ]; then
                               USING gin (${SCHEMA_NAME}.planet_osm_member_ids(members, 'R'::character(1)))
                               WITH (fastupdate = off);"
 
+  psql -v ON_ERROR_STOP=1 <<'SQL'
+CREATE INDEX IF NOT EXISTS nodes_tags_idx ON openstreetmap_geometries.nodes USING gin (tags);
+CREATE INDEX IF NOT EXISTS ways_tags_idx ON openstreetmap_geometries.ways USING gin (tags);
+CREATE INDEX IF NOT EXISTS areas_tags_idx ON openstreetmap_geometries.areas USING gin (tags);
+CREATE INDEX IF NOT EXISTS relations_tags_idx ON openstreetmap_geometries.relations USING gin (tags);
+SQL
+
 else
   echo "Schema ${SCHEMA_NAME} already exists – skipping import."
 fi
@@ -112,6 +119,11 @@ ALTER TABLE IF EXISTS changeset_data.ways              ADD COLUMN IF NOT EXISTS 
 ALTER TABLE IF EXISTS changeset_data.areas             ADD COLUMN IF NOT EXISTS changeset_id bigint;
 ALTER TABLE IF EXISTS changeset_data.relations         ADD COLUMN IF NOT EXISTS changeset_id bigint;
 ALTER TABLE IF EXISTS changeset_data.relation_members  ADD COLUMN IF NOT EXISTS changeset_id bigint;
+
+CREATE INDEX IF NOT EXISTS nodes_tags_idx ON changeset_data.nodes USING gin (tags);
+CREATE INDEX IF NOT EXISTS ways_tags_idx ON changeset_data.ways USING gin (tags);
+CREATE INDEX IF NOT EXISTS areas_tags_idx ON changeset_data.areas USING gin (tags);
+CREATE INDEX IF NOT EXISTS relations_tags_idx ON changeset_data.relations USING gin (tags);
 SQL
 
 else

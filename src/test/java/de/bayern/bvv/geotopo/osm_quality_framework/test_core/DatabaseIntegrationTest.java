@@ -101,6 +101,20 @@ public abstract class DatabaseIntegrationTest {
                         WITH (fastupdate = off);
                 """;
         this.jdbcTemplate.execute(sqlIndex);
+
+        String ddl = """
+            CREATE INDEX IF NOT EXISTS nodes_tags_idx ON openstreetmap_geometries.nodes USING gin (tags);
+            CREATE INDEX IF NOT EXISTS ways_tags_idx ON openstreetmap_geometries.ways USING gin (tags);
+            CREATE INDEX IF NOT EXISTS areas_tags_idx ON openstreetmap_geometries.areas USING gin (tags);
+            CREATE INDEX IF NOT EXISTS relations_tags_idx ON openstreetmap_geometries.relations USING gin (tags);
+            """;
+
+        for (String stmt : ddl.split(";")) {
+            String s = stmt.trim();
+            if (!s.isEmpty()) {
+                this.jdbcTemplate.execute(s);
+            }
+        }
     }
 
     private void createSchemaChangesetData() {
@@ -174,6 +188,11 @@ public abstract class DatabaseIntegrationTest {
             ALTER TABLE IF EXISTS changeset_data.areas             ADD COLUMN IF NOT EXISTS changeset_id bigint;
             ALTER TABLE IF EXISTS changeset_data.relations         ADD COLUMN IF NOT EXISTS changeset_id bigint;
             ALTER TABLE IF EXISTS changeset_data.relation_members  ADD COLUMN IF NOT EXISTS changeset_id bigint;
+            
+            CREATE INDEX IF NOT EXISTS nodes_tags_idx ON changeset_data.nodes USING gin (tags);
+            CREATE INDEX IF NOT EXISTS ways_tags_idx ON changeset_data.ways USING gin (tags);
+            CREATE INDEX IF NOT EXISTS areas_tags_idx ON changeset_data.areas USING gin (tags);
+            CREATE INDEX IF NOT EXISTS relations_tags_idx ON changeset_data.relations USING gin (tags);
             """;
 
             for (String stmt : ddl.split(";")) {
