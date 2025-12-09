@@ -2328,6 +2328,8 @@ INSERT INTO openstreetmap_schema.relation_members (object_type, relation_object_
     ('AX_BauwerkImGewaesserbereich', 'AX_objekthoehe', '*', '', '1'),
     ('AX_Gebietsgrenze', 'AX_KommunalesGebiet', '*', 'outer', '1..*'),
     ('AX_Gebietsgrenze', 'AX_KommunalesGebiet', '*', 'inner', '0..*'),
+    ('AX_Gebietsgrenze', 'AX_KommunalesTeilgebiet', '*', 'outer', '1..*'),
+    ('AX_Gebietsgrenze', 'AX_KommunalesTeilgebiet', '*', 'inner', '0..*'),
     ('AX_Gebietsgrenze', 'AX_Gebiet_Bundesland', '*', 'outer', '1..*'),
     ('AX_Gebietsgrenze', 'AX_Gebiet_Bundesland', '*', 'inner', '0..*'),
     ('AX_Gebietsgrenze', 'AX_Gebiet_Regierungsbezirk', '*', 'outer', '1..*'),
