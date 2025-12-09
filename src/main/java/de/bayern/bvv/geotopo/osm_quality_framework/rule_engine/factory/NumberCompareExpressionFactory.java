@@ -40,17 +40,20 @@ public class NumberCompareExpressionFactory implements ExpressionFactory {
 
         // ----- Execute rule ------
         return (taggedObject, baseTaggedObject) -> {
-            int tagNumber = parseInt(taggedObject.getTags().get(params.tagKey), params.tagKey);
-            int compareNumber = !(params.compareValue.isEmpty()) ? parseInt(params.compareValue, "compare_value") :
-                    parseInt(taggedObject.getTags().get(params.compareTagKey), "compare_tag_key");
+            Integer tagNumber = tryParseInt(taggedObject.getTags().get(params.tagKey), params.tagKey);
+            if (tagNumber == null) return false;
+
+            Integer compareNumber = !(params.compareValue.isEmpty()) ? tryParseInt(params.compareValue, "compare_value") :
+                    tryParseInt(taggedObject.getTags().get(params.compareTagKey), "compare_tag_key");
+            if (compareNumber == null) return false;
 
             return switch (params.operator) {
                 case "<" -> tagNumber < compareNumber;
                 case "<=" -> tagNumber <= compareNumber;
                 case ">" -> tagNumber > compareNumber;
                 case ">=" -> tagNumber >= compareNumber;
-                case "==" -> tagNumber == compareNumber;
-                case "!=" -> tagNumber != compareNumber;
+                case "==" -> tagNumber.intValue() == compareNumber.intValue();
+                case "!=" -> tagNumber.intValue() != compareNumber.intValue();
                 case "%" -> {
                     if (compareNumber == 0) {
                         throw new IllegalArgumentException(type() + ": modulo by zero");
@@ -91,12 +94,12 @@ public class NumberCompareExpressionFactory implements ExpressionFactory {
     /**
      * Number helper.
      */
-    private static int parseInt(String s, String field) {
+    private static Integer tryParseInt(String s, String field) {
         try {
             if (s.equals("max_value")) return Integer.MAX_VALUE;
             return Integer.parseInt(s);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("number_compare: '" + field + "' must be an integer, but was '" + s + "'", e);
+            return null;
         }
     }
 }
