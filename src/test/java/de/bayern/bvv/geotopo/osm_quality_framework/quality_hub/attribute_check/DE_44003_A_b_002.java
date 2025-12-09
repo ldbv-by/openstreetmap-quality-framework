@@ -64,7 +64,7 @@ class DE_44003_A_b_002 extends DatabaseIntegrationTest {
                         <tag k="object_type" v="AX_Gewaesserachse"/>
                         <tag k='breiteDesGewaessers' v='12' />
                         <tag k='funktion' v='8300' />
-                        <tag k='fliessrichtung' v='TRUE' />
+                        <tag k='fliessrichtung' v='FALSE' />
                     </way>
                     <way id="-2" version="0">
                         <nd ref="-4"/>
@@ -73,7 +73,7 @@ class DE_44003_A_b_002 extends DatabaseIntegrationTest {
                         <tag k="object_type" v="AX_Gewaesserachse"/>
                         <tag k='breiteDesGewaessers' v='12' />
                         <tag k='funktion' v='8300' />
-                        <tag k='fliessrichtung' v='TRUE' />
+                        <tag k='fliessrichtung' v='FALSE' />
                     </way>
                     <relation id='-3' changeset='-1'>
                         <member type='way' ref='-1' role='' />
@@ -122,7 +122,7 @@ class DE_44003_A_b_002 extends DatabaseIntegrationTest {
                         <tag k="object_type" v="AX_Gewaesserachse"/>
                         <tag k='breiteDesGewaessers' v='12' />
                         <tag k='funktion' v='8300' />
-                        <tag k='fliessrichtung' v='TRUE' />
+                        <tag k='fliessrichtung' v='FALSE' />
                     </way>
                     <way id="-2" version="0">
                         <nd ref="-4"/>
@@ -131,7 +131,7 @@ class DE_44003_A_b_002 extends DatabaseIntegrationTest {
                         <tag k="object_type" v="AX_Gewaesserachse"/>
                         <tag k='breiteDesGewaessers' v='12' />
                         <tag k='funktion' v='8300' />
-                        <tag k='fliessrichtung' v='TRUE' />
+                        <tag k='fliessrichtung' v='FALSE' />
                         <tag k='hydrologischesMerkmal' v='2000' />
                     </way>
                     <relation id='-3' changeset='-1'>
