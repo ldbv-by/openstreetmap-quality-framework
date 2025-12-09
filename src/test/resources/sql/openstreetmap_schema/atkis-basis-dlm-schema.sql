@@ -2290,7 +2290,8 @@ INSERT INTO openstreetmap_schema.relations (object_type, relation_object_type, m
     ('AX_Gebietsgrenze', 'AX_KommunalesTeilgebiet', '0..2'),
     ('AX_Gebietsgrenze', 'AX_Kondominium', '0..2'),
     ('AX_Gewaesserachse', 'AX_Wasserlauf', '0..*'),
-    ('AX_Gewaesserachse', 'AX_Kanal', '0..*')
+    ('AX_Gewaesserachse', 'AX_Kanal', '0..*'),
+    ('AX_Schutzzone', 'AX_SchutzgebietNachWasserrecht', '0..*')
 ON CONFLICT (object_type, relation_object_type) DO NOTHING;
 
 INSERT INTO openstreetmap_schema.relation_members (object_type, relation_object_type, type, role, multiplicity) VALUES
@@ -2334,5 +2335,6 @@ INSERT INTO openstreetmap_schema.relation_members (object_type, relation_object_
     ('AX_Gebietsgrenze', 'AX_Kondominium', '*', 'outer', '1..*'),
     ('AX_Gebietsgrenze', 'AX_Kondominium', '*', 'inner', '0..*'),
     ('AX_Gewaesserachse', 'AX_Wasserlauf', '*', '', '1..*'),
-    ('AX_Gewaesserachse', 'AX_Kanal', '*', '', '1..*')
+    ('AX_Gewaesserachse', 'AX_Kanal', '*', '', '1..*'),
+    ('AX_Schutzzone', 'AX_SchutzgebietNachWasserrecht', '*', '', '1..*')
 ON CONFLICT (object_type, relation_object_type, role) DO NOTHING;
