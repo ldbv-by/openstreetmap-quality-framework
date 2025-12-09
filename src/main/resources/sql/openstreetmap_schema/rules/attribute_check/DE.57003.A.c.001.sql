@@ -23,7 +23,14 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                         },
                         {
                             "all": [
-                                { "not": { "relations": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" } } },
+                                {
+                                    "not": {
+                                        "relations": {
+                                            "loop_info": { "type": "all" },
+                                            "checks": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" }
+                                        }
+                                    }
+                                },
                                 {
                                     "type": "spatial_compare",
                                     "operator": "within",
