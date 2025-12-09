@@ -49,7 +49,7 @@ public class TagEqualsExpressionFactory implements ExpressionFactory {
             if (tagValues.isEmpty()) return false;
 
             for (String tagValue : tagValues) {
-                if (tagValue.equals(this.resolveCurrentPlaceholder(taggedObject, params.value()))) return true;
+                if (tagValue.equals(this.resolveCurrentPlaceholder(taggedObject, baseTaggedObject, params.value()))) return true;
             }
 
             return false;
@@ -66,12 +66,14 @@ public class TagEqualsExpressionFactory implements ExpressionFactory {
         return new RuleParams(tagKey, value);
     }
 
-    private String resolveCurrentPlaceholder(TaggedObject taggedObject, String value) {
+    private String resolveCurrentPlaceholder(TaggedObject taggedObject, TaggedObject baseTaggedObject, String value) {
         if (value.startsWith("current:")) {
             String taggedObjectTagKey = value.substring("current:".length());
             return taggedObject.getTags().get(taggedObjectTagKey);
+        } else if (value.startsWith("base:")) {
+            String taggedObjectTagKey = value.substring("base:".length());
+            return baseTaggedObject.getTags().get(taggedObjectTagKey);
         }
-
         return value;
     }
 }
