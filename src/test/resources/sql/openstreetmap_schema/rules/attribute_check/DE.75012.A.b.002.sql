@@ -5,5 +5,5 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
     '{
         "checks": { "type": "tag_exists", "tag_key": "kennzeichen:gemeindeteil" }
     }',
-    'Das Tag ''kennzeichen:gemeindeteil'' muss bei einem Gemeindeteil belegt sein.')
+    'Das Tag ''kennzeichen:gemeindeteil'' muss in ''AX_KommunalesTeilgebiet'' vorhanden sein.')
 ON CONFLICT (id) DO NOTHING;
