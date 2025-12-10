@@ -10,7 +10,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                 "operators": ["covered_by", "intersects"],
                 "data_set_filter": {
                     "criteria": {
-                        "all": [
+                        "any": [
                             { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Hafenbecken" },
                             {
                                 "all": [
