@@ -12,7 +12,11 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
         "checks": {
             "type": "spatial_compare",
             "operator": "covered_by",
-            "data_set_filter": { "featureFilter": { "tags": { "object_type": "AX_Strassenachse|AX_Fahrwegachse|AX_WegPfadSteig" } } }
+            "data_set_filter": {
+                "criteria": {
+                    "type": "tag_in", "tag_key": "object_type", "values": ["AX_Strassenachse", "AX_Fahrwegachse", "AX_WegPfadSteig"]
+                }
+            }
         }
     }',
     'Ein Objekt mit der ''bauwerksfunktion'' 1620 liegt immer auf einem Objekt ''AX_Strassenachse'', ''AX_Fahrwegachse'' oder ''AX_WegPfadSteig''.')
