@@ -27,19 +27,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * AdV-Beschreibung:
  * Die Koordinatenreihenfolge bei ETRS89/UTM-Koordinaten ist Easting/Northing und die Koordinaten werden ohne Zonenkennung sowie mit false easting von 500000m angegeben.
+ * <p>
  * Prüfe die Koordinaten, ob
  * • bei UTM32 der erste Wert der Koordinate zwischen 262967.13 und 955227.0 und der zweite zwischen 5239956.14 und 6117957.42 liegt;
  * • bei UTM33 der erste Wert der Koordinate zwischen -190651.49 und 502685.99 und der zweite zwischen 5275795.78 und 6101262.02 liegt.
  * Prüfung, ob die Koordinatenreihenfolge bei GK Rechtswert/Hochwert ist und die Koordinaten ohne Streifenangaben angegeben sind.
+ * <p>
+ * Prüfung der Geometrien auf Konformität zu ISO 19107. Dazu wird jede Geometrie mit deegree und JTS validiert.
+ * Weiterhin wird geprüft dass in einer Surface enthaltene Polygon Patches verbunden sind, dass in einem CurveSegment zwei aufeinander folgende Punkte
+ * nicht dieselben Koordinaten haben, und dass die Geometrie die isSimple() Prüfung von JTS besteht.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-class DE_02000_G_a_006_007 extends DatabaseIntegrationTest {
+class DE_02000_G_a_006_007_008 extends DatabaseIntegrationTest {
 
     final Long CHANGESET_ID = 1L;
 
     Set<String> stepsToValidate = new HashSet<>(Set.of("geometry-check", "object-number-assignment"));
-    Set<String> rulesToValidate = new HashSet<>(Set.of("DE.02000.G.a.006_007"));
+    Set<String> rulesToValidate = new HashSet<>(Set.of("DE.02000.G.a.006_007_008"));
 
     @Autowired
     MockMvc mockMvc;
@@ -126,6 +131,6 @@ class DE_02000_G_a_006_007 extends DatabaseIntegrationTest {
         assertThat(geometryCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'geometry-check'")
-                .contains("Geometrie liegt außerhalb des gültigen Koordinatenbereichs.");
+                .contains("Geometrie liegt außerhalb des gültigen Koordinatenbereichs oder ist keine gültige Geometrie.");
     }
 }

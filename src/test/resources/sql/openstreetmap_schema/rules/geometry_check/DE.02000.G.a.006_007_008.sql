@@ -1,5 +1,5 @@
 INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error_text) VALUES (
-    'DE.02000.G.a.006_007',
+    'DE.02000.G.a.006_007_008',
     'geometry-check',
     'AA_REO',
     '{
@@ -7,5 +7,5 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
             "type": "geom_check", "min_lat": "5239956.14", "max_lat": "6117957.42", "min_lon": "262967.13", "max_lon": "955227.0"
         }
     }',
-    'Geometrie liegt außerhalb des gültigen Koordinatenbereichs.')
+    'Geometrie liegt außerhalb des gültigen Koordinatenbereichs oder ist keine gültige Geometrie.')
 ON CONFLICT (id) DO NOTHING;

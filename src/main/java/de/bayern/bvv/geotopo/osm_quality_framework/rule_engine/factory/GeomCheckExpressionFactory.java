@@ -50,6 +50,9 @@ public class GeomCheckExpressionFactory implements ExpressionFactory {
 
             if (taggedObject instanceof Feature feature) {
 
+                // Check ISO-19107
+                if (!feature.getGeometry().isValid()) return false;
+
                 // Check if the geometry is in allowed coordinate range.
                 Envelope geometryEnvelope = feature.getGeometryTransformed().getEnvelopeInternal();
                 return geometryEnvelope.getMinX() >= params.minLon() &&
