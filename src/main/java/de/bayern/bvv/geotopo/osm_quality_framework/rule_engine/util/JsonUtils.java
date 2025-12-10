@@ -59,6 +59,16 @@ public class JsonUtils {
         return false;
     }
 
+    public Double asDouble(JsonNode json, String field, String expressionType) {
+        JsonNode node = json.get(field);
+
+        if (node != null && node.isString()) {
+            return Double.parseDouble(node.asString());
+        }
+
+        throw new IllegalArgumentException(expressionType + ": '" + field + "' is required");
+    }
+
     public DataSetFilter asOptionalDataSetFilter(JsonNode json) {
         JsonNode node = json.get("data_set_filter");
         if (node != null && !node.isEmpty()) {

@@ -4,6 +4,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.api.Chan
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.mapper.ChangesetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.changeset.model.Changeset;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.ChangesetDataSetDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSetFilter;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.config.QualityPipeline;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.exception.QualityServiceException;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_hub.model.QualityHubResult;
@@ -89,7 +90,8 @@ public class Orchestrator {
                                       Set<String> rulesToValidate) {
 
         ChangesetDataSetDto changesetDataSetDto = this.changesetManagementService.getDataSet(
-                changeset.getId(), null);
+                changeset.getId(),
+                new DataSetFilter(null, "EPSG:25832", null, null, null, null));
 
         Set<QualityPipeline.Step> runnableSteps = this.getRunnableSteps(publishedPipelineSteps, allowedStepIds);
 
