@@ -129,8 +129,12 @@ public class GeodataViewServiceImpl implements GeodataViewService {
                     if  (candidateMembers != null) {
                         List<Feature> candidateMemberFeatures = new ArrayList<>();
                         for (TaggedObject candidateMember : candidateMembers.getAll()) {
-                            if (candidateMember instanceof Feature candidateMemberFeature) {
-                                candidateMemberFeatures.add(candidateMemberFeature);
+                            List<String> allowedObjectTypes = (dataSetFilter.memberFilter() == null) ? null : dataSetFilter.memberFilter().objectTypes();
+
+                            if (allowedObjectTypes == null || allowedObjectTypes.contains(candidateMember.getObjectType())) {
+                                if (candidateMember instanceof Feature candidateMemberFeature) {
+                                    candidateMemberFeatures.add(candidateMemberFeature);
+                                }
                             }
                         }
 
