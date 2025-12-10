@@ -30,15 +30,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Prüfe die Koordinaten, ob
  * • bei UTM32 der erste Wert der Koordinate zwischen 262967.13 und 955227.0 und der zweite zwischen 5239956.14 und 6117957.42 liegt;
  * • bei UTM33 der erste Wert der Koordinate zwischen -190651.49 und 502685.99 und der zweite zwischen 5275795.78 und 6101262.02 liegt.
+ * Prüfung, ob die Koordinatenreihenfolge bei GK Rechtswert/Hochwert ist und die Koordinaten ohne Streifenangaben angegeben sind.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-class DE_02000_G_a_006 extends DatabaseIntegrationTest {
+class DE_02000_G_a_006_007 extends DatabaseIntegrationTest {
 
     final Long CHANGESET_ID = 1L;
 
     Set<String> stepsToValidate = new HashSet<>(Set.of("geometry-check", "object-number-assignment"));
-    Set<String> rulesToValidate = new HashSet<>(Set.of("DE.02000.G.a.006"));
+    Set<String> rulesToValidate = new HashSet<>(Set.of("DE.02000.G.a.006_007"));
 
     @Autowired
     MockMvc mockMvc;
