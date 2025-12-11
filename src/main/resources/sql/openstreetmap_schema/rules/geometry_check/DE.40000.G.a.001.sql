@@ -1,7 +1,7 @@
 INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error_text) VALUES (
     'DE.40000.G.a.001',
     'geometry-check',
-    'AX_Turm', /*AX_TatsaechlicheNutzung',*/
+    'AX_TatsaechlicheNutzung',
     '{
         "conditions": {
             "all": [
@@ -12,12 +12,24 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
         "checks": {
             "type": "spatial_compare",
             "operator": "surrounded_by",
-            "data_set_filter": { "criteria": { "type": "tag_in", "tag_key": "object_type", "values": [
-                "AX_Wohnbauflaeche", "AX_Weg", "AX_Wald", "AX_UnlandVegetationsloseFlaeche", "AX_TagebauGrubeSteinbruch", "AX_Sumpf", "AX_Strassenverkehr", "AX_StehendesGewaesser", "AX_SportFreizeitUndErholungsflaeche", "AX_Siedlungsflaeche",
-                "AX_Schiffsverkehr", "AX_Platz", "AX_Moor", "AX_Meer", "AX_Landwirtschaft", "AX_IndustrieUndGewerbeflaeche", "AX_Heide", "AX_Halde", "AX_Hafenbecken",  "AX_Gebietsgrenze",
-                "AX_Gehoelz", "AX_Friedhof", "AX_Flugverkehr", "AX_Fliessgewaesser", "AX_FlaecheZurZeitUnbestimmbar", "AX_FlaecheGemischterNutzung", "AX_Bahnverkehr", "AX_Bergbaubetrieb", "AX_FlaecheBesondererFunktionalerPraegung"] }
+            "data_set_filter": {
+                "criteria": {
+                    "any": [
+                        {
+                            "type": "tag_in", "tag_key": "object_type", "values": ["AX_Wohnbauflaeche", "AX_Weg", "AX_Wald", "AX_UnlandVegetationsloseFlaeche", "AX_TagebauGrubeSteinbruch", "AX_Sumpf", "AX_Strassenverkehr", "AX_StehendesGewaesser", "AX_SportFreizeitUndErholungsflaeche", "AX_Siedlungsflaeche",
+                                                                                   "AX_Schiffsverkehr", "AX_Platz", "AX_Moor", "AX_Meer", "AX_Landwirtschaft", "AX_IndustrieUndGewerbeflaeche", "AX_Heide", "AX_Halde", "AX_Hafenbecken",  "AX_Gebietsgrenze",
+                                                                                   "AX_Gehoelz", "AX_Friedhof", "AX_Flugverkehr", "AX_Fliessgewaesser", "AX_FlaecheZurZeitUnbestimmbar", "AX_FlaecheGemischterNutzung", "AX_Bahnverkehr", "AX_Bergbaubetrieb", "AX_FlaecheBesondererFunktionalerPraegung"]
+                        },
+                        {
+                            "all": [
+                                { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Gebietsgrenze" },
+                                { "type": "tag_in", "tag_key": "artDerGebietsgrenze", "values": ["7101", "7102"] }
+                            ]
+                        }
+                    ]
+                }
             }
         }
     }',
-    'TODO: Die Members von ''AX_KommunalesGebiet'' dürfen nur ''AX_Gebietsgrenze'' mit ''artDerGebietsgrenze'' 7101, 7102, 7104, 7105, 7106 oder 7107 sein. Zudem muss ''AX_KommunalesGebiet'' muss lückenlos und flächendeckend sein.')
+    'Im Bereich der Objekte "Tatsächliche Nutzung" existiert eine Lücke bzw. Überschneidung in der Flächendeckung.')
 ON CONFLICT (id) DO NOTHING;
