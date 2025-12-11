@@ -8,7 +8,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                 {   "type": "tag_equals", "tag_key": "istWeitereNutzung", "value": "1000" },
                 {
                     "type": "spatial_compare",
-                    "operators": [ "covered_by", "overlaps" ],
+                    "operator": "covered_by",
                     "data_set_filter": { "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "current:object_type" } }
                 }
             ]
