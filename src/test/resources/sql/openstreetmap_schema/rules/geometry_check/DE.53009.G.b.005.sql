@@ -24,13 +24,11 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                 "conditions": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" },
                                 "checks": {
                                     "type": "spatial_compare",
-                                    "reference_feature_role": "over",
+                                    "reference_feature_role": "under",
                                     "operator": "equals_topo",
-                                    "self_check": true,
-                                    "data_set_filter": {
-                                        "criteria": { "type": "tag_in", "tag_key": "object_type", "values": ["AA_hatDirektUnten", "AX_Strassenachse", "AX_Fahrwegachse", "AX_Bahnstrecke", "AX_WegPfadSteig"] },
-                                        "memberFilter": { "role": "under" }
-                                    }
+                                    "aggregator": "union",
+                                    "data_set_filter": { "memberFilter": { "role": "over", "objectTypes": ["AX_Strassenachse", "AX_Fahrwegachse", "AX_Bahnstrecke", "AX_WegPfadSteig"] } },
+                                    "self_check": true
                                 }
                             }
                         }
@@ -44,12 +42,12 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                 "conditions": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" },
                                 "checks": {
                                     "type": "spatial_compare",
-                                    "reference_feature_role": "over",
+                                    "reference_feature_role": "under",
                                     "operator": "contains",
-                                    "self_check": true,
                                     "data_set_filter": {
-                                        "memberFilter": { "role": "under" }
-                                    }
+                                        "memberFilter": { "role": "over" }
+                                    },
+                                    "self_check": true
                                 }
                             }
                         }
