@@ -16,8 +16,8 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                 {
                     "type": "spatial_compare",
                     "operator": "surrounded_by",
-                    "aggregator": "union",
                     "data_set_filter": {
+                        "aggregator": "union",
                         "criteria": {
                             "any": [
                                 {

@@ -15,9 +15,8 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                     "type": "spatial_compare",
                                     "reference_feature_role": "over",
                                     "operator": "within",
-                                    "aggregator": "union",
                                     "self_check": true,
-                                    "data_set_filter": { "memberFilter": { "role": "under" } }
+                                    "data_set_filter": { "aggregator": "union", "memberFilter": { "role": "under" } }
                                 }
                             }
                         },
@@ -34,8 +33,8 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                 {
                                     "type": "spatial_compare",
                                     "operator": "within",
-                                    "aggregator": "union",
                                     "data_set_filter": {
+                                        "aggregator": "union",
                                         "criteria": {
                                             "all": [
                                                 { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Fliessgewaesser" },

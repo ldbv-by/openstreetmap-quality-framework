@@ -16,8 +16,8 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                     "type": "spatial_compare",
                     "reference_feature_role": "under",
                     "operator": "equals_topo",
-                    "aggregator": "union",
-                    "data_set_filter": { "memberFilter": { "role": "over", "objectTypes": ["AX_Gewaesserachse"] } },
+
+                    "data_set_filter": { "aggregator": "union", "memberFilter": { "role": "over", "objectTypes": ["AX_Gewaesserachse"] } },
                     "self_check": true
                 }
             }
