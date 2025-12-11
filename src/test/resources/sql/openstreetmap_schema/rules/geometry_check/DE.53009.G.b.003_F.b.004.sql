@@ -10,9 +10,17 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
             ]
         },
         "checks": {
-            "type": "spatial_compare",
-            "operator": "equals_topo",
-            "data_set_filter": { "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Gewaesserachse" } }
+            "relations": {
+                "conditions": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" },
+                "checks": {
+                    "type": "spatial_compare",
+                    "reference_feature_role": "under",
+                    "operator": "equals_topo",
+                    "aggregator": "union",
+                    "data_set_filter": { "memberFilter": { "role": "over", "objectTypes": ["AX_Gewaesserachse"] } },
+                    "self_check": true
+                }
+            }
         }
     }',
     'Ein linienförmiges Objekt ''AX_BauwerkImGewaesserbereich'' mit ''bauwerksfunktion'' 2010 bis 2013, 2070 und 2090 überlagern ein Objekt ''AX_Gewaesserachse'' mit identischer Geometrie.')
