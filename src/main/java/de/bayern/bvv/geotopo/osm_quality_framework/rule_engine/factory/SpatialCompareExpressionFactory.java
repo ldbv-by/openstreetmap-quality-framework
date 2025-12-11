@@ -41,7 +41,10 @@ public class SpatialCompareExpressionFactory implements ExpressionFactory {
         Set<SpatialOperator> operators, // covered, covered_by, intersects, surrounded_by, ...
         DataSetFilter dataSetFilter,    // feature set used for comparison with the reference feature.
         String referenceFeatureRole,    // only relation members with this role are considered as the reference feature.
-        boolean selfCheck               // checks only the reference object (default = false).
+        boolean selfCheck,              // checks only the reference object (default = false).
+        Integer minMatchCount,          // optional: necessary minimum count.
+        Integer maxMatchCount           // optional: necessary maximum count.
+
     ) {}
 
     /**
@@ -91,9 +94,11 @@ public class SpatialCompareExpressionFactory implements ExpressionFactory {
         DataSetFilter dataSetFilter = JsonUtils.asOptionalDataSetFilter(json);
         String referenceFeatureRole = JsonUtils.asOptionalString(json,"reference_feature_role");
         boolean selfCheck = JsonUtils.asOptionalBoolean(json, "self_check");
+        Integer minMatchCount = JsonUtils.asOptionalInteger(json, "min_match_count");
+        Integer maxMatchCount = JsonUtils.asOptionalInteger(json, "max_match_count");
 
         return new RuleParams(
-                operators, dataSetFilter, referenceFeatureRole, selfCheck
+                operators, dataSetFilter, referenceFeatureRole, selfCheck, minMatchCount, maxMatchCount
         );
     }
 
@@ -127,12 +132,18 @@ public class SpatialCompareExpressionFactory implements ExpressionFactory {
             }
         }
 
-        // Rule is true if spatial results are found.
-        return spatialResult != null &&
-                ((spatialResult.nodes() != null && !spatialResult.nodes().isEmpty()) ||
-                        (spatialResult.ways() != null && !spatialResult.ways().isEmpty()) ||
-                        (spatialResult.areas() != null && !spatialResult.areas().isEmpty()) ||
-                        (spatialResult.relations() != null && !spatialResult.relations().isEmpty()));
+        int resultCount = 0;
+        if (spatialResult != null) {
+            if (spatialResult.nodes() != null)      resultCount += spatialResult.nodes().size();
+            if (spatialResult.ways() != null)       resultCount += spatialResult.ways().size();
+            if (spatialResult.areas() != null)      resultCount += spatialResult.areas().size();
+            if (spatialResult.relations() != null)  resultCount += spatialResult.relations().size();
+        }
+
+        if (resultCount == 0) return false;
+
+        return (params.minMatchCount() == null || resultCount >= params.minMatchCount()) &&
+               (params.maxMatchCount() == null || resultCount <= params.maxMatchCount());
     }
 
     /**

@@ -69,6 +69,14 @@ public class JsonUtils {
         throw new IllegalArgumentException(expressionType + ": '" + field + "' is required");
     }
 
+    public Integer asOptionalInteger(JsonNode json, String field) {
+        JsonNode node = json.get(field);
+        if (node != null && node.isString()) {
+            return Integer.parseInt(node.asString());
+        }
+        return null;
+    }
+
     public DataSetFilter asOptionalDataSetFilter(JsonNode json) {
         JsonNode node = json.get("data_set_filter");
         if (node != null && !node.isEmpty()) {
