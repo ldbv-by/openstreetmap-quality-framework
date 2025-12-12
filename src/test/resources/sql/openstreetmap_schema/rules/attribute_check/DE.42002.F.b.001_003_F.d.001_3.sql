@@ -9,7 +9,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                 { "type": "tag_equals", "tag_key": "widmung", "value": "1303" }
             ]
         },
-        "checks": { "type": "tag_regex_match", "tag_key": "bezeichnung", "pattern": "^(E|B)[A-Za-z0-9äÄöÖüÜ]*$", "min_count": 2 }
+        "checks": { "type": "tag_regex_match", "tag_key": "bezeichnung", "pattern": "^(E|B)[A-Za-z0-9äÄöÖüÜ]*$", "min_count": "2" }
 
     }',
     'Das Tag ''bezeichnung'' muss mit ''E'' oder ''B'' beginnen und mindestens zwei Bezeichnungen vorkommen, wenn die ''internationaleBedeutung'' 2001 gesetzt ist.')
