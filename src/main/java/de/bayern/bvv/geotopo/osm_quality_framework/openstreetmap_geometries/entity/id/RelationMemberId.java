@@ -16,5 +16,6 @@ import java.io.Serializable;
 public class RelationMemberId implements Serializable {
     private Long relationOsmId;
     private String memberType;
+    private String memberRole;
     private Long memberOsmId;
 }
