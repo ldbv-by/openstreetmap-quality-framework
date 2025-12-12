@@ -5,6 +5,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
     '{
         "checks": {
             "way_nodes": {
+                "loop_info": { "type": "any" },
                 "conditions": {
                     "any": [
                         { "type": "way_node_compare", "index": "1" },
