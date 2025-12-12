@@ -6,6 +6,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
         "conditions": { "type": "tag_in", "tag_key": "art", "values": ["1710", "1720"] },
         "checks": {
             "way_nodes": {
+                "loop_info": { "type": "any" },
                 "conditions": {
                     "any": [
                         { "type": "way_node_compare", "index": "1" },
@@ -17,7 +18,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                     "operator": "touches",
                     "data_set_filter": {
                         "criteria": {
-                            "type": "tag_in", "tag_key": "object_type", "value": ["AX_SchifffahrtslinieFaehrverkehr", "AX_Strassenachse", "AX_Fahrbahnachse", "AX_Fahrwegachse", "AX_Bahnstrecke" ]
+                            "type": "tag_in", "tag_key": "object_type", "values": ["AX_SchifffahrtslinieFaehrverkehr", "AX_Strassenachse", "AX_Fahrbahnachse", "AX_Fahrwegachse", "AX_Bahnstrecke" ]
                         }
                     }
                 }
