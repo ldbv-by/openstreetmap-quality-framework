@@ -8,7 +8,8 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
             "operator": "covered_by",
             "data_set_filter": {
                 "aggregator": "union",
-                "criteria": { "type": "tag_in", "tag_key": "object_type", "values": ["AX_Fliessgewaesser", "AX_Hafenbecken", "AX_StehendesGewaesser", "AX_Meer"] } }
+                "criteria": { "type": "tag_in", "tag_key": "object_type", "values": ["AX_Fliessgewaesser", "AX_Hafenbecken", "AX_StehendesGewaesser", "AX_Meer"] }
+            }
         }
     }',
     'Ein Objekt ''AX_SchifffahrtslinieFaehrverkehr'' liegt immer innerhalb einem Objekt ''AX_Fliessgewaesser'', ''AX_Hafenbecken'', ''AX_StehendesGewaesser'' oder ''AX_Meer''.')
