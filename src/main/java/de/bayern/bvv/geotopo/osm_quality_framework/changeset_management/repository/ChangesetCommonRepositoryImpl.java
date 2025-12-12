@@ -198,42 +198,32 @@ public class ChangesetCommonRepositoryImpl<T> {
             case "relation_exists": {
                 Criteria relationCriteria = this.parseCriteria(params.get("criteria"));
 
-                @SuppressWarnings("unchecked")
-                Map<String, Object> relationMemberFilter = (Map<String, Object>) params.get("relation_members");
-                String relationMemberRole = null;
-                Criteria relationMemberCriteria = null;
-
-                if (relationMemberFilter != null) {
-                    relationMemberRole = (String) relationMemberFilter.get("role");
-                    relationMemberCriteria = this.parseCriteria(relationMemberFilter.get("criteria"));
-                }
-
                 // EXISTS subquery
-                Subquery<Long> sub = criteriaQuery.subquery(Long.class);
+                Subquery<Long> relationExistsSub = criteriaQuery.subquery(Long.class);
 
-                Root<RelationMemberEntity> rm = sub.from(RelationMemberEntity.class);
-                Root<RelationEntity>       rel = sub.from(RelationEntity.class);
+                Root<RelationEntity>       rel = relationExistsSub.from(RelationEntity.class);
+                Root<RelationMemberEntity> rm = relationExistsSub.from(RelationMemberEntity.class);
 
-                List<Predicate> subPs = new ArrayList<>();
+                List<Predicate> relationExistsPredicates = new ArrayList<>();
 
-                // r.osm_id = rm.relation_osm_id
+                // rel.osm_id = rm.relation_osm_id
                 Path<Long> rmRelationOsmId = rm.get("memberId").get("relationOsmId");
-                subPs.add(criteriaBuilder.equal(rel.get("osmId"), rmRelationOsmId));
+                relationExistsPredicates.add(criteriaBuilder.equal(rel.get("osmId"), rmRelationOsmId));
 
                 // rm.member_osm_id = :currentOsmId
                 Path<Long> rmMemberOsmId = rm.get("memberId").get("memberOsmId");
-                subPs.add(criteriaBuilder.equal(rmMemberOsmId, target.get("osmId")));
+                relationExistsPredicates.add(criteriaBuilder.equal(rmMemberOsmId, target.get("osmId")));
 
                 // rm.member_type passend zum Target
                 if (NodeEntity.class.isAssignableFrom(entityType)) {
-                    subPs.add(criteriaBuilder.equal(criteriaBuilder.lower(rm.get("memberId").get("memberType")), "n"));
+                    relationExistsPredicates.add(criteriaBuilder.equal(criteriaBuilder.lower(rm.get("memberId").get("memberType")), "n"));
                 } else if (WayEntity.class.isAssignableFrom(entityType)) {
-                    subPs.add(criteriaBuilder.equal(criteriaBuilder.lower(rm.get("memberId").get("memberType")), "w"));
+                    relationExistsPredicates.add(criteriaBuilder.equal(criteriaBuilder.lower(rm.get("memberId").get("memberType")), "w"));
                 } else if (RelationEntity.class.isAssignableFrom(entityType)) {
-                    subPs.add(criteriaBuilder.equal(criteriaBuilder.lower(rm.get("memberId").get("memberType")), "r"));
+                    relationExistsPredicates.add(criteriaBuilder.equal(criteriaBuilder.lower(rm.get("memberId").get("memberType")), "r"));
                 } else if (AreaEntity.class.isAssignableFrom(entityType)) {
                     // Area kann aus 'w' oder 'r' stammen
-                    subPs.add(criteriaBuilder.equal(
+                    relationExistsPredicates.add(criteriaBuilder.equal(
                             criteriaBuilder.lower(rm.get("memberId").get("memberType")),
                             criteriaBuilder.lower(target.get("osmGeometryType"))));
                 }
@@ -244,7 +234,7 @@ public class ChangesetCommonRepositoryImpl<T> {
                                     (Root<T>) target, entityType, rel, RelationEntity.class, relationCriteria);
 
                     if (relCriteriaPred != null) {
-                        subPs.add(relCriteriaPred);
+                        relationExistsPredicates.add(relCriteriaPred);
                     }
                 }
 
@@ -252,64 +242,70 @@ public class ChangesetCommonRepositoryImpl<T> {
                 try {
                     Path<Long> targetChangesetId = target.get("changeset").get("id");
                     Path<Long> rmChangesetId   = rm.get("changeset").get("id");
-                    subPs.add(criteriaBuilder.equal(rmChangesetId, targetChangesetId));
+                    relationExistsPredicates.add(criteriaBuilder.equal(rmChangesetId, targetChangesetId));
                     Path<Long> relChangesetId   = rel.get("changeset").get("id");
-                    subPs.add(criteriaBuilder.equal(relChangesetId, targetChangesetId));
+                    relationExistsPredicates.add(criteriaBuilder.equal(relChangesetId, targetChangesetId));
                 } catch (IllegalArgumentException ignored) {}
 
-                // optional: filter role
-                if (relationMemberRole != null && !relationMemberRole.isBlank()) {
-                    Path<String> rmRole = rm.get("memberId").get("memberRole");
-                    subPs.add(criteriaBuilder.equal(criteriaBuilder.lower(rmRole), relationMemberRole.toLowerCase()));
+                // optional: filter relation members
+                @SuppressWarnings("unchecked")
+                Map<String, Object> relationMemberFilter = (Map<String, Object>) params.get("relation_members");
+
+                String relationMemberRole = null;
+                Criteria relationMemberCriteria = null;
+                if (relationMemberFilter != null) {
+                    relationMemberRole = (String) relationMemberFilter.get("role");
+                    relationMemberCriteria = this.parseCriteria(relationMemberFilter.get("criteria"));
                 }
 
                 // optional: filter member criteria
                 if (relationMemberFilter != null) {
-                    // Todo: Check functionality!
-                    Root<NodeEntity>           n  = sub.from(NodeEntity.class);
-                    Root<WayEntity>            w  = sub.from(WayEntity.class);
-                    Root<AreaEntity>           a  = sub.from(AreaEntity.class);
-                    Root<RelationEntity>       rr = sub.from(RelationEntity.class);
-
-                    Expression<String> rmType = criteriaBuilder.lower(rm.get("memberId").get("memberType"));
-
-                    Predicate nodeBranch = criteriaBuilder.and(
-                            criteriaBuilder.equal(rmType, "n"),
-                            criteriaBuilder.equal(n.get("osmId"), rmMemberOsmId),
-                            (relationMemberCriteria == null ? criteriaBuilder.conjunction()
-                                    : criteriaToPredicate(criteriaQuery, criteriaBuilder, (Root<T>) target, entityType, n, NodeEntity.class, relationMemberCriteria))
+                    Predicate existsNodeMember = buildRelationMemberExists(
+                            criteriaQuery, criteriaBuilder, rel,
+                            relationMemberRole, relationMemberCriteria,
+                            "n", NodeEntity.class, null
                     );
 
-                    Predicate wayBranch = criteriaBuilder.and(
-                            criteriaBuilder.equal(rmType, "w"),
-                            criteriaBuilder.equal(w.get("osmId"), rmMemberOsmId),
-                            (relationMemberCriteria == null ? criteriaBuilder.conjunction()
-                                    : criteriaToPredicate(criteriaQuery, criteriaBuilder, (Root<T>) target, entityType, w, WayEntity.class, relationMemberCriteria))
+                    Predicate existsWayMember = buildRelationMemberExists(
+                            criteriaQuery, criteriaBuilder, rel,
+                            relationMemberRole, relationMemberCriteria,
+                            "w", WayEntity.class, null
                     );
 
-                    Predicate areaBranch = criteriaBuilder.and(
+                    // Area: kann aus w/r stammen -> zwei Exists (oder eins mit extra predicate)
+                    Predicate existsAreaWMember = buildRelationMemberExists(
+                            criteriaQuery, criteriaBuilder, rel,
+                            relationMemberRole, relationMemberCriteria,
+                            "w", AreaEntity.class,
+                            (cb, memberRoot) -> cb.equal(cb.lower(memberRoot.get("osmGeometryType")), "w")
+                    );
+
+                    Predicate existsAreaRMember = buildRelationMemberExists(
+                            criteriaQuery, criteriaBuilder, rel,
+                            relationMemberRole, relationMemberCriteria,
+                            "r", AreaEntity.class,
+                            (cb, memberRoot) -> cb.equal(cb.lower(memberRoot.get("osmGeometryType")), "r")
+                    );
+
+                    Predicate existsRelationMember = buildRelationMemberExists(
+                            criteriaQuery, criteriaBuilder, rel,
+                            relationMemberRole, relationMemberCriteria,
+                            "r", RelationEntity.class, null
+                    );
+
+                    relationExistsPredicates.add(
                             criteriaBuilder.or(
-                                    criteriaBuilder.equal(rmType, "w"),
-                                    criteriaBuilder.equal(rmType, "r")
-                            ),
-                            criteriaBuilder.equal(a.get("osmId"), rmMemberOsmId),
-                            criteriaBuilder.equal(criteriaBuilder.lower(a.get("osmGeometryType")), rmType),
-                            (relationMemberCriteria == null ? criteriaBuilder.conjunction()
-                                    : criteriaToPredicate(criteriaQuery, criteriaBuilder, (Root<T>) target, entityType, a, AreaEntity.class, relationMemberCriteria))
+                                    existsNodeMember,
+                                    existsWayMember,
+                                    existsAreaWMember,
+                                    existsAreaRMember,
+                                    existsRelationMember
+                            )
                     );
-
-                    Predicate relBranch = criteriaBuilder.and(
-                            criteriaBuilder.equal(rmType, "r"),
-                            criteriaBuilder.equal(rr.get("osmId"), rmMemberOsmId),
-                            (relationMemberCriteria == null ? criteriaBuilder.conjunction()
-                                    : criteriaToPredicate(criteriaQuery, criteriaBuilder, (Root<T>) target, entityType, rr, RelationEntity.class, relationMemberCriteria))
-                    );
-
-                    subPs.add(criteriaBuilder.or(nodeBranch, wayBranch, areaBranch, relBranch));
                 }
 
-                sub.select(rel.get("osmId")).where(subPs.toArray(new Predicate[0]));
-                return criteriaBuilder.exists(sub);
+                relationExistsSub.select(rel.get("osmId")).where(relationExistsPredicates.toArray(new Predicate[0]));
+                return criteriaBuilder.exists(relationExistsSub);
             }
 
             case "bbox": {
@@ -404,5 +400,75 @@ public class ChangesetCommonRepositoryImpl<T> {
         }
 
         return null;
+    }
+
+    @FunctionalInterface
+    private interface ExtraMemberEntityPredicate {
+        Predicate apply(CriteriaBuilder cb, Root<?> memberRoot);
+    }
+
+    /**
+     * EXISTS: Für eine gegebene Relation (rel) existiert ein RelationMember rm2,
+     * das (optional) die Rolle erfüllt und dessen Member-Entity (Node/Way/Area/Relation)
+     * die relationMemberCriteria erfüllt.
+     */
+    private Predicate buildRelationMemberExists(
+            CriteriaQuery<?> criteriaQuery,
+            CriteriaBuilder cb,
+            Root<RelationEntity> rel,
+            String relationMemberRole,
+            Criteria relationMemberCriteria,
+            String memberTypeLower,              // "n"|"w"|"r"
+            Class<?> memberEntityClass,
+            ExtraMemberEntityPredicate extraPredicate
+    ) {
+        Subquery<Long> sub = criteriaQuery.subquery(Long.class);
+
+        // rm2 ist das Member, das gefiltert werden soll
+        Root<RelationMemberEntity> rm2 = sub.from(RelationMemberEntity.class);
+        Root<?> memberRoot = sub.from(memberEntityClass);
+
+        List<Predicate> ps = new ArrayList<>();
+
+        // rm2 gehört zur selben Relation
+        ps.add(cb.equal(rm2.get("memberId").get("relationOsmId"), rel.get("osmId")));
+
+        // rm2.member_type = memberTypeLower
+        ps.add(cb.equal(cb.lower(rm2.get("memberId").get("memberType")), memberTypeLower));
+
+        // memberRoot.osmId = rm2.member_osm_id
+        Path<Long> rm2MemberOsmId = rm2.get("memberId").get("memberOsmId");
+        ps.add(cb.equal(memberRoot.get("osmId"), rm2MemberOsmId));
+
+        // optional: role filter (auf rm2!)
+        if (relationMemberRole != null && !relationMemberRole.isBlank()) {
+            ps.add(cb.equal(cb.lower(rm2.get("memberId").get("memberRole")), relationMemberRole.toLowerCase()));
+        }
+
+        // optional: changeset koppeln (falls vorhanden)
+        try {
+            Path<Long> relChangesetId = rel.get("changeset").get("id");
+            ps.add(cb.equal(rm2.get("changeset").get("id"), relChangesetId));
+            ps.add(cb.equal(memberRoot.get("changeset").get("id"), relChangesetId));
+        } catch (IllegalArgumentException ignored) {}
+
+        // optional: criteria auf dem Member-Entity
+        if (relationMemberCriteria != null) {
+            Predicate memberCriteriaPred = this.criteriaToPredicate(
+                    criteriaQuery, cb,
+                    null, Object.class,                 // root/rootEntityType werden nicht gebraucht
+                    (From<?, ?>) memberRoot, memberEntityClass,
+                    relationMemberCriteria
+            );
+            if (memberCriteriaPred != null) ps.add(memberCriteriaPred);
+        }
+
+        // optional: extra predicate (Area: osmGeometryType match)
+        if (extraPredicate != null) {
+            ps.add(extraPredicate.apply(cb, memberRoot));
+        }
+
+        sub.select(cb.literal(1L)).where(ps.toArray(new Predicate[0]));
+        return cb.exists(sub);
     }
 }
