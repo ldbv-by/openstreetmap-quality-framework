@@ -2087,7 +2087,7 @@ INSERT INTO openstreetmap_schema.tags (object_type, tag_key, multiplicity, tag_d
     ('AX_WegPfadSteig', 'strassenschluessel', '0..1', 'CharacterString'),
     ('AX_WegPfadSteig', 'regionalsprache', '0..2', 'CharacterString'),
     ('AX_Bahnverkehrsanlage', 'bahnhofskategorie', '1', 'AX_Bahnhofskategorie_Bahnverkehrsanlage'),
-    ('AX_Bahnverkehrsanlage', 'name', '0..1', 'CharacterString'),
+    ('AX_Bahnverkehrsanlage', 'name', '1', 'CharacterString'), /* DE.53004.F.b.001 */
     ('AX_Bahnverkehrsanlage', 'bezeichnung', '0..1', 'CharacterString'),
     ('AX_Bahnverkehrsanlage', 'zustand', '0..1', 'AX_Zustand_Bahnverkehrsanlage'),
     ('AX_Bahnverkehrsanlage', 'bahnkategorie', '0..*', 'AX_Bahnkategorie_Bahnverkehrsanlage'),
