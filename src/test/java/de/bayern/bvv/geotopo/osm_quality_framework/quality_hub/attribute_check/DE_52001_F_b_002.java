@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * AdV-Beschreibung:
- * Ortslage' darf sich nicht gegenseitig überlagern.
+ * Die Attributart 'Name' muss immer belegt sein.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
