@@ -220,6 +220,7 @@ public class GeodataViewServiceImpl implements GeodataViewService {
                     case INTERSECTS -> match = referenceGeometry.intersects(candidate.getGeometry());
                     case OVERLAPS -> match = referenceGeometry.overlaps(candidate.getGeometry());
                     case CROSSES -> match = referenceGeometry.crosses(candidate.getGeometry());
+                    case COVERS -> match = referenceGeometry.covers(candidate.getGeometry());
                 }
 
                 if (match) {
