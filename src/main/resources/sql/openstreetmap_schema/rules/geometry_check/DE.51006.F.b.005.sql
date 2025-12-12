@@ -8,6 +8,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
             "type": "spatial_compare",
             "operator": "covered_by",
             "data_set_filter": {
+                "aggregator": "union",
                 "criteria": {
                     "type": "tag_in", "tag_key": "object_type", "values": [ "AX_SportFreizeitUndErholungsflaeche",
                                                                             "AX_Landwirtschaft",
