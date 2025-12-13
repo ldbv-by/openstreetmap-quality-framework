@@ -26,29 +26,36 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * AdV-Beschreibung:
- * Die Attributart 'Internationale Bedeutung' mit der Werteart 2001 'Europastraße' kann nur
- * in Verbindung mit der Attributart 'Bezeichnung' mit "E" vorkommen.
- *
- * Die Attributart 'Internationale Bedeutung' mit der Werteart 2001 'Europastraße' muss mindestens 2 Bezeichnungen führen.
- *
- * Falls IBD vorhanden ist, beginnt BEZ bei WDM 1301 mit "E" oder mit "A" und bei WDM 1303 mit "E" oder mit "B".
- * Jede weitere Bezeichnung muss mit "E" beginnen. Ansonsten beginnt BEZ bei WDM 1301 mit "A", bei 1303 mit "B", bei 1305 mit "L" oder "S".
- * Bei WDM 1307, 9997 und 9999 ist BEZ nicht erlaubt. Jedes BEZ muss den regulären Ausdruck '^[A-Za-z0-9äÄöÖüÜ]+$' erfüllen.
+ * Es ist zu prüfen, dass bei Belegung der Attributart 'Internationale Bedeutung'  die Attributart 'Bezeichnung' mindestens zweimal belegt ist.
+ * <p>
+ * Ist bei einem Objekt AX_Strasse IBD nicht belegt und die Widmung mit dem Wert 1301 oder 1303 belegt, muss das Attribut BEZ wie folgt belegt sein:
+ * bei einem Objekt mit WDM 1301 muss die Bezeichnung mit einem 'A' beginnen,
+ * bei einem Objekt mit WDM 1303 muss die Bezeichnung mit einem 'B' beginnen.
+ * Belegungen von BEZ mit anderen Buchstaben sind nicht zulässig.
+ * Ein Leerzeichen im Attribut BEZ darf nicht enthalten sein.
+ * <p>
+ * Bei einem Objekt 42002 'Straße' bei dem die Attributart 'Internationale Bedeutung' mit 2001 'Europastraße' und die Attributart 'Widmung' mit 1301 'Autobahn'belegt ist,
+ * muss die eine Bezeichnung mit "A" und die andere Bezeichnung mit "E" beginnen. Jede weitere Bezeichnung muss ebenfalls mit "E" beginnen.
+ * Bei einem Objekt 42002 'Straße' bei dem die Attributart 'Internationale Bedeutung' mit 2001 'Europastraße' und die Attributart 'Widmung' mit 1303 'Bundesstraße' belegt ist,
+ * muss die eine Bezeichnung mit "B" und die andere Bezeichnung mit "E" beginnen. Jede weitere Bezeichnung muss ebenfalls mit "E" beginnen.
+ * Bei einem Objekt 42002 'Straße' ohne 'Internationale Bedeutung' beginnt 'Bezeichnung'
+ * bei 'Widmung' 1301 'Autobahn' mit "A",
+ * bei 'Widmung' 1303 'Bundesstraße' mit "B",
+ * bei 'Widmung' 1305 'Landesstraße, Staatsstraße' mit "L" oder "S".
+ * Bei 'Widmung' 1307 'Gemeindestraße', 9997 'Nicht öffentliche Straße' und 9999 'Sonstige öffentliche Straße' ist 'Bezeichnung' nicht erlaubt.
+ * Bei 'Widmung' 1306 'Kreisstraße' ist die Nichtbelegung von 'Bezeichnung' nicht erlaubt.
+ * Nach einem Buchstaben müssen alle dazugehörigen weiteren Zeichen im Attribut 'Bezeichnung' Ziffern sein.
+ * Eine Ausnahme gilt für Bundes-, Landes- und Kreisstraßen, bei denen als Suffix ein Klein- oder Großbuchstabe erlaubt ist.
+ * Bezeichnungen von Straßen müssen generell folgenden regulären Ausdruck erfüllen: '^[A-Za-z][A-Za-z0-9äÄöÖüÜ]*$' - Leer- und Sonderzeichen sind somit nicht erlaubt.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-class DE_42002_F_b_001_003_F_d_001 extends DatabaseIntegrationTest {
+class DE_42002_F_b_003_006_F_d_001 extends DatabaseIntegrationTest {
 
     final Long CHANGESET_ID = 1L;
 
     Set<String> stepsToValidate = new HashSet<>(Set.of("attribute-check", "object-number-assignment"));
-    Set<String> rulesToValidate = new HashSet<>(Set.of("DE.42002.F.b.001_003_F.d.001_1",
-                                                       "DE.42002.F.b.001_003_F.d.001_2",
-                                                       "DE.42002.F.b.001_003_F.d.001_3",
-                                                       "DE.42002.F.b.001_003_F.d.001_4",
-                                                       "DE.42002.F.b.001_003_F.d.001_5",
-                                                       "DE.42002.F.b.001_003_F.d.001_6",
-                                                       "DE.42002.F.b.001_003_F.d.001_7"));
+    Set<String> rulesToValidate = new HashSet<>(Set.of("DE.42002.F.b.003_006_F.d.001"));
 
     @Autowired
     MockMvc mockMvc;
@@ -59,7 +66,7 @@ class DE_42002_F_b_001_003_F_d_001 extends DatabaseIntegrationTest {
             .build();
 
     @Test
-    void createBundesautobahnMitBezeichnung() throws Exception {
+    void createBundesautobahnMitZweiKorrektenBezeichnungen() throws Exception {
         // Arrange
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
@@ -102,7 +109,7 @@ class DE_42002_F_b_001_003_F_d_001 extends DatabaseIntegrationTest {
     }
 
     @Test
-    void createBundesautobahnMitFalscherBezeichnung() throws Exception {
+    void createBundesautobahnMitDreiKorrektenBezeichnungen() throws Exception {
         // Arrange
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
@@ -117,7 +124,50 @@ class DE_42002_F_b_001_003_F_d_001 extends DatabaseIntegrationTest {
                   </way>
                   <relation id='-77' changeset='-1'>
                     <member type='way' ref='-1308' role='' />
-                    <tag k='bezeichnung' v='Europastrasse1;Test' />
+                    <tag k='bezeichnung' v='Europastrasse1;Europastrasse2;Autobahn' />
+                    <tag k='internationaleBedeutung' v='2001' />
+                    <tag k='object_type' v='AX_Strasse' />
+                    <tag k='widmung' v='1301' />
+                  </relation>
+                </create>
+                </osmChange>
+                """;
+
+        // Act
+        MvcResult mvcResult = this.mockMvc.perform(
+                        post("/osm-quality-framework/v1/quality-hub/check/changeset/{id}", CHANGESET_ID)
+                                .contentType(MediaType.APPLICATION_XML)
+                                .content(CHANGESET_XML)
+                                .param("steps", String.join(",", stepsToValidate))
+                                .param("rules", String.join(",", rulesToValidate)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        QualityHubResultDto qualityHubResultDto = this.objectMapper.readValue(mvcResult.getResponse().getContentAsByteArray(), QualityHubResultDto.class);
+
+        // Assert
+        assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
+        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result to be valid, but it was invalid.").isTrue();
+    }
+
+    @Test
+    void createBundesautobahnMitEinerFalschenBezeichnung() throws Exception {
+        // Arrange
+        final String CHANGESET_XML = """
+                <osmChange version="0.6" generator="JOSM">
+                <create>
+                  <node id='-25364' changeset='-1' lat='49.87494356474' lon='12.32280142285' />
+                  <node id='-25363' changeset='-1' lat='49.87777772641' lon='12.32285980169' />
+                  <way id='-1308' changeset='-1'>
+                    <nd ref='-25363' />
+                    <nd ref='-25364' />
+                    <tag k='object_type' v='AX_Strassenachse' />
+                    <tag k='breiteDerFahrbahn' v='9' />
+                  </way>
+                  <relation id='-77' changeset='-1'>
+                    <member type='way' ref='-1308' role='' />
+                    <tag k='bezeichnung' v='Europastrasse1;Autobahn1;Autobahn2' />
                     <tag k='internationaleBedeutung' v='2001' />
                     <tag k='object_type' v='AX_Strasse' />
                     <tag k='widmung' v='1301' />
@@ -157,7 +207,7 @@ class DE_42002_F_b_001_003_F_d_001 extends DatabaseIntegrationTest {
         assertThat(attributeCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'attribut-check'")
-                .contains("Das Tag 'bezeichnung' muss mit 'E' oder 'A' beginnen und mindestens zwei Bezeichnungen vorkommen, wenn die 'internationaleBedeutung' 2001 gesetzt ist.");
+                .contains("Keine gültige Bezeichnung-, internationaleBedeutung- und Widmungskombination.");
     }
 
     @Test
@@ -216,11 +266,11 @@ class DE_42002_F_b_001_003_F_d_001 extends DatabaseIntegrationTest {
         assertThat(attributeCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'attribut-check'")
-                .contains("Das Tag 'bezeichnung' muss mit 'E' oder 'A' beginnen und mindestens zwei Bezeichnungen vorkommen, wenn die 'internationaleBedeutung' 2001 gesetzt ist.");
+                .contains("Keine gültige Bezeichnung-, internationaleBedeutung- und Widmungskombination.");
     }
 
     @Test
-    void createBundesstrasseMitBezeichnung() throws Exception {
+    void createBundesstrasseMitKorrekterBezeichnung() throws Exception {
         // Arrange
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
@@ -278,7 +328,7 @@ class DE_42002_F_b_001_003_F_d_001 extends DatabaseIntegrationTest {
                   </way>
                   <relation id='-77' changeset='-1'>
                     <member type='way' ref='-1308' role='' />
-                    <tag k='bezeichnung' v='Europastrasse1;Autobahn' />
+                    <tag k='bezeichnung' v='Autobahn' />
                     <tag k='internationaleBedeutung' v='2001' />
                     <tag k='object_type' v='AX_Strasse' />
                     <tag k='widmung' v='1303' />
@@ -318,11 +368,11 @@ class DE_42002_F_b_001_003_F_d_001 extends DatabaseIntegrationTest {
         assertThat(attributeCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'attribut-check'")
-                .contains("Das Tag 'bezeichnung' muss mit 'E' oder 'B' beginnen und mindestens zwei Bezeichnungen vorkommen, wenn die 'internationaleBedeutung' 2001 gesetzt ist.");
+                .contains("Keine gültige Bezeichnung-, internationaleBedeutung- und Widmungskombination.");
     }
 
     @Test
-    void createLandstrasseMitBezeichnung() throws Exception {
+    void createLandstrasseMitKorrekterBezeichnung() throws Exception {
         // Arrange
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
@@ -418,6 +468,65 @@ class DE_42002_F_b_001_003_F_d_001 extends DatabaseIntegrationTest {
         assertThat(attributeCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'attribut-check'")
-                .contains("Das Tag 'bezeichnung' muss bei 'widmung' 1305 mit 'L' oder 'S' beginnen.");
+                .contains("Keine gültige Bezeichnung-, internationaleBedeutung- und Widmungskombination.");
+    }
+
+    @Test
+    void createLandstrasseMitInternationalerBedeutung() throws Exception {
+        // Arrange
+        final String CHANGESET_XML = """
+                <osmChange version="0.6" generator="JOSM">
+                <create>
+                  <node id='-25364' changeset='-1' lat='49.87494356474' lon='12.32280142285' />
+                  <node id='-25363' changeset='-1' lat='49.87777772641' lon='12.32285980169' />
+                  <way id='-1308' changeset='-1'>
+                    <nd ref='-25363' />
+                    <nd ref='-25364' />
+                    <tag k='object_type' v='AX_Strassenachse' />
+                    <tag k='breiteDerFahrbahn' v='9' />
+                  </way>
+                  <relation id='-77' changeset='-1'>
+                    <member type='way' ref='-1308' role='' />
+                    <tag k='bezeichnung' v='Landstrasse' />
+                    <tag k='object_type' v='AX_Strasse' />
+                    <tag k='widmung' v='1305' />
+                    <tag k='internationaleBedeutung' v='2001' />
+                  </relation>
+                </create>
+                </osmChange>
+                """;
+
+        // Act
+        MvcResult mvcResult = this.mockMvc.perform(
+                        post("/osm-quality-framework/v1/quality-hub/check/changeset/{id}", CHANGESET_ID)
+                                .contentType(MediaType.APPLICATION_XML)
+                                .content(CHANGESET_XML)
+                                .param("steps", String.join(",", stepsToValidate))
+                                .param("rules", String.join(",", rulesToValidate)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        QualityHubResultDto qualityHubResultDto = this.objectMapper.readValue(mvcResult.getResponse().getContentAsByteArray(), QualityHubResultDto.class);
+
+        // Assert
+        assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
+        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        QualityServiceResultDto attributeCheck = qualityHubResultDto.qualityServiceResults().stream()
+                .filter(s -> "attribute-check".equals(s.qualityServiceId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("QualityService 'attribute-check' not found"));
+
+        assertThat(attributeCheck.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        assertThat(attributeCheck.errors())
+                .as("Errors of 'attribute-check' must not be empty")
+                .isNotEmpty();
+
+        assertThat(attributeCheck.errors())
+                .extracting(QualityServiceErrorDto::errorText)
+                .as("Error text of 'attribut-check'")
+                .contains("Keine gültige Bezeichnung-, internationaleBedeutung- und Widmungskombination.");
     }
 }
