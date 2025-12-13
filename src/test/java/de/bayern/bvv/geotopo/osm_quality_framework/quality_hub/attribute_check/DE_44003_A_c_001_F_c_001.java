@@ -30,12 +30,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-class DE_44003_A_c_001 extends DatabaseIntegrationTest {
+class DE_44003_A_c_001_F_c_001 extends DatabaseIntegrationTest {
 
     final Long CHANGESET_ID = 1L;
 
     Set<String> stepsToValidate = new HashSet<>(Set.of("attribute-check", "object-number-assignment"));
-    Set<String> rulesToValidate = new HashSet<>(Set.of("DE.44003.A.c.001"));
+    Set<String> rulesToValidate = new HashSet<>(Set.of("DE.44003.A.c.001_F.c.001"));
 
     @Autowired
     MockMvc mockMvc;
@@ -175,6 +175,6 @@ class DE_44003_A_c_001 extends DatabaseIntegrationTest {
         assertThat(attributeCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'attribut-check'")
-                .contains("Die zu 'AX_Kanal' gehörenden 'AX_Gewaesserachse' dürfen keine Fliessrichtung haben.");
+                .contains("Die zu 'AX_Kanal' gehörenden 'AX_Gewaesserachse' und 'AX_Gewaesserstationierungsachse' dürfen keine Fliessrichtung haben.");
     }
 }
