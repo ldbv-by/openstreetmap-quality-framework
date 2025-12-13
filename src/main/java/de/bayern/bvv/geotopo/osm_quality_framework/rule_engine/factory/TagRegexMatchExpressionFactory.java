@@ -31,7 +31,8 @@ public class TagRegexMatchExpressionFactory implements ExpressionFactory {
     private record RuleParams (
             String tagKey,
             Pattern pattern,
-            Integer minCount
+            Integer minCount,
+            Integer maxCount
     ) {}
 
     /**
@@ -53,11 +54,12 @@ public class TagRegexMatchExpressionFactory implements ExpressionFactory {
 
             int matches = 0;
             for (String tagValue : tagValues) {
-                if (!params.pattern.matcher(tagValue).matches()) return false;
-                matches++;
+                if (params.pattern.matcher(tagValue).matches()) matches++;
             }
 
-            return params.minCount == null || matches >= params.minCount;
+            return (matches > 0) &&
+                   (params.minCount == null || matches >= params.minCount) &&
+                   (params.maxCount == null || matches <= params.maxCount);
         };
     }
 
@@ -68,12 +70,13 @@ public class TagRegexMatchExpressionFactory implements ExpressionFactory {
         String tagKey = JsonUtils.asString(json, "tag_key", type());
         String patternStr = JsonUtils.asString(json, "pattern", type());
         Integer minCount = tryParseInt(JsonUtils.asOptionalString(json, "min_count"));
+        Integer maxCount = tryParseInt(JsonUtils.asOptionalString(json, "max_count"));
 
         try {
             Pattern pattern = Pattern.compile(patternStr);
 
             return new RuleParams(
-                    tagKey, pattern, minCount
+                    tagKey, pattern, minCount, maxCount
             );
         } catch (PatternSyntaxException e) {
             throw new IllegalArgumentException(type() + ": invalid pattern: " + e.getMessage(), e);
