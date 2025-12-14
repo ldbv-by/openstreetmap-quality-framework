@@ -201,8 +201,8 @@ public class CommonRepositoryImpl<T> {
                 // EXISTS subquery
                 Subquery<Long> relationExistsSub = criteriaQuery.subquery(Long.class);
 
-                Root<de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.RelationEntity>       rel = relationExistsSub.from(de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.RelationEntity.class);
-                Root<de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.RelationMemberEntity> rm = relationExistsSub.from(de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.RelationMemberEntity.class);
+                Root<RelationEntity>       rel = relationExistsSub.from(RelationEntity.class);
+                Root<RelationMemberEntity> rm = relationExistsSub.from(RelationMemberEntity.class);
 
                 List<Predicate> relationExistsPredicates = new ArrayList<>();
 
@@ -215,13 +215,13 @@ public class CommonRepositoryImpl<T> {
                 relationExistsPredicates.add(criteriaBuilder.equal(rmMemberOsmId, target.get("osmId")));
 
                 // rm.member_type passend zum Target
-                if (de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.NodeEntity.class.isAssignableFrom(entityType)) {
+                if (NodeEntity.class.isAssignableFrom(entityType)) {
                     relationExistsPredicates.add(criteriaBuilder.equal(criteriaBuilder.lower(rm.get("memberId").get("memberType")), "n"));
-                } else if (de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.WayEntity.class.isAssignableFrom(entityType)) {
+                } else if (WayEntity.class.isAssignableFrom(entityType)) {
                     relationExistsPredicates.add(criteriaBuilder.equal(criteriaBuilder.lower(rm.get("memberId").get("memberType")), "w"));
-                } else if (de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.RelationEntity.class.isAssignableFrom(entityType)) {
+                } else if (RelationEntity.class.isAssignableFrom(entityType)) {
                     relationExistsPredicates.add(criteriaBuilder.equal(criteriaBuilder.lower(rm.get("memberId").get("memberType")), "r"));
-                } else if (de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.AreaEntity.class.isAssignableFrom(entityType)) {
+                } else if (AreaEntity.class.isAssignableFrom(entityType)) {
                     // Area kann aus 'w' oder 'r' stammen
                     relationExistsPredicates.add(criteriaBuilder.equal(
                             criteriaBuilder.lower(rm.get("memberId").get("memberType")),
@@ -231,7 +231,7 @@ public class CommonRepositoryImpl<T> {
                 // optional: filter relation criteria
                 if (relationCriteria != null) {
                     Predicate relCriteriaPred = this.criteriaToPredicate(criteriaQuery, criteriaBuilder,
-                            (Root<T>) target, entityType, rel, de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.RelationEntity.class, relationCriteria);
+                            (Root<T>) target, entityType, rel, RelationEntity.class, relationCriteria);
 
                     if (relCriteriaPred != null) {
                         relationExistsPredicates.add(relCriteriaPred);
@@ -263,34 +263,34 @@ public class CommonRepositoryImpl<T> {
                     Predicate existsNodeMember = buildRelationMemberExists(
                             criteriaQuery, criteriaBuilder, rel,
                             relationMemberRole, relationMemberCriteria,
-                            "n", de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.NodeEntity.class, null
+                            "n", NodeEntity.class, null
                     );
 
                     Predicate existsWayMember = buildRelationMemberExists(
                             criteriaQuery, criteriaBuilder, rel,
                             relationMemberRole, relationMemberCriteria,
-                            "w", de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.WayEntity.class, null
+                            "w", WayEntity.class, null
                     );
 
                     // Area: kann aus w/r stammen -> zwei Exists (oder eins mit extra predicate)
                     Predicate existsAreaWMember = buildRelationMemberExists(
                             criteriaQuery, criteriaBuilder, rel,
                             relationMemberRole, relationMemberCriteria,
-                            "w", de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.AreaEntity.class,
+                            "w", AreaEntity.class,
                             (cb, memberRoot) -> cb.equal(cb.lower(memberRoot.get("osmGeometryType")), "w")
                     );
 
                     Predicate existsAreaRMember = buildRelationMemberExists(
                             criteriaQuery, criteriaBuilder, rel,
                             relationMemberRole, relationMemberCriteria,
-                            "r", de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.AreaEntity.class,
+                            "r", AreaEntity.class,
                             (cb, memberRoot) -> cb.equal(cb.lower(memberRoot.get("osmGeometryType")), "r")
                     );
 
                     Predicate existsRelationMember = buildRelationMemberExists(
                             criteriaQuery, criteriaBuilder, rel,
                             relationMemberRole, relationMemberCriteria,
-                            "r", de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.RelationEntity.class, null
+                            "r", RelationEntity.class, null
                     );
 
                     relationExistsPredicates.add(
@@ -415,7 +415,7 @@ public class CommonRepositoryImpl<T> {
     private Predicate buildRelationMemberExists(
             CriteriaQuery<?> criteriaQuery,
             CriteriaBuilder cb,
-            Root<de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.RelationEntity> rel,
+            Root<RelationEntity> rel,
             String relationMemberRole,
             Criteria relationMemberCriteria,
             String memberTypeLower,              // "n"|"w"|"r"
@@ -425,7 +425,7 @@ public class CommonRepositoryImpl<T> {
         Subquery<Long> sub = criteriaQuery.subquery(Long.class);
 
         // rm2 ist das Member, das gefiltert werden soll
-        Root<de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.RelationMemberEntity> rm2 = sub.from(de.bayern.bvv.geotopo.osm_quality_framework.changeset_management.entity.RelationMemberEntity.class);
+        Root<RelationMemberEntity> rm2 = sub.from(RelationMemberEntity.class);
         Root<?> memberRoot = sub.from(memberEntityClass);
 
         List<Predicate> ps = new ArrayList<>();
