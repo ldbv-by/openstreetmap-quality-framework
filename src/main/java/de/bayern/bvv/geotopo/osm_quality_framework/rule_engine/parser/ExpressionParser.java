@@ -186,9 +186,9 @@ public final class ExpressionParser {
                     int success    = 0;
 
                     for (Feature wayNode : wayNodes) {
-                        if (conditions.evaluate(wayNode, baseTaggedObject)) {
+                        if (conditions.evaluate(wayNode, taggedObject)) {
                             candidates++;
-                            if (checks.evaluate(wayNode, baseTaggedObject)) {
+                            if (checks.evaluate(wayNode, taggedObject)) {
                                 success++;
                                 if (loopInfo.type() == LoopInfoType.ANY) return true;
                             }
@@ -215,7 +215,7 @@ public final class ExpressionParser {
                         candidates++;
                         boolean allOk = true;
                         for (Expression e : expressions) {
-                            if (!e.evaluate(wayNode, baseTaggedObject)) {
+                            if (!e.evaluate(wayNode, taggedObject)) {
                                 allOk = false;
                                 break;
                             }
