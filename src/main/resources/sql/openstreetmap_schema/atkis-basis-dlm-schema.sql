@@ -2356,7 +2356,7 @@ INSERT INTO openstreetmap_schema.relation_members (object_type, relation_object_
     ('AX_Gebiet_Kreis', 'AX_KreisRegion', '*', '', '1'),
     ('AX_KommunalesGebiet', 'AX_Gemeinde', '*', '', '1'),
     ('AX_KommunalesTeilgebiet', 'AX_Gemeindeteil', '*', '', '1'),
-    ('AX_Strukturlinie3D', 'AX_BoeschungKliff', '*', '', '0..*'),
+    ('AX_Strukturlinie3D', 'AX_BoeschungKliff', '*', '', '1..*'),
     ('AX_Nullpunkt', 'AX_Netzknoten', '*', '', '0..*'),
     ('AX_Ast', 'AX_Netzknoten', '*', '', '0..*'),
     ('AX_Gemeinde', 'AX_Verwaltungsgemeinschaft', '*', '', '0..*')
