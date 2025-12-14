@@ -551,6 +551,7 @@ class DE_50001_A_b_001 extends DatabaseIntegrationTest {
                     <tag k='object_type' v='AX_Bahnverkehrsanlage' />
                     <tag k='bahnhofskategorie' v='1010' />
                     <tag k='ergebnisDerUeberpruefung' v='2000' />
+                    <tag k='name' v='Test' />
                   </node>
                 </create>
                 </osmChange>
