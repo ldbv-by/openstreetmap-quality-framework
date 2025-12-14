@@ -2298,7 +2298,9 @@ INSERT INTO openstreetmap_schema.relations (object_type, relation_object_type, m
     ('AX_Gebiet_Kreis', 'AX_KreisRegion', '1'),
     ('AX_KommunalesGebiet', 'AX_Gemeinde', '1'),
     ('AX_KommunalesTeilgebiet', 'AX_Gemeindeteil', '1'),
-    ('AX_Strukturlinie3D', 'AX_BoeschungKliff', '0..*')
+    ('AX_Strukturlinie3D', 'AX_BoeschungKliff', '0..*'),
+    ('AX_Nullpunkt', 'AX_Netzknoten', '1..*'), /* DE.56002.R.a.001 */
+    ('AX_Ast', 'AX_Netzknoten', '1..*') /* DE.56004.R.a.001 */
 ON CONFLICT (object_type, relation_object_type) DO NOTHING;
 
 INSERT INTO openstreetmap_schema.relation_members (object_type, relation_object_type, type, role, multiplicity) VALUES
@@ -2351,5 +2353,7 @@ INSERT INTO openstreetmap_schema.relation_members (object_type, relation_object_
     ('AX_Gebiet_Kreis', 'AX_KreisRegion', '*', '', '1'),
     ('AX_KommunalesGebiet', 'AX_Gemeinde', '*', '', '1'),
     ('AX_KommunalesTeilgebiet', 'AX_Gemeindeteil', '*', '', '1'),
-    ('AX_Strukturlinie3D', 'AX_BoeschungKliff', '*', '', '0..*')
+    ('AX_Strukturlinie3D', 'AX_BoeschungKliff', '*', '', '0..*'),
+    ('AX_Nullpunkt', 'AX_Netzknoten', '*', '', '0..*'),
+    ('AX_Ast', 'AX_Netzknoten', '*', '', '0..*')
 ON CONFLICT (object_type, relation_object_type, role) DO NOTHING;

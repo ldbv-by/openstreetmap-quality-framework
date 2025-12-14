@@ -273,15 +273,7 @@ public final class ExpressionParser {
                     .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
                     .build();
 
-            LoopInfo loopInfo = objectMapper.treeToValue(loopInfoNode, LoopInfo.class);
-
-            if (loopInfo.type().equals(LoopInfoType.COUNT)) {
-                if (loopInfo.minCount() == null || loopInfo.maxCount() == null) {
-                    throw new IllegalArgumentException("'minCount' and 'maxCount' can't be null.");
-                }
-            }
-
-            return loopInfo;
+            return objectMapper.treeToValue(loopInfoNode, LoopInfo.class);
         } catch (JacksonException e) {
             throw new IllegalArgumentException("'loop_info' parse error.");
         }
@@ -295,7 +287,8 @@ public final class ExpressionParser {
             case ANY      -> success >= 1;
             case NONE     -> success == 0;
             case ALL      -> success == candidates;
-            case COUNT    -> success >= loopInfo.minCount() && success <= loopInfo.maxCount();
+            case COUNT    -> (loopInfo.minCount() == null || success >= loopInfo.minCount()) &&
+                             (loopInfo.maxCount() == null || success <= loopInfo.maxCount());
         };
     }
 }
