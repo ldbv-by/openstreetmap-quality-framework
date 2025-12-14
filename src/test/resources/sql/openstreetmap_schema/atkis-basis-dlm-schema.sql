@@ -2348,7 +2348,7 @@ INSERT INTO openstreetmap_schema.relation_members (object_type, relation_object_
     ('AX_Gebietsgrenze', 'AX_Kondominium', '*', 'inner', '0..*'),
     ('AX_Gewaesserachse', 'AX_Wasserlauf', '*', '', '1..*'),
     ('AX_Gewaesserachse', 'AX_Kanal', '*', '', '1..*'),
-    ('AX_Schutzzone', 'AX_SchutzgebietNachWasserrecht', '*', '', '1..*'),
+    ('AX_Schutzzone', 'AX_SchutzgebietNachWasserrecht', '*', '', '1..*'), /* DE.71005.R.a.001 */
     ('AX_Gebiet_Bundesland', 'AX_Bundesland', '*', '', '1'),
     ('AX_Gebiet_Regierungsbezirk', 'AX_Regierungsbezirk', '*', '', '1'),
     ('AX_Gebiet_Kreis', 'AX_KreisRegion', '*', '', '1'),
