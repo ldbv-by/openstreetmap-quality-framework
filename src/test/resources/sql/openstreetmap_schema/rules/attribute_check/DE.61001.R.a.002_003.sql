@@ -1,5 +1,5 @@
 INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error_text) VALUES (
-    'DE.61001.R.a.002',
+    'DE.61001.R.a.002_003',
     'attribute-check',
     'AX_BoeschungKliff',
     '{

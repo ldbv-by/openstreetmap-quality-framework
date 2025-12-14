@@ -27,15 +27,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * AdV-Beschreibung:
  * Das ZUSO 'Böschung, Kliff' besteht mindestens aus je einem REO 'Strukturlinie3D' mit (ART 1210 oder ART 1220) und ART 1230.
+ * Es ist zu prüfen, dass wenn ART 1250 vergeben ist, auch ART 1210 oder ART 1220 und ART 1230 vergeben ist.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-class DE_61001_R_a_002 extends DatabaseIntegrationTest {
+class DE_61001_R_a_002_003 extends DatabaseIntegrationTest {
 
     final Long CHANGESET_ID = 1L;
 
     Set<String> stepsToValidate = new HashSet<>(Set.of("attribute-check", "object-number-assignment"));
-    Set<String> rulesToValidate = new HashSet<>(Set.of("DE.61001.R.a.002"));
+    Set<String> rulesToValidate = new HashSet<>(Set.of("DE.61001.R.a.002_003"));
 
     @Autowired
     MockMvc mockMvc;
