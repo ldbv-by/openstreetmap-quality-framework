@@ -211,6 +211,13 @@ public class AttributeCheckService implements QualityService {
      */
     private void validateRelation(TaggedObject taggedObject, ObjectType objectType) {
 
+        // Check if relation members are set.
+        if (taggedObject instanceof Relation relation) {
+            if (relation.getMembers().isEmpty()) {
+                this.setError(taggedObject, "Die Objektart '" + taggedObject.getObjectType() + "' erwartet mindestens einen Member.");
+            }
+        }
+
         // Checks whether required relations with valid values are set.
         for (de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Relation relation :
                 objectType.getRelations()) {

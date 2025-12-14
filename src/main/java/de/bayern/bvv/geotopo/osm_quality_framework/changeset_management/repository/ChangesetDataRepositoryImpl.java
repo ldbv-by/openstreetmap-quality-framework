@@ -65,7 +65,7 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
                                 "CASE WHEN osm_id > 1e17 THEN -(osm_id - 1e17)::bigint ELSE osm_id END";
                         case "members" ->
                                 """
-                                (
+                                COALESCE((
                                 SELECT jsonb_agg(
                                          jsonb_set(
                                            m,
@@ -80,8 +80,13 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
                                            true
                                          )
                                        )
-                                FROM jsonb_array_elements(COALESCE(members, '[]'::jsonb)) AS m
-                              ) AS members""";
+                                FROM jsonb_array_elements(
+                                    CASE
+                                      WHEN jsonb_typeof(members) = 'array' THEN members
+                                      ELSE '[]'::jsonb
+                                    END
+                                ) AS m
+                              ), '[]'::jsonb) AS members""";
                         default -> col;
                     })
                     .collect(Collectors.joining(", "));
@@ -138,7 +143,7 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
             INSERT INTO changeset_data.planet_osm_rels (id, members, tags)
             SELECT
               CASE WHEN r.id > 1e17 THEN -(r.id - 1e17)::bigint ELSE r.id END AS id,
-              (
+              COALESCE((
                 SELECT jsonb_agg(
                          jsonb_set(
                            m,
@@ -153,8 +158,13 @@ public class ChangesetDataRepositoryImpl implements ChangesetDataRepository {
                            true
                          )
                        )
-                FROM jsonb_array_elements(COALESCE(r.members, '[]'::jsonb)) AS m
-              ) AS members,
+                FROM jsonb_array_elements(
+                    CASE
+                      WHEN jsonb_typeof(members) = 'array' THEN members
+                      ELSE '[]'::jsonb
+                    END
+                ) AS m
+              ), '[]'::jsonb) AS members,
               r.tags
             FROM %s.planet_osm_rels r
             ON CONFLICT (id) DO UPDATE
