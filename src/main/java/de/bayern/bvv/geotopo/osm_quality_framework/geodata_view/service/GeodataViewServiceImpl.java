@@ -358,10 +358,13 @@ public class GeodataViewServiceImpl implements GeodataViewService {
      */
     @Override
     public DataSetDto getRelationMembers(Long relationId, String role, String coordinateReferenceSystem) {
-        DataSetDto relationMembers = this.changesetManagementService.getRelationMembers(1L, relationId, role, coordinateReferenceSystem);
+        DataSetDto relationMembers = null;
+        for (Long changesetId : this.changesetManagementService.getChangesetIds(Set.of(ChangesetState.OPEN, ChangesetState.CHECKED))) {
+            relationMembers = this.changesetManagementService.getRelationMembers(changesetId, relationId, role, coordinateReferenceSystem);
+        }
 
-        if (relationMembers.nodes().isEmpty() && relationMembers.ways().isEmpty() &&
-                relationMembers.areas().isEmpty() && relationMembers.relations().isEmpty()) {
+        if (relationMembers == null || (relationMembers.nodes().isEmpty() && relationMembers.ways().isEmpty() &&
+                relationMembers.areas().isEmpty() && relationMembers.relations().isEmpty())) {
             relationMembers = this.osmGeometriesService.getRelationMembers(relationId, role, coordinateReferenceSystem);
         }
 
@@ -438,8 +441,8 @@ public class GeodataViewServiceImpl implements GeodataViewService {
 
     private static Set<Long> idsOf(List<? extends TaggedObject> list) {
         return (list == null || list.isEmpty())
-                ? java.util.Collections.emptySet()
-                : list.stream().map(TaggedObject::getOsmId).collect(java.util.stream.Collectors.toSet());
+                ? Collections.emptySet()
+                : list.stream().map(TaggedObject::getOsmId).collect(Collectors.toSet());
     }
 
 

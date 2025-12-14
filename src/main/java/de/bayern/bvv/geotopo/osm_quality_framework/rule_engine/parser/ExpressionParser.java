@@ -117,13 +117,13 @@ public final class ExpressionParser {
                 Expression checks = parse(jsonNode.path("checks"));
 
                 return (taggedObject, baseTaggedObject) -> {
-                    List<Feature> relationMembers = this.getRelationMembersAsFeature(taggedObject, role);
+                    List<TaggedObject> relationMembers = this.getRelationMembers(taggedObject, role);
                     if (relationMembers.isEmpty()) return false;
 
                     int candidates = 0;
                     int success    = 0;
 
-                    for (Feature relationMember : relationMembers) {
+                    for (TaggedObject relationMember : relationMembers) {
                         if (conditions.evaluate(relationMember, baseTaggedObject)) {
                             candidates++;
                             if (checks.evaluate(relationMember, baseTaggedObject)) {
@@ -143,13 +143,13 @@ public final class ExpressionParser {
                     if (!jsonNode.has("loop_info")) expressions.add(parse(jsonNode));
                 }
                 return (taggedObject, baseTaggedObject) -> {
-                    List<Feature> relationMembers = this.getRelationMembersAsFeature(taggedObject, role);
+                    List<TaggedObject> relationMembers = this.getRelationMembers(taggedObject, role);
                     if (relationMembers.isEmpty()) return false;
 
                     int candidates = 0;
                     int success    = 0;
 
-                    for (Feature relationMember : relationMembers) {
+                    for (TaggedObject relationMember : relationMembers) {
                         candidates++;
                         boolean allOk = true;
                         for (Expression e : expressions) {
@@ -238,8 +238,8 @@ public final class ExpressionParser {
     /**
      * Get relation members as feature list.
      */
-    private List<Feature> getRelationMembersAsFeature(TaggedObject taggedObject, String role) {
-        List<Feature> relationMemberFeatures = new ArrayList<>();
+    private List<TaggedObject> getRelationMembers(TaggedObject taggedObject, String role) {
+        List<TaggedObject> relationMembers = new ArrayList<>();
 
         if (taggedObject instanceof Relation relation) {
             if (relation.getMembers() != null && !relation.getMembers().isEmpty()) {
@@ -249,16 +249,12 @@ public final class ExpressionParser {
                         .orElse(null);
 
                 if (relationMemberTaggedFeatures != null && relationMemberTaggedFeatures.getAll() != null) {
-                    for (TaggedObject relationMemberTaggedObject : relationMemberTaggedFeatures.getAll()) {
-                        if (relationMemberTaggedObject instanceof Feature) {
-                            relationMemberFeatures.add((Feature) relationMemberTaggedObject);
-                        }
-                    }
+                    relationMembers.addAll(relationMemberTaggedFeatures.getAll());
                 }
             }
         }
 
-        return relationMemberFeatures;
+        return relationMembers;
     }
 
     private LoopInfo parseLoopInfo(JsonNode loopNode) {
