@@ -35,7 +35,7 @@ class DE_71007_R_a_001 extends DatabaseIntegrationTest {
     final Long CHANGESET_ID = 1L;
 
     Set<String> stepsToValidate = new HashSet<>(Set.of("attribute-check", "object-number-assignment"));
-    Set<String> rulesToValidate = new HashSet<>(Set.of("DE.71005.R.a.001"));
+    Set<String> rulesToValidate = new HashSet<>(Set.of("DE.71007.R.a.001"));
 
     @Autowired
     MockMvc mockMvc;
