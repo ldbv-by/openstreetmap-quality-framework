@@ -2270,7 +2270,7 @@ INSERT INTO openstreetmap_schema.relations (object_type, relation_object_type, m
     ('AX_Turm', 'AX_zeigtAuf', '0..*'),
     ('AX_Benutzer', 'AX_ist', '1'),
     ('AX_Benutzer', 'AX_gehoertZu', '1'),
-    ('AX_Strassenachse', 'AX_Strasse', '1..*'),
+    ('AX_Strassenachse', 'AX_Strasse', '1..*'), /* DE.42003.R.a.001 */
     ('AX_Fahrbahnachse', 'AX_Strasse', '1..*'),
     ('AX_Gebaeude_Kerndaten', 'AX_objekthoehe', '0..*'),
     ('AX_BauwerkOderAnlageFuerIndustrieUndGewerbe', 'AX_objekthoehe', '0..*'),
