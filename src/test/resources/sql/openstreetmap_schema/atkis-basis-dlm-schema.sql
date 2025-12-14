@@ -2291,7 +2291,9 @@ INSERT INTO openstreetmap_schema.relations (object_type, relation_object_type, m
     ('AX_Gebietsgrenze', 'AX_KommunalesTeilgebiet', '0..2'),
     ('AX_Gebietsgrenze', 'AX_Kondominium', '0..2'),
     ('AX_Gewaesserachse', 'AX_Wasserlauf', '0..*'),
+    ('AX_Fliessgewaesser', 'AX_Wasserlauf', '0..*'),
     ('AX_Gewaesserachse', 'AX_Kanal', '0..*'),
+    ('AX_Fliessgewaesser', 'AX_Kanal', '0..*'),
     ('AX_Schutzzone', 'AX_SchutzgebietNachWasserrecht', '0..*'),
     ('AX_Schutzzone', 'AX_SchutzgebietNachNaturUmweltOderBodenschutzrecht', '0..*'),
     ('AX_Gebiet_Bundesland', 'AX_Bundesland', '1'),
@@ -2348,7 +2350,9 @@ INSERT INTO openstreetmap_schema.relation_members (object_type, relation_object_
     ('AX_Gebietsgrenze', 'AX_Kondominium', '*', 'outer', '1..*'),
     ('AX_Gebietsgrenze', 'AX_Kondominium', '*', 'inner', '0..*'),
     ('AX_Gewaesserachse', 'AX_Wasserlauf', '*', '', '1..*'),
+    ('AX_Fliessgewaesser', 'AX_Wasserlauf', '*', '', '1..*'),
     ('AX_Gewaesserachse', 'AX_Kanal', '*', '', '1..*'),
+    ('AX_Fliessgewaesser', 'AX_Kanal', '*', '', '1..*'),
     ('AX_Schutzzone', 'AX_SchutzgebietNachWasserrecht', '*', '', '1..*'), /* DE.71005.R.a.001 */
     ('AX_Schutzzone', 'AX_SchutzgebietNachNaturUmweltOderBodenschutzrecht', '*', '', '1..*'), /* DE.71007.R.a.001 */
     ('AX_Gebiet_Bundesland', 'AX_Bundesland', '*', '', '1'),
