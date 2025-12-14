@@ -57,7 +57,7 @@ class DE_42005_R_a_001 extends DatabaseIntegrationTest {
                     <nd ref='-1' />
                     <nd ref='-2' />
                     <tag k='object_type' v='AX_Fahrbahnachse' />
-                    <tag k='breiteDesVerkehrsweges' v='6' />
+                    <tag k='breiteDerFahrbahn' v='9' />
                   </way>
                   <relation id='-3' changeset='-1'>
                     <member type='way' ref='-1' role='' />
@@ -98,7 +98,7 @@ class DE_42005_R_a_001 extends DatabaseIntegrationTest {
                     <nd ref='-1' />
                     <nd ref='-2' />
                     <tag k='object_type' v='AX_Fahrbahnachse' />
-                    <tag k='breiteDesVerkehrsweges' v='6' />
+                    <tag k='breiteDerFahrbahn' v='9' />
                   </way>
                 </create>
                 </osmChange>
