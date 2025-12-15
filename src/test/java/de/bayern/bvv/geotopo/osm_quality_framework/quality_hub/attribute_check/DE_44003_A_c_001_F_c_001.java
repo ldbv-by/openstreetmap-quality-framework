@@ -175,6 +175,6 @@ class DE_44003_A_c_001_F_c_001 extends DatabaseIntegrationTest {
         assertThat(attributeCheck.errors())
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'attribut-check'")
-                .contains("Die zu 'AX_Kanal' gehörenden 'AX_Gewaesserachse' und 'AX_Gewaesserstationierungsachse' dürfen keine Fliessrichtung haben.");
+                .contains("Die zu 'AX_Kanal' gehörenden 'AX_Gewaesserachse' dürfen keine Fliessrichtung haben.");
     }
 }
