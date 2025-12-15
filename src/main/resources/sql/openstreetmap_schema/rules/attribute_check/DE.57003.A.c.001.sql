@@ -3,20 +3,22 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
     'attribute-check',
     'AX_Gewaesserstationierungsachse',
     '{
-        "conditions": {
+        "conditions": { "type": "tag_equals", "tag_key": "artDerGewaesserstationierungsachse", "value": "2000" },
+        "checks": {
             "all": [
-                { "type": "tag_equals", "tag_key": "artDerGewaesserstationierungsachse", "value": "2000" },
+                { "type": "tag_equals", "tag_key": "fliessrichtung", "value": "FALSE" },
                 {
                     "any": [
                         {
                             "relations": {
+                                "loop_info": { "type": "any" },
                                 "conditions": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" },
                                 "checks": {
                                     "type": "spatial_compare",
-                                    "reference_feature_role": "over",
+                                    "reference_feature_role": "under",
                                     "operator": "within",
                                     "self_check": true,
-                                    "data_set_filter": { "aggregator": "union", "memberFilter": { "role": "under" } }
+                                    "data_set_filter": { "aggregator": "union", "memberFilter": { "role": "over", "objectTypes": ["AX_Fliessgewaesser"] } }
                                 }
                             }
                         },
@@ -25,7 +27,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                 {
                                     "not": {
                                         "relations": {
-                                            "loop_info": { "type": "all" },
+                                            "loop_info": { "type": "any" },
                                             "checks": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" }
                                         }
                                     }
@@ -39,7 +41,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                             "all": [
                                                 { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Fliessgewaesser" },
                                                 { "type": "tag_equals", "tag_key": "funktion", "value": "8300" },
-                                                { "not": { "type": "relation_exists", "object_type": "AA_hatDirektUnten" } }
+                                                { "not": { "type": "relation_exists", "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" } } }
                                             ]
                                         }
                                     }
@@ -49,8 +51,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                     ]
                 }
             ]
-        },
-        "checks": { "type": "tag_equals", "tag_key": "fliessrichtung", "value": "FALSE" }
+        }
     }',
     'Eine Gewässerstationierungsachse mit AGA 2000, die (vollständig) in einem oder mehreren Fließgewässern mit FKT 8300 liegt, hat FLR ''FALSE''')
 ON CONFLICT (id) DO NOTHING;

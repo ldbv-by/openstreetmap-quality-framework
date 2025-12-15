@@ -498,8 +498,8 @@ INSERT INTO openstreetmap_schema.relation_members (object_type, relation_object_
     ('AA_Objekt', 'AA_modellart', '*', '', '1'),
     ('AA_REO', 'AA_istAbgeleitetAus', '*', '', '1'),
     ('AA_REO', 'AA_istAbgeleitetAus', '*', 'traegtBeiZu', '1..*'),
-    ('AA_REO', 'AA_hatDirektUnten', '*', 'over', '1'),
-    ('AA_REO', 'AA_hatDirektUnten', '*', 'under', '1..*'),
+    ('AA_REO', 'AA_hatDirektUnten', '*', 'over', '1..*'),
+    ('AA_REO', 'AA_hatDirektUnten', '*', 'under', '1'),
     ('AG_ObjektMitGemeinsamerGeometrie', 'AG_thema', '*', '', '1'),
     ('AG_ObjektMitGemeinsamerGeometrie', 'AG_thema', '*', 'element', '1..*')
 ON CONFLICT (object_type, relation_object_type, role) DO NOTHING;

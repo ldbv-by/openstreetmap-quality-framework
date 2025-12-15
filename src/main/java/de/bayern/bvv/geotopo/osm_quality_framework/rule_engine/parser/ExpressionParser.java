@@ -277,12 +277,10 @@ public final class ExpressionParser {
 
     /** Wendet die LoopInfo auf Zähler an. */
     private boolean evaluateLoop(int success, int candidates, LoopInfo loopInfo) {
-        if (candidates == 0) return true;
-
         return switch (loopInfo.type()) {
             case ANY      -> success >= 1;
             case NONE     -> success == 0;
-            case ALL      -> success == candidates;
+            case ALL      -> candidates > 0 && success == candidates;
             case COUNT    -> (loopInfo.minCount() == null || success >= loopInfo.minCount()) &&
                              (loopInfo.maxCount() == null || success <= loopInfo.maxCount());
         };
