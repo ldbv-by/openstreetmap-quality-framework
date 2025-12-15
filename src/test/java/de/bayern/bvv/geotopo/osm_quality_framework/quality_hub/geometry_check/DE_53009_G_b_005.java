@@ -79,7 +79,7 @@ class DE_53009_G_b_005 extends DatabaseIntegrationTest {
                     <tag k='spurweite' v='1000' />
                   </way>
                   <relation id='-100' changeset='-1'>
-                    <member type='way' ref='-663' role='under' />
+                    <member type='way' ref='-667' role='under' />
                     <member type='way' ref='-700' role='over' />
                     <tag k='object_type' v='AA_hatDirektUnten' />
                   </relation>
