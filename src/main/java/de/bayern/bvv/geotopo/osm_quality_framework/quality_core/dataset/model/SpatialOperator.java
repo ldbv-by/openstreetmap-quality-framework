@@ -10,6 +10,7 @@ public enum SpatialOperator {
     COVERS,
     COVERED_BY,
     COVERED_BY_BOUNDARY,
+    COVERED_BY_MULTILINE_AS_POLYGON,
     EQUALS,
     EQUALS_TOPO,
     INTERSECTS,

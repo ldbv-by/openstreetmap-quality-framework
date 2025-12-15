@@ -15,6 +15,7 @@ import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.locationtech.jts.index.strtree.STRtree;
+import org.locationtech.jts.operation.polygonize.Polygonizer;
 import org.locationtech.jts.operation.union.UnaryUnionOp;
 import org.springframework.stereotype.Service;
 
@@ -216,6 +217,7 @@ public class GeodataViewServiceImpl implements GeodataViewService {
                     case TOUCHES -> match = referenceGeometry.touches(candidate.getGeometry());
                     case COVERED_BY ->  match = referenceGeometry.coveredBy(candidate.getGeometry());
                     case COVERED_BY_BOUNDARY -> match = referenceGeometry.coveredBy(candidate.getGeometry().getBoundary());
+                    case COVERED_BY_MULTILINE_AS_POLYGON -> match = toPolygon(referenceGeometry.getGeometry()).coveredBy(toPolygon(candidate.getGeometry()));
                     case EQUALS_TOPO -> match = referenceGeometry.getGeometry().equalsTopo(candidate.getGeometry());
                     case INTERSECTS -> match = referenceGeometry.intersects(candidate.getGeometry());
                     case OVERLAPS -> match = referenceGeometry.overlaps(candidate.getGeometry());
@@ -445,5 +447,52 @@ public class GeodataViewServiceImpl implements GeodataViewService {
                 : list.stream().map(TaggedObject::getOsmId).collect(Collectors.toSet());
     }
 
+    public static Geometry toPolygon(Geometry geom) {
+        if (geom == null || geom.isEmpty()) {
+            return emptyPolygon(geom);
+        }
 
+        // Already area
+        if (geom instanceof Polygon || geom instanceof MultiPolygon) {
+            return geom;
+        }
+
+        // Optional: if it's a collection, you can union it first
+        // (helps if you sometimes get GeometryCollection of linework)
+        if (geom instanceof GeometryCollection && !(geom instanceof MultiLineString)) {
+            geom = geom.union();
+            if (geom instanceof Polygon || geom instanceof MultiPolygon) {
+                return geom;
+            }
+        }
+
+        // Linework -> polygonize
+        if (geom instanceof LineString || geom instanceof MultiLineString) {
+            GeometryFactory gf = geom.getFactory();
+
+            // Noding: split at intersections, fixes many "many segments" cases
+            Geometry noded = geom.union();
+
+            Polygonizer polygonizer = new Polygonizer();
+            polygonizer.add(noded);
+
+            @SuppressWarnings("unchecked")
+            Collection<Polygon> polygons = (Collection<Polygon>) polygonizer.getPolygons();
+
+            if (polygons == null || polygons.isEmpty()) {
+                return gf.createPolygon(); // empty => coveredBy will be false
+            }
+
+            Geometry area = gf.createMultiPolygon(polygons.toArray(new Polygon[0])).union();
+            return area;
+        }
+
+        // Fallback: cannot convert meaningfully
+        return emptyPolygon(geom);
+    }
+
+    private static Polygon emptyPolygon(Geometry geom) {
+        GeometryFactory gf = (geom != null) ? geom.getFactory() : new GeometryFactory();
+        return gf.createPolygon();
+    }
 }
