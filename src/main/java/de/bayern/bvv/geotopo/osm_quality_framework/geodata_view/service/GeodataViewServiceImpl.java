@@ -215,6 +215,7 @@ public class GeodataViewServiceImpl implements GeodataViewService {
                     case CONTAINS -> match = referenceGeometry.contains(candidate.getGeometry());
                     case WITHIN -> match = referenceGeometry.within(candidate.getGeometry());
                     case TOUCHES -> match = referenceGeometry.touches(candidate.getGeometry());
+                    case TOUCHES_ENDPOINT_ONLY -> match = referenceGeometry.getGeometry().relate(candidate.getGeometry(), "FF*FT****");
                     case COVERED_BY ->  match = referenceGeometry.coveredBy(candidate.getGeometry());
                     case COVERED_BY_BOUNDARY -> match = referenceGeometry.coveredBy(candidate.getGeometry().getBoundary());
                     case COVERED_BY_MULTILINE_AS_POLYGON -> match = toPolygon(referenceGeometry.getGeometry()).coveredBy(toPolygon(candidate.getGeometry()));
