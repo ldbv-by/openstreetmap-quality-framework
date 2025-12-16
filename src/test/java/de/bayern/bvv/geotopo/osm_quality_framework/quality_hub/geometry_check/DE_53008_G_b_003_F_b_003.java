@@ -79,8 +79,8 @@ class DE_53008_G_b_003_F_b_003 extends DatabaseIntegrationTest {
                     <tag k='spurweite' v='1000' />
                   </way>
                   <relation id='-100' changeset='-1'>
-                    <member type='way' ref='-667' role='over' />
-                    <member type='way' ref='-700' role='under' />
+                    <member type='way' ref='-667' role='under' />
+                    <member type='way' ref='-700' role='over' />
                     <tag k='object_type' v='AA_hatDirektUnten' />
                   </relation>
                 </create>
@@ -135,8 +135,8 @@ class DE_53008_G_b_003_F_b_003 extends DatabaseIntegrationTest {
                     <tag k='spurweite' v='1000' />
                   </way>
                   <relation id='-100' changeset='-1'>
-                    <member type='way' ref='-667' role='over' />
-                    <member type='way' ref='-700' role='under' />
+                    <member type='way' ref='-667' role='under' />
+                    <member type='way' ref='-700' role='over' />
                     <tag k='object_type' v='AA_hatDirektUnten' />
                   </relation>
                 </create>

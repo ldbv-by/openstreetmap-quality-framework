@@ -19,9 +19,9 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                 "conditions": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" },
                                 "checks": {
                                     "type": "spatial_compare",
-                                    "reference_feature_role": "over",
+                                    "reference_feature_role": "under",
                                     "operator": "equals_topo",
-                                    "data_set_filter": { "memberFilter": { "role": "under" } },
+                                    "data_set_filter": { "memberFilter": { "role": "over" } },
                                     "self_check": true
                                 }
                             }
@@ -36,9 +36,9 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                                 "conditions": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" },
                                 "checks": {
                                     "type": "spatial_compare",
-                                    "reference_feature_role": "over",
+                                    "reference_feature_role": "under",
                                     "operator": "contains",
-                                    "data_set_filter": { "memberFilter": { "role": "under" } },
+                                    "data_set_filter": { "memberFilter": { "role": "over" } },
                                     "self_check": true
                                 }
                             }
