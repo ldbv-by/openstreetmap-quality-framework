@@ -50,7 +50,7 @@ class DE_51009_G_b_001 extends DatabaseIntegrationTest {
             .build();
 
     @Test
-    void createTreppeInnerhalbWegPfadSteig() throws Exception {
+    void createPunkfoermingeTreppeInnerhalbWegPfadSteig() throws Exception {
         // Arrange
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">
@@ -63,6 +63,47 @@ class DE_51009_G_b_001 extends DatabaseIntegrationTest {
                     <tag k='object_type' v='AX_SonstigesBauwerkOderSonstigeEinrichtung' />
                     <tag k='bauwerksfunktion' v='1620' />
                   </node>
+                  <way id='-663' changeset='-1'>
+                    <nd ref='-25358' />
+                    <nd ref='-25364' />
+                    <nd ref='-25361' />
+                    <nd ref='-25362' />
+                    <nd ref='-25359' />
+                    <tag k='object_type' v='AX_WegPfadSteig' />
+                  </way>
+                </create>
+                </osmChange>
+                """;
+
+        // Act
+        MvcResult mvcResult = this.mockMvc.perform(
+                        post("/osm-quality-framework/v1/quality-hub/check/changeset/{id}", CHANGESET_ID)
+                                .contentType(MediaType.APPLICATION_XML)
+                                .content(CHANGESET_XML)
+                                .param("steps", String.join(",", stepsToValidate))
+                                .param("rules", String.join(",", rulesToValidate)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        QualityHubResultDto qualityHubResultDto = this.objectMapper.readValue(mvcResult.getResponse().getContentAsByteArray(), QualityHubResultDto.class);
+
+        // Assert
+        assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
+        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result to be valid, but it was invalid.").isTrue();
+    }
+
+    @Test
+    void createLinienfoermigeTreppeInnerhalbWegPfadSteig() throws Exception {
+        // Arrange
+        final String CHANGESET_XML = """
+                <osmChange version="0.6" generator="JOSM">
+                <create>
+                  <node id='-25362' changeset='-1' lat='49.88064989274' lon='12.32196506929' />
+                  <node id='-25361' changeset='-1' lat='49.88237537717' lon='12.32196506929' />
+                  <node id='-25359' changeset='-1' lat='49.87713667792' lon='12.32196506929' />
+                  <node id='-25358' changeset='-1' lat='49.88647161642' lon='12.32196506929' />
+                  <node id='-25364' changeset='-1' lat='49.88488281818' lon='12.32196506929' />
                   <way id='-736' changeset='-1'>
                     <nd ref='-25361' />
                     <nd ref='-25362' />
@@ -96,11 +137,27 @@ class DE_51009_G_b_001 extends DatabaseIntegrationTest {
 
         // Assert
         assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
-        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result to be valid, but it was invalid.").isTrue();
+        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        QualityServiceResultDto geometryCheck = qualityHubResultDto.qualityServiceResults().stream()
+                .filter(s -> "geometry-check".equals(s.qualityServiceId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("QualityService 'geometry-check' not found"));
+
+        assertThat(geometryCheck.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        assertThat(geometryCheck.errors())
+                .as("Errors of 'geometry-check' must not be empty")
+                .isNotEmpty();
+
+        assertThat(geometryCheck.errors())
+                .extracting(QualityServiceErrorDto::errorText)
+                .as("Error text of 'geometry-check'")
+                .contains("Ein Objekt mit der 'bauwerksfunktion' 1620 liegt immer auf einem Objekt 'AX_Strassenachse', 'AX_Fahrwegachse' oder 'AX_WegPfadSteig'.");
     }
 
     @Test
-    void createTreppeIdentischMitWegPfadSteig() throws Exception {
+    void createLinienfoermigeTreppeIdentischMitWegPfadSteig() throws Exception {
         // Arrange
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="JOSM">

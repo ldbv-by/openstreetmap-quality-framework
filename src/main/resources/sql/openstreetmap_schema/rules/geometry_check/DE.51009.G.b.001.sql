@@ -6,17 +6,38 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
         "conditions": {
             "all": [
                 { "type": "tag_equals", "tag_key": "bauwerksfunktion", "value": "1620" },
-                { "any": [ { "type": "geom_type", "value": "Point" }, { "type": "geom_type", "value": "LineString" } ] }
+                { "not": { "type": "geom_type", "value": "Polygon" } }
             ]
         },
         "checks": {
-            "type": "spatial_compare",
-            "operator": "covered_by",
-            "data_set_filter": {
-                "criteria": {
-                    "type": "tag_in", "tag_key": "object_type", "values": ["AX_Strassenachse", "AX_Fahrwegachse", "AX_WegPfadSteig"]
+            "any": [
+                {
+                    "all": [
+                        { "type": "geom_type", "value": "LineString" },
+                        { "type": "spatial_compare",
+                          "operator": "equals_topo",
+                          "data_set_filter": {
+                              "criteria": {
+                                  "type": "tag_in", "tag_key": "object_type", "values": ["AX_Strassenachse", "AX_Fahrwegachse", "AX_WegPfadSteig"]
+                              }
+                          }
+                        }
+                    ]
+                },
+                {
+                    "all": [
+                        { "type": "geom_type", "value": "Point" },
+                        { "type": "spatial_compare",
+                          "operator": "covered_by",
+                          "data_set_filter": {
+                              "criteria": {
+                                  "type": "tag_in", "tag_key": "object_type", "values": ["AX_Strassenachse", "AX_Fahrwegachse", "AX_WegPfadSteig"]
+                              }
+                          }
+                        }
+                    ]
                 }
-            }
+            ]
         }
     }',
     'Ein Objekt mit der ''bauwerksfunktion'' 1620 liegt immer auf einem Objekt ''AX_Strassenachse'', ''AX_Fahrwegachse'' oder ''AX_WegPfadSteig''.')
