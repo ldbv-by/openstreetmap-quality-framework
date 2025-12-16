@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * AdV-Beschreibung:
- * Als Geometrietypen sind nur Punkt- und Liniengeometrie zugelassen.
+ * Als Geometrietypen sind nur Linien- und Flächengeometrie zugelassen.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
