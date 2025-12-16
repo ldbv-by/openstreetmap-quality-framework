@@ -4,10 +4,20 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
     'AX_VorratsbehaelterSpeicherbauwerk',
     '{
         "checks": {
-            "relations": {
-                "conditions": { "type": "tag_equals", "tag_key": "object_type", "value": "AX_objekthoehe" },
-                "checks": { "type": "number_compare", "tag_key": "hoehe", "operator": ">", "compare_value": "0" }
-            }
+            "any": [
+                {
+                    "relations": {
+                        "conditions": { "type": "tag_equals", "tag_key": "object_type", "value": "AX_objekthoehe" },
+                        "checks": { "type": "number_compare", "tag_key": "hoehe", "operator": ">", "compare_value": "0" }
+                    }
+                },
+                {
+                    "relations": {
+                        "loop_info": { "type": "none" },
+                        "checks": { "type": "tag_equals", "tag_key": "object_type", "value": "AX_objekthoehe" }
+                    }
+                }
+            ]
         }
     }',
     'Das Tag ''hoehe'' der Relation ''AX_objekthoehe'' muss größer Null sein.')
