@@ -9,16 +9,16 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                 {
                     "type": "spatial_compare",
                     "operator": "covered_by",
-                    "data_set_filter": { "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Bahnstrecke" } }
-                },
-                {
-                    "type": "spatial_compare",
-                    "operator": "covered_by",
                     "data_set_filter": {
                         "criteria": {
-                            "all": [
-                                { "type": "tag_equals", "tag_key": "object_type", "value": "AX_SeilbahnSchwebebahn" },
-                                { "type": "tag_equals", "tag_key": "bahnkategorie", "value": "2500" }
+                            "any": [
+                                { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Bahnstrecke" },
+                                {
+                                    "all": [
+                                        { "type": "tag_equals", "tag_key": "object_type", "value": "AX_SeilbahnSchwebebahn" },
+                                        { "type": "tag_equals", "tag_key": "bahnkategorie", "value": "2500" }
+                                    ]
+                                }
                             ]
                         }
                     }
