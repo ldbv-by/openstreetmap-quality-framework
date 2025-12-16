@@ -66,6 +66,11 @@ class DE_53001_G_b_005 extends DatabaseIntegrationTest {
                     <nd ref='-25362' />
                     <tag k='object_type' v='AX_WegPfadSteig' />
                   </way>
+                  <relation id='-100' changeset='-1'>
+                    <member type='way' ref='-663' role='over' />
+                    <member type='way' ref='-736' role='under' />
+                    <tag k='object_type' v='AA_hatDirektUnten' />
+                  </relation>
                 </create>
                 </osmChange>
                 """;

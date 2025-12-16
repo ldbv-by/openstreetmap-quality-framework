@@ -5,12 +5,19 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
     '{
         "conditions": { "type": "tag_equals", "tag_key": "bauwerksfunktion", "value": "1900" },
         "checks": {
-            "type": "spatial_compare",
-            "operator": "equals_topo",
-            "data_set_filter": {
-                "criteria": {
-                    "type": "tag_in", "tag_key": "object_type", "values": ["AX_Strassenachse", "AX_Fahrbahnachse", "AX_WegPfadSteig",
-                                                                           "AX_Fahrwegachse", "AX_Bahnstrecke", "AX_Gewaesserachse"]
+            "relations": {
+                "conditions": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" },
+                "checks": {
+                    "type": "spatial_compare",
+                    "reference_feature_role": "under",
+                    "operator": "equals_topo",
+                    "data_set_filter": {
+                        "memberFilter": {
+                            "role": "over",
+                            "objectTypes": ["AX_Strassenachse", "AX_Fahrbahnachse", "AX_WegPfadSteig", "AX_Fahrwegachse", "AX_Bahnstrecke", "AX_Gewaesserachse"]
+                        }
+                    },
+                    "self_check": true
                 }
             }
         }
