@@ -25,7 +25,9 @@ public class TagStartsWithExpressionFactory implements ExpressionFactory {
      */
     private record RuleParams (
             String tagKey,
-            String value
+            String value,
+            Integer substringStart,
+            Integer substringLength
     ) {}
 
     /**
@@ -42,7 +44,12 @@ public class TagStartsWithExpressionFactory implements ExpressionFactory {
             String tagValue = taggedObject.getTags().get(params.tagKey);
             if (tagValue == null) return false;
 
-            return tagValue.startsWith(this.resolveCurrentPlaceholder(taggedObject, params.value()));
+            String compareValue = this.resolveCurrentPlaceholder(taggedObject, baseTaggedObject, params.value());
+            if (params.substringStart != null && params.substringLength != null) {
+                compareValue = compareValue.substring(params.substringStart, params.substringLength);
+            }
+
+            return tagValue.startsWith(compareValue);
         };
     }
 
@@ -52,16 +59,19 @@ public class TagStartsWithExpressionFactory implements ExpressionFactory {
     private RuleParams parseParams(JsonNode json) {
         String tagKey = JsonUtils.asString(json, "tag_key", type());
         String value = JsonUtils.asString(json, "value", type());
-
-        return new RuleParams(tagKey, value);
+        Integer substringStart = JsonUtils.asOptionalInteger(json, "substring_start");
+        Integer substringLength = JsonUtils.asOptionalInteger(json, "substring_length");
+        return new RuleParams(tagKey, value,substringStart, substringLength);
     }
 
-    private String resolveCurrentPlaceholder(TaggedObject taggedObject, String value) {
+    private String resolveCurrentPlaceholder(TaggedObject taggedObject, TaggedObject baseTaggedObject, String value) {
         if (value.startsWith("current:")) {
             String taggedObjectTagKey = value.substring("current:".length());
             return taggedObject.getTags().get(taggedObjectTagKey);
+        } else if (value.startsWith("base:")) {
+            String taggedObjectTagKey = value.substring("base:".length());
+            return baseTaggedObject.getTags().get(taggedObjectTagKey);
         }
-
         return value;
     }
 }
