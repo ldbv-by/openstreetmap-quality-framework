@@ -49,7 +49,7 @@ class DE_40000_G_a_004 extends DatabaseIntegrationTest {
             .build();
 
     @Test
-    void createHatDirektUntenUeberschneidungsfrei() throws Exception {
+    void createUeberschneidungsfreieFlaechenMitGleichenHatDirektUnten() throws Exception {
         // Arrange
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="iD">
@@ -118,7 +118,7 @@ class DE_40000_G_a_004 extends DatabaseIntegrationTest {
     }
 
     @Test
-    void createHatDirektUntenNichtUeberschneidungsfrei() throws Exception {
+    void createNichtUeberschneidungsfreieFlaechenMitGleichenHDU() throws Exception {
         // Arrange
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="iD">
@@ -208,5 +208,81 @@ class DE_40000_G_a_004 extends DatabaseIntegrationTest {
                 .extracting(QualityServiceErrorDto::errorText)
                 .as("Error text of 'geometry-check'")
                 .contains("Members auf einem Bauwerk im Verkehrsbereich oder Gewässerbereich müssen überschneidungsfrei sein.");
+    }
+
+    @Test
+    void createNichtUeberschneidungsfreieFlaechenMitUnterschiedlichenHDU() throws Exception {
+        // Arrange
+        final String CHANGESET_XML = """
+                <osmChange version="0.6" generator="iD">
+                    <create>
+                        <node id="-1" lon="12.317446189523055" lat="49.87283851843256" version="0"/>
+                        <node id="-2" lon="12.318295913469939" lat="49.872866176770636" version="0"/>
+                        <node id="-3" lon="12.318338828814177" lat="49.87161600393924" version="0"/>
+                        <node id="-4" lon="12.317497687805174" lat="49.871610472214115" version="0"/>
+                        <node id="-8" lon="12.318319452614706" lat="49.87218045869448" version="0"/>
+                        <node id="-9" lon="12.317474482245547" lat="49.8721638440477" version="0"/>
+                        <node id="-23" lon="12.31830647425666" lat="49.8725585320333" version="0"/>
+                        <node id="-24" lon="12.317458495128848" lat="49.87254507745128" version="0"/>
+                        <way id="-1" version="0">
+                            <nd ref="-1"/>
+                            <nd ref="-2"/>
+                            <nd ref="-23"/>
+                            <nd ref="-8"/>
+                            <nd ref="-3"/>
+                            <nd ref="-4"/>
+                            <nd ref="-9"/>
+                            <nd ref="-24"/>
+                            <nd ref="-1"/>
+                            <tag k="object_type" v="AX_BauwerkImVerkehrsbereich"/>
+                            <tag k="bauwerksfunktion" v="1800"/>
+                        </way>
+                        <way id="-2" version="0">
+                            <nd ref="-1"/>
+                            <nd ref="-2"/>
+                            <nd ref="-23"/>
+                            <nd ref="-8"/>
+                            <nd ref="-9"/>
+                            <nd ref="-24"/>
+                            <nd ref="-1"/>
+                            <tag k="object_type" v="AX_Wohnbauflaeche"/>
+                        </way>
+                        <way id="-3" version="0">
+                            <nd ref="-4"/>
+                            <nd ref="-3"/>
+                            <nd ref="-8"/>
+                            <nd ref="-23"/>
+                            <nd ref="-24"/>
+                            <nd ref="-9"/>
+                            <nd ref="-4"/>
+                            <tag k="object_type" v="AX_Wald"/>
+                        </way>
+                        <relation id="-1" version="0">
+                            <member type="way" role="under" ref="-1"/>
+                            <member type="way" role="over" ref="-2"/>
+                            <tag k="object_type" v="AA_hatDirektUnten"/>
+                        </relation>
+                    </create>
+                    <modify/>
+                    <delete if-unused="true"/>
+                </osmChange>
+                """;
+
+        // Act
+        MvcResult mvcResult = this.mockMvc.perform(
+                        post("/osm-quality-framework/v1/quality-hub/check/changeset/{id}", CHANGESET_ID)
+                                .contentType(MediaType.APPLICATION_XML)
+                                .content(CHANGESET_XML)
+                                .param("steps", String.join(",", stepsToValidate))
+                                .param("rules", String.join(",", rulesToValidate)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        QualityHubResultDto qualityHubResultDto = this.objectMapper.readValue(mvcResult.getResponse().getContentAsByteArray(), QualityHubResultDto.class);
+
+        // Assert
+        assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
+        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result to be valid, but it was invalid.").isTrue();
     }
 }
