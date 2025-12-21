@@ -219,11 +219,14 @@ public class GeodataViewServiceImpl implements GeodataViewService {
                     case COVERED_BY ->  match = referenceGeometry.coveredBy(candidate.getGeometry());
                     case COVERED_BY_BOUNDARY -> match = referenceGeometry.coveredBy(candidate.getGeometry().getBoundary());
                     case COVERED_BY_MULTILINE_AS_POLYGON -> match = toPolygon(referenceGeometry.getGeometry()).coveredBy(toPolygon(candidate.getGeometry()));
-                    case EQUALS_TOPO -> match = referenceGeometry.getGeometry().equalsTopo(candidate.getGeometry());
+                    case EQUALS_TOPO, EQUALS -> match = referenceGeometry.getGeometry().equalsTopo(candidate.getGeometry());
+                    case EQUALS_TOPO_BY_MULTILINE_AS_POLYGON, EQUALS_BY_MULTILINE_AS_POLYGON -> match = toPolygon(referenceGeometry.getGeometry()).equalsTopo(toPolygon(candidate.getGeometry()));
                     case INTERSECTS -> match = referenceGeometry.intersects(candidate.getGeometry());
                     case OVERLAPS -> match = referenceGeometry.overlaps(candidate.getGeometry());
+                    case OVERLAPS_BY_MULTILINE_AS_POLYGON -> match = toPolygon(referenceGeometry.getGeometry()).overlaps(toPolygon(candidate.getGeometry()));
                     case CROSSES -> match = referenceGeometry.crosses(candidate.getGeometry());
                     case COVERS -> match = referenceGeometry.covers(candidate.getGeometry());
+                    case COVERS_BY_MULTILINE_AS_POLYGON -> match = toPolygon(referenceGeometry.getGeometry()).covers(toPolygon(candidate.getGeometry()));
                 }
 
                 if (match) {
