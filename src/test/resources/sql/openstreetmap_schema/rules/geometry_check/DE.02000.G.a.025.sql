@@ -3,7 +3,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
     'geometry-check',
     'AA_REO',
     '{
-        "condition": {
+        "conditions": {
             "all": [
                 { "type": "tag_in", "tag_key": "object_type", "values": ["AX_Gewaesserachse", "AX_Gewaesserstationierungsachse", "AX_Sickerstrecke"] },
                 {
