@@ -1,6 +1,6 @@
 INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error_text) VALUES (
     'DE.53008.R.b.001',
-    'geometry-check',
+    'attribute-check',
     'AX_EinrichtungenFuerDenSchiffsverkehr',
     '
     {

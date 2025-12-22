@@ -1,11 +1,21 @@
 INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error_text) VALUES (
     'DE.53001.R.b.001',
-    'geometry-check',
+    'attribute-check',
     'AX_BauwerkImVerkehrsbereich',
     '{
         "checks": {
             "any": [
-                { "type": "tag_in", "tag_key": "bauwerksfunktion", "values": ["1880", "1890", "1900"] },
+                {
+                    "all": [
+                        { "type": "tag_in", "tag_key": "bauwerksfunktion", "values": ["1880", "1890", "1900"] },
+                        {
+                            "relations": {
+                                "loop_info": { "type": "none" },
+                                "checks": { "type": "tag_equals", "tag_key": "object_type", "value": "AA_hatDirektUnten" }
+                            }
+                        }
+                    ]
+                },
                 {
                     "relations": {
                         "loop_info": { "type": "all" },
