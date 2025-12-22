@@ -106,7 +106,7 @@ public final class ExpressionParser {
             LoopInfo loopInfo = this.parseLoopInfo(jsonNode);
 
             String role;
-            if (node.has("role")) {
+            if (jsonNode.has("role")) {
                 role = jsonNode.path("role").asText();
             } else {
                 role = null;
@@ -244,7 +244,7 @@ public final class ExpressionParser {
         if (taggedObject instanceof Relation relation) {
             if (relation.getMembers() != null && !relation.getMembers().isEmpty()) {
                 DataSet relationMemberTaggedFeatures = Optional.ofNullable(
-                                this.geodataViewService.getRelationMembers(relation.getOsmId(), null, null))
+                                this.geodataViewService.getRelationMembers(relation.getOsmId(), role, null))
                         .map(DataSetMapper::toDomain)
                         .orElse(null);
 
