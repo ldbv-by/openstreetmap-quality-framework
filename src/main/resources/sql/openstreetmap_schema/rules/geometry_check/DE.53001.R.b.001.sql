@@ -16,8 +16,8 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                             "relation_members": {
                                 "loop_info": { "type": "all" },
                                 "checks": { "type": "tag_in", "tag_key": "object_type", "values": ["AX_Strassenachse", "AX_Fahrwegachse", "AX_WegPfadSteig", "AX_Bahnstrecke", "AX_Gleis",
-                                                                                                  "AX_Gewaesserachse", "AX_Strassenverkehr", "AX_Bahnverkehr", "AX_Fliessgewaesser",
-                                                                                                  "AX_BauwerkImVerkehrsbereich"] }
+                                                                                                   "AX_Gewaesserachse", "AX_Strassenverkehr", "AX_Bahnverkehr", "AX_Fliessgewaesser",
+                                                                                                   "AX_Fahrbahnachse", "AX_BauwerkImVerkehrsbereich"] }
                             }
                         }
                     }
