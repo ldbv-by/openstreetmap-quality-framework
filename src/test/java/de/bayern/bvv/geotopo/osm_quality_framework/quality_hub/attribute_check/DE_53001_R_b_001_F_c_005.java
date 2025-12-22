@@ -34,12 +34,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-class DE_53001_R_b_001 extends DatabaseIntegrationTest {
+class DE_53001_R_b_001_F_c_005 extends DatabaseIntegrationTest {
 
     final Long CHANGESET_ID = 1L;
 
     Set<String> stepsToValidate = new HashSet<>(Set.of("attribute-check", "object-number-assignment"));
-    Set<String> rulesToValidate = new HashSet<>(Set.of("DE.53001.R.b.001"));
+    Set<String> rulesToValidate = new HashSet<>(Set.of("DE.53001.R.b.001_F.c.005"));
 
     @Autowired
     MockMvc mockMvc;

@@ -1,5 +1,5 @@
 INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error_text) VALUES (
-    'DE.53001.R.b.001',
+    'DE.53001.R.b.001_F.c.005',
     'attribute-check',
     'AX_BauwerkImVerkehrsbereich',
     '{
