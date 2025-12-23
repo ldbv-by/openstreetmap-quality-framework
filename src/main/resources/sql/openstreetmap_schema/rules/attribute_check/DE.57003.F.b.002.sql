@@ -11,12 +11,25 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                 "aggregator": "union",
                 "criteria": {
                     "all": [
-                        { "type": "tag_in", "tag_key": "object_type", "values": ["AX_Gewaesserachse", "AX_Fliessgewaesser"] },
-                        { "type": "tag_equals", "tag_key": "fliessrichtung", "value": "current:fliessrichtung" }
+                        { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Fliessgewaesser" },
+                        {
+                            "not": {
+                                "type": "relation_exists",
+                                "criteria": { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Wasserlauf" },
+                                "relation_members": {
+                                    "criteria": {
+                                        "all": [
+                                            { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Gewaesserachse" },
+                                            { "not": { "type": "tag_equals", "tag_key": "fliessrichtung", "value": "current:fliessrichtung" } }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
                     ]
                 }
             }
-        }
+       }
     }',
     'Die Gewässerstationierungsachse hat die falsche Fließrichtung.')
 ON CONFLICT (id) DO NOTHING;
