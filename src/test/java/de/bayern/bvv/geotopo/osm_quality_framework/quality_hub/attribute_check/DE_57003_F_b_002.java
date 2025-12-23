@@ -69,7 +69,7 @@ class DE_57003_F_b_002 extends DatabaseIntegrationTest {
                                 <nd ref="-4"/>
                                 <nd ref="-1"/>
                                 <tag k="object_type" v="AX_Gewaesserachse"/>
-                        <tag k='breiteDesGewaessers' v='12' />
+                                <tag k='breiteDesGewaessers' v='12' />
                                 <tag k="fliessrichtung" v="TRUE"/>
                             </way>
                             <way id="-2" version="0">
@@ -80,7 +80,7 @@ class DE_57003_F_b_002 extends DatabaseIntegrationTest {
                                 <nd ref="-3"/>
                                 <nd ref="-4"/>
                                 <tag k="object_type" v="AX_Gewaesserachse"/>
-                        <tag k='breiteDesGewaessers' v='12' />
+                                <tag k='breiteDesGewaessers' v='12' />
                                 <tag k="fliessrichtung" v="TRUE"/>
                             </way>
                             <way id="-3" version="0">
