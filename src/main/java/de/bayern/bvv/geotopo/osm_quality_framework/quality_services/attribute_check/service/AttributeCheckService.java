@@ -40,15 +40,14 @@ public class AttributeCheckService implements QualityService {
     public QualityServiceResultDto checkChangesetQuality(QualityServiceRequestDto qualityServiceRequestDto) {
         long startTime = System.currentTimeMillis();
 
-        // ----- Initialize result of quality service.
-        this.qualityServiceResult = new QualityServiceResult(qualityServiceRequestDto.qualityServiceId(), qualityServiceRequestDto.changesetId());
-
+        ChangesetDataSet changesetDataSet = ChangesetDataSetMapper.toDomain(qualityServiceRequestDto.changesetDataSetDto());
         Set<String> rulesToValidate = qualityServiceRequestDto.rulesToValidate();
         boolean hasRuleFilter = rulesToValidate != null && !rulesToValidate.isEmpty();
 
-        // ----- Check the attribute consistency for each new or modified changeset object.
-        ChangesetDataSet changesetDataSet = ChangesetDataSetMapper.toDomain(qualityServiceRequestDto.changesetDataSetDto());
+        // ----- Initialize result of quality service.
+        this.qualityServiceResult = new QualityServiceResult(qualityServiceRequestDto.qualityServiceId(), qualityServiceRequestDto.changesetId());
 
+        // ----- Check the attribute consistency for each new or modified changeset object.
         for (TaggedObject changedObject : changesetDataSet.getCreatedAndModified()) {
 
             // ----- Get schema configuration for tagged object.

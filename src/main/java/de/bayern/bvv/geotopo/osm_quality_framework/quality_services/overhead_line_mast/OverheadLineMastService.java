@@ -33,12 +33,11 @@ public class OverheadLineMastService implements QualityService {
      */
     @Override
     public QualityServiceResultDto checkChangesetQuality(QualityServiceRequestDto qualityServiceRequestDto) {
+        Changeset modifiedChangeset = ChangesetMapper.toDomain(qualityServiceRequestDto.changesetId(), qualityServiceRequestDto.changesetDto());
+
         // ----- Initialize result of quality service.
         QualityServiceResult qualityServiceResult = new QualityServiceResult(
                 qualityServiceRequestDto.qualityServiceId(), qualityServiceRequestDto.changesetId());
-
-        Changeset modifiedChangeset = ChangesetMapper.toDomain(
-                qualityServiceRequestDto.changesetId(), qualityServiceRequestDto.changesetDto());
 
         // ----- Get tagged objects.
         ChangesetDataSet changesetDataSet = ChangesetDataSetMapper.toDomain(qualityServiceRequestDto.changesetDataSetDto());

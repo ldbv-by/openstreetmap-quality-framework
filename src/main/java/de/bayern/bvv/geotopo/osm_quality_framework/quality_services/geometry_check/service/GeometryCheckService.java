@@ -41,17 +41,15 @@ public class GeometryCheckService implements QualityService {
     public QualityServiceResultDto checkChangesetQuality(
             QualityServiceRequestDto qualityServiceRequestDto) {
 
+        ChangesetDataSet changesetDataSet = ChangesetDataSetMapper.toDomain(qualityServiceRequestDto.changesetDataSetDto());
+        Set<String> rulesToValidate = qualityServiceRequestDto.rulesToValidate();
+        boolean hasRuleFilter = rulesToValidate != null && !rulesToValidate.isEmpty();
+
         // ----- Initialize result of quality service.
         this.qualityServiceResult = new QualityServiceResult(
                 qualityServiceRequestDto.qualityServiceId(), qualityServiceRequestDto.changesetId());
 
-        Set<String> rulesToValidate = qualityServiceRequestDto.rulesToValidate();
-        boolean hasRuleFilter = rulesToValidate != null && !rulesToValidate.isEmpty();
-
         // ----- Check the geometric consistency for each new or modified changeset object.
-        ChangesetDataSet changesetDataSet =
-                ChangesetDataSetMapper.toDomain(qualityServiceRequestDto.changesetDataSetDto());
-
         for (TaggedObject changedObject : changesetDataSet.getCreatedAndModified()) {
 
             // ----- Get rules from openstreetmap-schema for the object_type.
