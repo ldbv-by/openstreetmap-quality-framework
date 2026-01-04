@@ -167,7 +167,7 @@ class DE_53001_R_b_001_F_c_005 extends DatabaseIntegrationTest {
     }
 
     @Test
-    void createBrueckeMitGebietsgrenzeMitHDU() throws Exception {
+    void createBrueckeMitLeitungMitHDU() throws Exception {
         // Arrange
         final String CHANGESET_XML = """
                 <osmChange version="0.6" generator="iD">
@@ -177,7 +177,8 @@ class DE_53001_R_b_001_F_c_005 extends DatabaseIntegrationTest {
                         <way id="-1" version="0">
                             <nd ref="-1"/>
                             <nd ref="-2"/>
-                            <tag k="object_type" v="AX_Gebietsgrenze"/>
+                            <tag k="object_type" v="AX_Leitung"/>
+                            <tag k="bauwerksfunktion" v="1110"/>
                         </way>
                         <way id="-2" version="0">
                             <nd ref="-1"/>
@@ -189,11 +190,6 @@ class DE_53001_R_b_001_F_c_005 extends DatabaseIntegrationTest {
                             <member type="way" role="under" ref="-2"/>
                             <member type="way" role="over" ref="-1"/>
                             <tag k="object_type" v="AA_hatDirektUnten"/>
-                        </relation>
-                        <relation id="-2" version="0">
-                            <member type="way" role="" ref="-1"/>
-                            <tag k="object_type" v="AX_Strasse"/>
-                            <tag k="widmung" v="1301"/>
                         </relation>
                     </create>
                     <modify/>
