@@ -129,7 +129,24 @@ class DE_53009_G_b_003_F_b_004 extends DatabaseIntegrationTest {
 
         // Assert
         assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
-        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result to be valid, but it was invalid.").isTrue();
+        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        QualityServiceResultDto geometryCheck = qualityHubResultDto.qualityServiceResults().stream()
+                .filter(s -> "geometry-check".equals(s.qualityServiceId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("QualityService 'geometry-check' not found"));
+
+        assertThat(geometryCheck.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        assertThat(geometryCheck.errors())
+                .as("Errors of 'geometry-check' must not be empty")
+                .isNotEmpty();
+
+        assertThat(geometryCheck.errors())
+                .extracting(QualityServiceErrorDto::errorText)
+                .as("Error text of 'geometry-check'")
+                .contains("Ein linienförmiges Objekt 'AX_BauwerkImGewaesserbereich' mit 'bauwerksfunktion' 2010 bis 2013, 2070 und 2090 überlagern ein Objekt 'AX_Gewaesserachse' mit identischer Geometrie.");
+
     }
 
     @Test
