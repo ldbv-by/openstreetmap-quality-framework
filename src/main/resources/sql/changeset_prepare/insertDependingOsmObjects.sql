@@ -7,9 +7,13 @@ DECLARE
     m_new int;
     m_cnt int;
 BEGIN
-    CREATE TEMP TABLE copy_nodes (id bigint PRIMARY KEY, directlyAffected boolean NOT NULL DEFAULT FALSE) ON COMMIT DROP;
-    CREATE TEMP TABLE copy_ways  (id bigint PRIMARY KEY, directlyAffected boolean NOT NULL DEFAULT FALSE) ON COMMIT DROP;
-    CREATE TEMP TABLE copy_rels  (id bigint PRIMARY KEY, directlyAffected boolean NOT NULL DEFAULT FALSE) ON COMMIT DROP;
+    CREATE TEMP TABLE copy_nodes (id bigint PRIMARY KEY, directlyAffected boolean NOT NULL DEFAULT FALSE, recursive_checked boolean NOT NULL DEFAULT FALSE) ON COMMIT DROP;
+    CREATE TEMP TABLE copy_ways  (id bigint PRIMARY KEY, directlyAffected boolean NOT NULL DEFAULT FALSE, recursive_checked boolean NOT NULL DEFAULT FALSE) ON COMMIT DROP;
+    CREATE TEMP TABLE copy_rels  (id bigint PRIMARY KEY, directlyAffected boolean NOT NULL DEFAULT FALSE, recursive_checked boolean NOT NULL DEFAULT FALSE) ON COMMIT DROP;
+
+    CREATE TEMP TABLE todo_nodes (id bigint PRIMARY KEY) ON COMMIT DROP;
+    CREATE TEMP TABLE todo_ways  (id bigint PRIMARY KEY) ON COMMIT DROP;
+    CREATE TEMP TABLE todo_rels  (id bigint PRIMARY KEY) ON COMMIT DROP;
 
     -- init copy tables with changeset nodes, ways and relations
     INSERT INTO copy_nodes
@@ -35,6 +39,12 @@ BEGIN
 
     -- fill copy tables recursive
     LOOP
+        TRUNCATE todo_nodes; TRUNCATE todo_ways; TRUNCATE todo_rels;
+
+        INSERT INTO todo_nodes SELECT id FROM copy_nodes WHERE recursive_checked = FALSE;
+        INSERT INTO todo_ways  SELECT id FROM copy_ways  WHERE recursive_checked = FALSE;
+        INSERT INTO todo_rels  SELECT id FROM copy_rels  WHERE recursive_checked = FALSE;
+
         m_new := 0;
 
         -- 1. Way -> Nodes
@@ -43,6 +53,7 @@ BEGIN
         FROM openstreetmap_geometries.planet_osm_ways w,
              copy_ways cw
         WHERE cw.id = w.id
+          AND cw.recursive_checked = FALSE
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
 
@@ -54,6 +65,7 @@ BEGIN
              copy_rels cr,
              jsonb_array_elements(r.members) AS member
         WHERE cr.id = r.id
+          AND cr.recursive_checked = FALSE
           AND member->>'type' = 'N'
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
@@ -65,6 +77,7 @@ BEGIN
              copy_rels cr,
              jsonb_array_elements(r.members) AS member
         WHERE cr.id = r.id
+          AND cr.recursive_checked = FALSE
           AND member->>'type' = 'W'
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
@@ -76,6 +89,7 @@ BEGIN
              copy_rels cr,
              jsonb_array_elements(r.members) AS member
         WHERE cr.id = r.id
+          AND cr.recursive_checked = FALSE
           AND member->>'type' = 'R'
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
@@ -91,7 +105,8 @@ BEGIN
         FROM openstreetmap_geometries.planet_osm_rels r,
              (SELECT COALESCE(array_agg(id) FILTER (WHERE directlyAffected), '{}')::bigint[] AS ids_direct,
                   COALESCE(array_agg(id), '{}')::bigint[]                                 AS ids
-              FROM copy_nodes) cn
+              FROM copy_nodes
+              WHERE recursive_checked = FALSE) cn
         WHERE openstreetmap_geometries.planet_osm_member_ids(members, 'N'::char(1)) && cn.ids
         ON CONFLICT (id) DO UPDATE
                                 SET directlyAffected = copy_rels.directlyAffected OR EXCLUDED.directlyAffected;
@@ -106,7 +121,8 @@ BEGIN
         FROM openstreetmap_geometries.planet_osm_rels r,
              (SELECT COALESCE(array_agg(id) FILTER (WHERE directlyAffected), '{}')::bigint[] AS ids_direct,
                   COALESCE(array_agg(id), '{}')::bigint[]                                 AS ids
-              FROM copy_ways) cw
+              FROM copy_ways
+              WHERE recursive_checked = FALSE) cw
         WHERE openstreetmap_geometries.planet_osm_member_ids(members, 'W'::char(1)) && cw.ids
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
@@ -121,10 +137,15 @@ BEGIN
         FROM openstreetmap_geometries.planet_osm_rels r,
              (SELECT COALESCE(array_agg(id) FILTER (WHERE directlyAffected), '{}')::bigint[] AS ids_direct,
                   COALESCE(array_agg(id), '{}')::bigint[]                                 AS ids
-              FROM copy_rels) cr
+              FROM copy_rels
+              WHERE recursive_checked = FALSE) cr
         WHERE openstreetmap_geometries.planet_osm_member_ids(members, 'R'::char(1)) && cr.ids
         ON CONFLICT DO NOTHING;
         GET DIAGNOSTICS m_cnt = ROW_COUNT; m_new := m_new + m_cnt;
+
+        UPDATE copy_nodes cn SET recursive_checked = TRUE FROM todo_nodes tn WHERE cn.id = tn.id;
+        UPDATE copy_ways  cw SET recursive_checked = TRUE FROM todo_ways  tw WHERE cw.id = tw.id;
+        UPDATE copy_rels  cr SET recursive_checked = TRUE FROM todo_rels  tr WHERE cr.id = tr.id;
 
         -- Finish loop when no new object is found.
         IF m_new = 0 THEN
