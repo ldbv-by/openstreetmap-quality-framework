@@ -208,4 +208,134 @@ class DE_40000_G_a_001_009 extends DatabaseIntegrationTest {
                 .as("Error text of 'geometry-check'")
                 .contains("Im Bereich der Objekte \"Tatsächliche Nutzung\" existiert eine Lücke bzw. Überschneidung in der Flächendeckung.");
     }
+
+    @Test
+    void createWohnbauflaechenAufWohnbauflaecheMitBundeslandgrenze() throws Exception {
+        // Arrange
+        final String CHANGESET_XML = """
+                <osmChange version="0.6" generator="iD">
+                <create>
+                    <node id="-1" lon="12.320182357943636" lat="49.875184860596924" version="0"/>
+                    <node id="-2" lon="12.320182357943636" lat="49.87400665839374" version="0"/>
+                    <node id="-4" lon="12.32224229479449" lat="49.87399283367411" version="0"/>
+                    <node id="-6" lon="12.322207962388132" lat="49.875171036003486" version="0"/>
+                    <node id="-17" lon="12.320843254310388" lat="49.874764472628776" version="0"/>
+                    <node id="-18" lon="12.321555649286676" lat="49.874764472628776" version="0"/>
+                    <node id="-19" lon="12.321564232224558" lat="49.87433854916628" version="0"/>
+                    <node id="-20" lon="12.32081750484191" lat="49.874355143824374" version="0"/>
+                    <node id="-23" lon="12.321203719283238" lat="49.87517788988539" version="0"/>
+                    <node id="-24" lon="12.321203742940055" lat="49.874764472628776" version="0"/>
+                    <node id="-27" lon="12.321187616823943" lat="49.87434691875936" version="0"/>
+                    <node id="-28" lon="12.321203274717165" lat="49.873999806782166" version="0"/>
+                    <way id="-1" version="0">
+                        <nd ref="-1"/>
+                        <nd ref="-2"/>
+                        <tag k="artDerGebietsgrenze" v="7102"/>
+                        <tag k="object_type" v="AX_Gebietsgrenze"/>
+                    </way>
+                    <way id="-2" version="0">
+                        <nd ref="-4"/>
+                        <nd ref="-28"/>
+                        <nd ref="-2"/>
+                        <tag k="artDerGebietsgrenze" v="7102"/>
+                        <tag k="object_type" v="AX_Gebietsgrenze"/>
+                    </way>
+                    <way id="-3" version="0">
+                        <nd ref="-6"/>
+                        <nd ref="-4"/>
+                        <tag k="artDerGebietsgrenze" v="7102"/>
+                        <tag k="object_type" v="AX_Gebietsgrenze"/>
+                    </way>
+                    <way id="-4" version="0">
+                        <nd ref="-1"/>
+                        <nd ref="-23"/>
+                        <nd ref="-6"/>
+                        <tag k="artDerGebietsgrenze" v="7102"/>
+                        <tag k="object_type" v="AX_Gebietsgrenze"/>
+                    </way>
+                    <way id="-6" version="0">
+                        <nd ref="-17"/>
+                        <nd ref="-24"/>
+                        <nd ref="-18"/>
+                        <nd ref="-19"/>
+                        <nd ref="-27"/>
+                        <nd ref="-20"/>
+                        <nd ref="-17"/>
+                        <tag k="object_type" v="AX_Wohnbauflaeche"/>
+                    </way>
+                    <way id="-7" version="0">
+                        <nd ref="-23"/>
+                        <nd ref="-24"/>
+                        <nd ref="-18"/>
+                        <nd ref="-19"/>
+                        <nd ref="-27"/>
+                        <nd ref="-28"/>
+                        <nd ref="-4"/>
+                        <nd ref="-6"/>
+                        <nd ref="-23"/>
+                        <tag k="object_type" v="AX_Wohnbauflaeche"/>
+                    </way>
+                    <way id="-8" version="0">
+                        <nd ref="-1"/>
+                        <nd ref="-23"/>
+                        <nd ref="-24"/>
+                        <nd ref="-17"/>
+                        <nd ref="-20"/>
+                        <nd ref="-27"/>
+                        <nd ref="-28"/>
+                        <nd ref="-2"/>
+                        <nd ref="-1"/>
+                        <tag k="object_type" v="AX_Wohnbauflaeche"/>
+                    </way>
+                    <way id="-9" version="0">
+                        <nd ref="-1"/>
+                        <nd ref="-23"/>
+                        <nd ref="-24"/>
+                        <nd ref="-17"/>
+                        <nd ref="-20"/>
+                        <nd ref="-27"/>
+                        <nd ref="-28"/>
+                        <nd ref="-2"/>
+                        <nd ref="-1"/>
+                        <tag k="object_type" v="AX_Wohnbauflaeche"/>
+                    </way>
+                </create>
+                <modify/>
+                <delete if-unused="true"/>
+                </osmChange>
+                """;
+
+        // Act
+        MvcResult mvcResult = this.mockMvc.perform(
+                        post("/osm-quality-framework/v1/quality-hub/check/changeset/{id}", CHANGESET_ID)
+                                .contentType(MediaType.APPLICATION_XML)
+                                .content(CHANGESET_XML)
+                                .param("steps", String.join(",", stepsToValidate))
+                                .param("rules", String.join(",", rulesToValidate)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        QualityHubResultDto qualityHubResultDto = this.objectMapper.readValue(mvcResult.getResponse().getContentAsByteArray(), QualityHubResultDto.class);
+
+        // Assert
+        assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
+        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        QualityServiceResultDto geometryCheck = qualityHubResultDto.qualityServiceResults().stream()
+                .filter(s -> "geometry-check".equals(s.qualityServiceId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("QualityService 'geometry-check' not found"));
+
+        assertThat(geometryCheck.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        assertThat(geometryCheck.errors())
+                .as("Errors of 'geometry-check' must not be empty")
+                .isNotEmpty();
+
+        assertThat(geometryCheck.errors())
+                .extracting(QualityServiceErrorDto::errorText)
+                .as("Error text of 'geometry-check'")
+                .contains("Im Bereich der Objekte \"Tatsächliche Nutzung\" existiert eine Lücke bzw. Überschneidung in der Flächendeckung.");
+    }
 }
