@@ -384,4 +384,63 @@ class DE_40000_G_a_001_009 extends DatabaseIntegrationTest {
                 .as("Error text of 'geometry-check'")
                 .contains("Im Bereich der Objekte \"Tatsächliche Nutzung\" existiert eine Lücke bzw. Überschneidung in der Flächendeckung.");
     }
+
+    @Test
+    void createWohnbauflaecheAufBestehenderFlaecherGemischterNutzung() throws Exception {
+        // Arrange
+        final String CHANGESET_XML = """
+                <osmChange version="0.6" generator="iD">
+                	<create>
+                		<node id="-15" lon="12.339650347214857" lat="49.87671787635957" version="0"/>
+                		<node id="-16" lon="12.340035292377584" lat="49.87671787635957" version="0"/>
+                		<node id="-17" lon="12.340042840209037" lat="49.87647953212283" version="0"/>
+                		<node id="-18" lon="12.339676764912875" lat="49.87648682837445" version="0"/>
+                		<way id="-3" version="0">
+                			<nd ref="-15"/>
+                			<nd ref="-16"/>
+                			<nd ref="-17"/>
+                			<nd ref="-18"/>
+                			<nd ref="-15"/>
+                			<tag k="object_type" v="AX_Wohnbauflaeche"/>
+                			<tag k="artDerBebauung" v="1000"/>
+                		</way>
+                	</create>
+                	<modify/>
+                	<delete if-unused="true"/>
+                </osmChange>
+                """;
+
+        // Act
+        MvcResult mvcResult = this.mockMvc.perform(
+                        post("/osm-quality-framework/v1/quality-hub/check/changeset/{id}", CHANGESET_ID)
+                                .contentType(MediaType.APPLICATION_XML)
+                                .content(CHANGESET_XML)
+                                .param("steps", String.join(",", stepsToValidate))
+                                .param("rules", String.join(",", rulesToValidate)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        QualityHubResultDto qualityHubResultDto = this.objectMapper.readValue(mvcResult.getResponse().getContentAsByteArray(), QualityHubResultDto.class);
+
+        // Assert
+        assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
+        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        QualityServiceResultDto geometryCheck = qualityHubResultDto.qualityServiceResults().stream()
+                .filter(s -> "geometry-check".equals(s.qualityServiceId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("QualityService 'geometry-check' not found"));
+
+        assertThat(geometryCheck.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        assertThat(geometryCheck.errors())
+                .as("Errors of 'geometry-check' must not be empty")
+                .isNotEmpty();
+
+        assertThat(geometryCheck.errors())
+                .extracting(QualityServiceErrorDto::errorText)
+                .as("Error text of 'geometry-check'")
+                .contains("Im Bereich der Objekte \"Tatsächliche Nutzung\" existiert eine Lücke bzw. Überschneidung in der Flächendeckung.");
+    }
 }

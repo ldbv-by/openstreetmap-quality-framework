@@ -35,7 +35,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                 {
                     "not": {
                         "type": "spatial_compare",
-                        "operators": [ "overlaps", "equals" ],
+                        "operators": [ "overlaps", "equals", "covered_by" ],
                         "data_set_filter": {
                             "criteria": {
                                 "all": [
