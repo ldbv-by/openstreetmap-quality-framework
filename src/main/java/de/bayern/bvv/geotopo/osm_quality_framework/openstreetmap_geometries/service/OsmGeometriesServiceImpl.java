@@ -85,10 +85,9 @@ public class OsmGeometriesServiceImpl implements OsmGeometriesService {
         resultDataSet.getWays().addAll(this.getWaysByFeatureFilter(osmIds, criteria, coordinateReferenceSystem, relations));
         resultDataSet.getAreas().addAll(this.getAreasByFeatureFilter(osmIds, criteria, coordinateReferenceSystem, relations));
 
+        resultDataSet.getRelations().addAll(relations);
         if (osmIds != null && osmIds.relationIds() != null && !osmIds.relationIds().isEmpty()) {
             resultDataSet.getRelations().addAll(this.getRelationsByFeatureFilter(osmIds, criteria));
-        } else {
-            resultDataSet.getRelations().addAll(relations);
         }
 
         return DataSetMapper.toDto(resultDataSet);
