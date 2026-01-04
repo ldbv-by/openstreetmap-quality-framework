@@ -159,15 +159,30 @@ public class GeodataViewServiceImpl implements GeodataViewService {
                         referenceGeometry, referenceEnvelope, operators, dataSetFilter, selfCheck);
 
                 for (Feature resultFeature : resultFeatures) {
-                    switch (resultFeature.getGeometry()) {
-                        case Point _ -> resultDataSet.getNodes().add(resultFeature);
-                        case LineString _ -> resultDataSet.getWays().add(resultFeature);
-                        case Polygon _ -> resultDataSet.getAreas().add(resultFeature);
-                        case null, default -> candidateDataSet.getRelations().stream()
-                                .filter(cr -> cr.getOsmId().equals(resultFeature.getOsmId()))
-                                .findFirst()
-                                .ifPresent(cr -> resultDataSet.getRelations().add(cr));
-                    }
+
+                    candidateDataSet.getNodes().stream()
+                            .filter(cr -> cr.getOsmId().equals(resultFeature.getOsmId()) &&
+                                    cr.getObjectType().equals(resultFeature.getObjectType()))
+                            .findFirst()
+                            .ifPresent(cr -> resultDataSet.getNodes().add(cr));
+
+                    candidateDataSet.getWays().stream()
+                            .filter(cr -> cr.getOsmId().equals(resultFeature.getOsmId()) &&
+                                    cr.getObjectType().equals(resultFeature.getObjectType()))
+                            .findFirst()
+                            .ifPresent(cr -> resultDataSet.getWays().add(cr));
+
+                    candidateDataSet.getAreas().stream()
+                            .filter(cr -> cr.getOsmId().equals(resultFeature.getOsmId()) &&
+                                    cr.getObjectType().equals(resultFeature.getObjectType()))
+                            .findFirst()
+                            .ifPresent(cr -> resultDataSet.getAreas().add(cr));
+
+                    candidateDataSet.getRelations().stream()
+                            .filter(cr -> cr.getOsmId().equals(resultFeature.getOsmId()) &&
+                                                    cr.getObjectType().equals(resultFeature.getObjectType()))
+                            .findFirst()
+                            .ifPresent(cr -> resultDataSet.getRelations().add(cr));
                 }
             }
         }
@@ -187,9 +202,14 @@ public class GeodataViewServiceImpl implements GeodataViewService {
 
         for (Feature candidate : features) {
             // Skip the same object (same OSM id and type) as the reference feature.
-            if (Objects.equals(candidate.getOsmId(), referenceFeature.getOsmId()) &&
-                candidate.getObjectType().equals(referenceFeature.getObjectType()) &&
-                !selfCheck) continue;
+            if (!selfCheck &&
+                    (Objects.equals(candidate.getOsmId(), referenceFeature.getOsmId()) &&
+                     candidate.getObjectType().equals(referenceFeature.getObjectType())) ||
+                    (Optional.ofNullable(referenceFeature.getRelations()).orElseGet(List::of).stream()
+                        .anyMatch(r -> Objects.equals(r.getOsmId(), candidate.getOsmId())
+                            && Objects.equals(r.getObjectType(), candidate.getObjectType())))) {
+                continue;
+            }
 
             candidateDataSetTree.insert(candidate.getGeometry().getEnvelopeInternal(), candidate);
         }

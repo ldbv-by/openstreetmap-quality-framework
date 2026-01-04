@@ -45,7 +45,12 @@ public class RuleAlias {
             }
         }
 
-        OsmIds resolvedOsmIds = new OsmIds(nodeIds, wayIds, areaIds, relationIds);
+        OsmIds resolvedOsmIds;
+        if (nodeIds == null && wayIds == null && areaIds == null && relationIds == null) {
+            resolvedOsmIds = null;
+        } else {
+            resolvedOsmIds = new OsmIds(nodeIds, wayIds, areaIds, relationIds);
+        }
 
         // Replace alias name, e.g. current, ...
         Criteria resolvedCriteria = (dataSetFilter.criteria() == null) ? null :
