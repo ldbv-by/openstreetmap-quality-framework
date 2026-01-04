@@ -39,10 +39,10 @@ public class ChangesetPrepareIntegrationTest extends DatabaseIntegrationTest {
                 () -> assertNodes(changesetId),
                 () -> assertWays(changesetId),
                 () -> assertAreas(changesetId, 7547L, 10732L),
-                () -> assertRelations(changesetId),
-                () -> assertRelationMembers(changesetId),
+                () -> assertRelations(changesetId, 10029L, 13001L),
+                () -> assertRelationMembers(changesetId, 7547L, 10732L),
                 () -> assertChangesetObjects(changesetId, "CREATE"),
-                () -> assertChangesetObjects(changesetId, "MODIFY", 7547L, 10732L),
+                () -> assertChangesetObjects(changesetId, "MODIFY", 7547L, 10732L, 10029L, 13001L),
                 () -> assertChangesetObjects(changesetId, "DELETE")
         );
     }
@@ -69,10 +69,10 @@ public class ChangesetPrepareIntegrationTest extends DatabaseIntegrationTest {
                 () -> assertNodes(changesetId),
                 () -> assertWays(changesetId),
                 () -> assertAreas(changesetId, 873L, 7421L),
-                () -> assertRelations(changesetId),
-                () -> assertRelationMembers(changesetId),
+                () -> assertRelations(changesetId, 9903L, 14891L),
+                () -> assertRelationMembers(changesetId, 873L, 7421L),
                 () -> assertChangesetObjects(changesetId, "CREATE"),
-                () -> assertChangesetObjects(changesetId, "MODIFY", 873L, 7421L),
+                () -> assertChangesetObjects(changesetId, "MODIFY", 873L, 7421L, 9903L, 14891L),
                 () -> assertChangesetObjects(changesetId, "DELETE")
         );
     }
@@ -99,10 +99,10 @@ public class ChangesetPrepareIntegrationTest extends DatabaseIntegrationTest {
                 () -> assertNodes(changesetId),
                 () -> assertWays(changesetId),
                 () -> assertAreas(changesetId, 7476L, 884L),
-                () -> assertRelations(changesetId),
-                () -> assertRelationMembers(changesetId),
+                () -> assertRelations(changesetId, 9958L, 14902L),
+                () -> assertRelationMembers(changesetId, 7476L, 884L),
                 () -> assertChangesetObjects(changesetId, "CREATE"),
-                () -> assertChangesetObjects(changesetId, "MODIFY", 7476L, 884L),
+                () -> assertChangesetObjects(changesetId, "MODIFY", 7476L, 884L, 9958L, 14902L),
                 () -> assertChangesetObjects(changesetId, "DELETE")
         );
     }
@@ -129,11 +129,12 @@ public class ChangesetPrepareIntegrationTest extends DatabaseIntegrationTest {
                 () -> assertNodes(changesetId),
                 () -> assertWays(changesetId, 3943L),
                 () -> assertAreas(changesetId, 873L, 10737L),
-                () -> assertRelations(changesetId, 4L, 1467L),
-                () -> assertRelationMembers(changesetId, 3943L, 5813L, 5749L, 5629L, 3950L, 3949L,
-                        3948L, 3947L, 3946L, 3945L, 3944L, 3942L, 3941L, 3640L, 4L, 10L, 33L, 34L, 102L, 103L, 406L),
+                () -> assertRelations(changesetId, 4L, 14022L, 14891L, 13005L, 6430L),
+                () -> assertRelationMembers(changesetId, 4L, 873L, 3640L, 3941L, 3942L, 3943L, 3944L, 3945L,
+                                                        3946L, 3947L, 3948L, 3949L, 3950L, 5629L, 5749L,
+                                                        5813L, 3943L, 10737L),
                 () -> assertChangesetObjects(changesetId, "CREATE"),
-                () -> assertChangesetObjects(changesetId, "MODIFY", 3943L, 873L, 10737L, 4L, 1467L),
+                () -> assertChangesetObjects(changesetId, "MODIFY", 3943L, 873L, 10737L, 4L, 14022L, 14891L, 13005L, 6430L),
                 () -> assertChangesetObjects(changesetId, "DELETE")
         );
     }
@@ -160,10 +161,10 @@ public class ChangesetPrepareIntegrationTest extends DatabaseIntegrationTest {
                 () -> assertNodes(changesetId),
                 () -> assertWays(changesetId, 5389L),
                 () -> assertAreas(changesetId, 10800L, 11290L),
-                () -> assertRelations(changesetId, 404L),
-                () -> assertRelationMembers(changesetId, 5388L, 5389L, 5390L, 5391L, 5712L, 5429L),
+                () -> assertRelations(changesetId, 404L, 7876L, 14422L, 13067L, 13545L),
+                () -> assertRelationMembers(changesetId, 404L, 5388L, 5389L, 5390L, 5391L, 5429L, 5712L, 5389L, 10800L, 11290L),
                 () -> assertChangesetObjects(changesetId, "CREATE"),
-                () -> assertChangesetObjects(changesetId, "MODIFY", 5389L,10800L, 11290L, 404L),
+                () -> assertChangesetObjects(changesetId, "MODIFY", 5389L, 10800L, 11290L, 404L, 7876L, 14422L, 13067L, 13545L),
                 () -> assertChangesetObjects(changesetId, "DELETE")
         );
     }
@@ -175,8 +176,8 @@ public class ChangesetPrepareIntegrationTest extends DatabaseIntegrationTest {
                 <osmChange version="0.6" generator="JOSM">
                 <create>
                   <node id='-25468' changeset='-1' lat='49.88025286581' lon='12.34805233434'>
-                    <tag k='BWF_bauwerksfunktion' v='1003' />
                     <tag k='object_type' v='AX_Turm' />
+                    <tag k='bauwerksfunktion' v='1003' />
                   </node>
                 </create>
                 </osmChange>
@@ -348,10 +349,10 @@ public class ChangesetPrepareIntegrationTest extends DatabaseIntegrationTest {
                 () -> assertNodes(changesetId),
                 () -> assertWays(changesetId),
                 () -> assertAreas(changesetId, -62L, -766L),
-                () -> assertRelations(changesetId),
-                () -> assertRelationMembers(changesetId),
+                () -> assertRelations(changesetId, 11759L),
+                () -> assertRelationMembers(changesetId, 9342L),
                 () -> assertChangesetObjects(changesetId, "CREATE", -62L, -766L),
-                () -> assertChangesetObjects(changesetId, "MODIFY"),
+                () -> assertChangesetObjects(changesetId, "MODIFY", 11759L),
                 () -> assertChangesetObjects(changesetId, "DELETE")
         );
     }
@@ -378,10 +379,10 @@ public class ChangesetPrepareIntegrationTest extends DatabaseIntegrationTest {
                 () -> assertNodes(changesetId),
                 () -> assertWays(changesetId),
                 () -> assertAreas(changesetId),
-                () -> assertRelations(changesetId),
-                () -> assertRelationMembers(changesetId),
+                () -> assertRelations(changesetId, 13992L),
+                () -> assertRelationMembers(changesetId, 11746L),
                 () -> assertChangesetObjects(changesetId, "CREATE"),
-                () -> assertChangesetObjects(changesetId, "MODIFY"),
+                () -> assertChangesetObjects(changesetId, "MODIFY", 13992L),
                 () -> assertChangesetObjects(changesetId, "DELETE", 11746L)
         );
     }
@@ -398,8 +399,8 @@ public class ChangesetPrepareIntegrationTest extends DatabaseIntegrationTest {
                     <member type='way' ref='7473' role='inner' />
                     <member type='way' ref='7474' role='inner' />
                     <member type='way' ref='10495' role='outer' />
-                    <tag k='OID_identifikator' v='DEBYBDLMJW0002rY' />
-                    <tag k='VEG_vegetationsmerkmal' v='1020' />
+                    <tag k='identifikator:UUID' v='DEBYBDLMJW0002rY' />
+                    <tag k='vegetationsmerkmal' v='1020' />
                     <tag k='object_type' v='AX_Landwirtschaft' />
                     <tag k='type' v='multipolygon' />
                   </relation>
@@ -425,10 +426,10 @@ public class ChangesetPrepareIntegrationTest extends DatabaseIntegrationTest {
                 () -> assertNodes(changesetId),
                 () -> assertWays(changesetId),
                 () -> assertAreas(changesetId, 884L),
-                () -> assertRelations(changesetId),
-                () -> assertRelationMembers(changesetId),
+                () -> assertRelations(changesetId, 9958L, 14902L),
+                () -> assertRelationMembers(changesetId, 884L, 7476L),
                 () -> assertChangesetObjects(changesetId, "CREATE"),
-                () -> assertChangesetObjects(changesetId, "MODIFY", 884L),
+                () -> assertChangesetObjects(changesetId, "MODIFY", 884L, 9958L, 14902L),
                 () -> assertChangesetObjects(changesetId, "DELETE", 7476L)
         );
     }

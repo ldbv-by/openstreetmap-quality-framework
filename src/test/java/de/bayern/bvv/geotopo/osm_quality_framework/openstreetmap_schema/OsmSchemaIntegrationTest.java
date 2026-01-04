@@ -165,8 +165,8 @@ class OsmSchemaIntegrationTest extends DatabaseIntegrationTest {
             assertThat(r.multiplicity().min()).isEqualTo(0);
             assertThat(r.multiplicity().max()).isEqualTo(Integer.MAX_VALUE);
             assertThat(r.members()).containsExactlyInAnyOrder(
-                    new MemberDto("*", "over", new MultiplicityDto(1, 1)),
-                    new MemberDto("*", "under", new MultiplicityDto(1, Integer.MAX_VALUE))
+                    new MemberDto("*", "over", new MultiplicityDto(1, Integer.MAX_VALUE)),
+                    new MemberDto("*", "under", new MultiplicityDto(1, 1))
             );
         }
 

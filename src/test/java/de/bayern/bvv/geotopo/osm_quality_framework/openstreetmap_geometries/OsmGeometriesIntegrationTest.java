@@ -3,14 +3,16 @@ package de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_geometries.api.OsmGeometriesService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.DataSetDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.FeatureDto;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.dto.RelationDto;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.DataSetFilter;
-import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.FeatureFilter;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.OsmIds;
 import de.bayern.bvv.geotopo.osm_quality_framework.test_core.DatabaseIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,7 +25,7 @@ class OsmGeometriesIntegrationTest extends DatabaseIntegrationTest {
         // Arrange
         DataSetFilter dataSetFilter = new DataSetFilter(
                 null, null, null,
-                new OsmIds(null, null, Set.of(10727L), null), null,null);
+                new OsmIds(null, null, Set.of(10707L), null), null,null);
 
         // Act
         DataSetDto dataSetDto = this.osmGeometriesService.getDataSet(dataSetFilter);
@@ -42,14 +44,13 @@ class OsmGeometriesIntegrationTest extends DatabaseIntegrationTest {
                 .isEqualTo(1);
 
         assertThat(dataSetDto.relations().size())
-                .withFailMessage("Dataset composition: expected relations=0 but was %d", dataSetDto.relations().size())
-                .isEqualTo(0);
+                .withFailMessage("Dataset composition: expected relations=1 but was %d", dataSetDto.relations().size())
+                .isEqualTo(1);
 
         FeatureDto featureDto = dataSetDto.areas().getFirst();
-        assertThat(featureDto.osmId()).isEqualTo(10727L);
+        assertThat(featureDto.osmId()).isEqualTo(10707L);
         assertThat(featureDto.objectType()).isEqualTo("AX_SportFreizeitUndErholungsflaeche");
-        assertThat(featureDto.tags().size()).isEqualTo(3);
-        assertThat(featureDto.relations().size()).isEqualTo(0);
+        assertThat(featureDto.tags().size()).isEqualTo(6);
     }
 
     @Test
@@ -76,17 +77,18 @@ class OsmGeometriesIntegrationTest extends DatabaseIntegrationTest {
                 .isEqualTo(0);
 
         assertThat(dataSetDto.relations().size())
-                .withFailMessage("Dataset composition: expected relations=1 but was %d", dataSetDto.relations().size())
-                .isEqualTo(1);
+                .withFailMessage("Dataset composition: expected relations=2 but was %d", dataSetDto.relations().size())
+                .isEqualTo(2);
 
         FeatureDto featureDto = dataSetDto.ways().getFirst();
         assertThat(featureDto.osmId()).isEqualTo(3660L);
         assertThat(featureDto.objectType()).isEqualTo("AX_Strassenachse");
-        assertThat(featureDto.tags().get("OID_identifikator")).isEqualTo("DEBYBDLMJW0003yU");
-        assertThat(featureDto.relations().size()).isEqualTo(1);
-        assertThat(featureDto.relations().getFirst().osmId()).isEqualTo(6);
-        assertThat(featureDto.relations().getFirst().objectType()).isEqualTo("AX_Strasse");
-        assertThat(featureDto.relations().getFirst().tags().get("OID_identifikator")).isEqualTo("DEBYBDLMJW00045Y");
+        assertThat(featureDto.tags().get("identifikator:UUID")).isEqualTo("DEBYBDLMJW0003yU");
+
+        List<RelationDto> streets = featureDto.relations().stream().filter(r -> r.objectType().equals("AX_Strasse")).toList();
+        assertThat(streets.size()).isEqualTo(1);
+        assertThat(streets.getFirst().osmId()).isEqualTo(6L);
+        assertThat(streets.getFirst().tags().get("identifikator:UUID")).isEqualTo("DEBYBDLMJW00045Y");
     }
 
     @Test
@@ -114,7 +116,7 @@ class OsmGeometriesIntegrationTest extends DatabaseIntegrationTest {
         FeatureDto featureDto = dataSetDto.ways().getFirst();
         assertThat(featureDto.osmId()).isEqualTo(122L);
         assertThat(featureDto.objectType()).isEqualTo("AX_BauwerkImGewaesserbereich");
-        assertThat(featureDto.tags().size()).isEqualTo(3);
-        assertThat(featureDto.relations().size()).isEqualTo(1);
+        assertThat(featureDto.tags().get("identifikator:UUID")).isEqualTo("DEBYBDLMJW0000RJ");
+        assertThat(featureDto.tags().size()).isEqualTo(5);
     }
 }
