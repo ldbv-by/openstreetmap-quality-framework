@@ -81,7 +81,7 @@ public class GeometryCheckService implements QualityService {
 
                 DataSet neighbourObjects = DataSetMapper.toDomain(this.geodataViewService.getDataSetBySpatialRelation(
                         FeatureMapper.toDto(deletedFeature), Set.of(SpatialOperator.INTERSECTS),
-                        new DataSetFilter(false, null, null, null, null, null),
+                        new DataSetFilter(false, "EPSG:25832", null, null, null, null),
                         false
                 ));
 
