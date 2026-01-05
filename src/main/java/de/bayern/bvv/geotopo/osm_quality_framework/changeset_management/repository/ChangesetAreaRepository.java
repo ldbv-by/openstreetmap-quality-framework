@@ -13,7 +13,7 @@ public interface ChangesetAreaRepository extends JpaRepository<AreaEntity,Long>,
 
     @Query(value = """
         WITH v_relation_members AS (
-          SELECT DISTINCT rm.member_osm_id, rm.member_type
+          SELECT DISTINCT rm.member_osm_id, rm.member_type, rm.changeset_id
             FROM changeset_data.relation_members rm
            WHERE rm.relation_osm_id = :relationOsmId
              AND rm.member_type in ('w', 'r')
@@ -23,7 +23,8 @@ public interface ChangesetAreaRepository extends JpaRepository<AreaEntity,Long>,
         SELECT a.*
           FROM changeset_data.areas a
           JOIN v_relation_members rm ON rm.member_osm_id = a.osm_id AND
-               lower(rm.member_type) = lower(a.osm_geometry_type);
+               lower(rm.member_type) = lower(a.osm_geometry_type) AND
+               rm.changeset_id = a.changeset_id;
         """, nativeQuery = true)
     List<AreaEntity> fetchByRelationIdAndRole(@Param("changesetId")Long changesetId,
                                               @Param("relationOsmId")Long relationOsmId,
