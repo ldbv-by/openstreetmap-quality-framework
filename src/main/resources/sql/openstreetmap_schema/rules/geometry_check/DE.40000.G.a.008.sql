@@ -22,6 +22,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                     "operator": "covered_by_boundary",
                     "min_match_count": "2",
                     "data_set_filter": {
+                        "aggregator": "union_split",
                         "criteria": {
                             "type": "tag_in", "tag_key": "object_type", "values": ["AX_Wohnbauflaeche", "AX_Weg", "AX_Wald", "AX_UnlandVegetationsloseFlaeche", "AX_TagebauGrubeSteinbruch", "AX_Sumpf", "AX_Strassenverkehr", "AX_StehendesGewaesser", "AX_SportFreizeitUndErholungsflaeche", "AX_Siedlungsflaeche",
                                                                                     "AX_Schiffsverkehr", "AX_Platz", "AX_Moor", "AX_Meer", "AX_Landwirtschaft", "AX_IndustrieUndGewerbeflaeche", "AX_Heide", "AX_Halde", "AX_Hafenbecken",  "AX_Gebietsgrenze",
@@ -35,6 +36,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                             "type": "spatial_compare",
                             "operator": "equals_topo",
                             "data_set_filter": {
+                                "aggregator": "union",
                                 "criteria": {
                                     "all": [
                                         { "type": "tag_equals", "tag_key": "object_type", "value": "AX_Gebietsgrenze" },
@@ -47,6 +49,7 @@ INSERT INTO openstreetmap_schema.rules (id, type, object_type, expression, error
                             "type": "spatial_compare",
                             "operator": "covered_by_boundary",
                             "data_set_filter": {
+                                "aggregator": "union",
                                 "criteria": {
                                     "any": [
                                         {

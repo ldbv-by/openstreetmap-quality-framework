@@ -50,6 +50,7 @@ class DE_40000_G_a_008 extends DatabaseIntegrationTest {
             .addModule(new JtsJackson3Module())
             .build();
 
+
     @Test
     void createBahnstreckeNebenWohnbauflaechen() throws Exception {
         // Arrange
@@ -226,4 +227,174 @@ class DE_40000_G_a_008 extends DatabaseIntegrationTest {
         assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
         assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result to be valid, but it was invalid.").isTrue();
     }
+
+    @Test
+    void createBahnstreckeAufMehrerenWohnbauflaechenAnliegend() throws Exception {
+        // Arrange
+        final String CHANGESET_XML = """
+                <osmChange version="0.6" generator="iD">
+                    <create>
+                        <node id="-1" lon="12.322487013547502" lat="49.87577689673275" version="0"/>
+                        <node id="-2" lon="12.322447576721006" lat="49.87408674751416" version="0"/>
+                        <node id="-4" lon="12.323719433180768" lat="49.87578325058924" version="0"/>
+                        <node id="-5" lon="12.323679996354272" lat="49.875014430790365" version="0"/>
+                        <node id="-6" lon="12.322469368057835" lat="49.875020668992505" version="0"/>
+                        <node id="-9" lon="12.323699714767521" lat="49.87409945567112" version="0"/>
+                        <node id="-18" lon="12.321264453496966" lat="49.87580866588576" version="0"/>
+                        <node id="-19" lon="12.321086985144994" lat="49.8751224474581" version="0"/>
+                        <node id="-23" lon="12.321027828776936" lat="49.874054977107136" version="0"/>
+                        <way id="-1" version="0">
+                            <nd ref="-1"/>
+                            <nd ref="-6"/>
+                            <nd ref="-2"/>
+                            <tag k="object_type" v="AX_Bahnstrecke"/>
+                        </way>
+                        <way id="-2" version="0">
+                            <nd ref="-1"/>
+                            <nd ref="-4"/>
+                            <nd ref="-5"/>
+                            <nd ref="-6"/>
+                            <nd ref="-1"/>
+                            <tag k="artDerBebauung" v="1000"/>
+                            <tag k="object_type" v="AX_Wohnbauflaeche"/>
+                        </way>
+                        <way id="-3" version="0">
+                            <nd ref="-2"/>
+                            <nd ref="-9"/>
+                            <nd ref="-5"/>
+                            <nd ref="-6"/>
+                            <nd ref="-2"/>
+                            <tag k="artDerBebauung" v="1000"/>
+                            <tag k="object_type" v="AX_Wohnbauflaeche"/>
+                        </way>
+                        <way id="-5" version="0">
+                            <nd ref="-1"/>
+                            <nd ref="-18"/>
+                            <nd ref="-19"/>
+                            <nd ref="-6"/>
+                            <nd ref="-1"/>
+                            <tag k="artDerBebauung" v="1000"/>
+                            <tag k="object_type" v="AX_Wohnbauflaeche"/>
+                        </way>
+                        <way id="-6" version="0">
+                            <nd ref="-19"/>
+                            <nd ref="-23"/>
+                            <nd ref="-2"/>
+                            <nd ref="-6"/>
+                            <nd ref="-19"/>
+                            <tag k="artDerBebauung" v="1000"/>
+                            <tag k="object_type" v="AX_Wohnbauflaeche"/>
+                        </way>
+                    </create>
+                    <modify/>
+                    <delete if-unused="true"/>
+                </osmChange>
+                """;
+
+        // Act
+        MvcResult mvcResult = this.mockMvc.perform(
+                        post("/osm-quality-framework/v1/quality-hub/check/changeset/{id}", CHANGESET_ID)
+                                .contentType(MediaType.APPLICATION_XML)
+                                .content(CHANGESET_XML)
+                                .param("steps", String.join(",", stepsToValidate))
+                                .param("rules", String.join(",", rulesToValidate)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        QualityHubResultDto qualityHubResultDto = this.objectMapper.readValue(mvcResult.getResponse().getContentAsByteArray(), QualityHubResultDto.class);
+
+        // Assert
+        assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
+        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result to be valid, but it was invalid.").isTrue();
+    }
+
+    @Test
+    void createBahnstreckeAufMehrerenWohnbauflaechenNichtAnliegend() throws Exception {
+        // Arrange
+        final String CHANGESET_XML = """
+                <osmChange version="0.6" generator="iD">
+                    <create>
+                        <node id="-1" lon="12.322487013547502" lat="49.87577689673275" version="0"/>
+                        <node id="-2" lon="12.322447576721006" lat="49.87408674751416" version="0"/>
+                        <node id="-4" lon="12.323719433180768" lat="49.87578325058924" version="0"/>
+                        <node id="-5" lon="12.323679996354272" lat="49.875014430790365" version="0"/>
+                        <node id="-6" lon="12.322469368057835" lat="49.875020668992505" version="0"/>
+                        <node id="-9" lon="12.323699714767521" lat="49.87409945567112" version="0"/>
+                        <node id="-18" lon="12.321264453496966" lat="49.87580866588576" version="0"/>
+                        <node id="-19" lon="12.321086985144994" lat="49.8751224474581" version="0"/>
+                        <node id="-23" lon="12.321027828776936" lat="49.874054977107136" version="0"/>
+                        <way id="-1" version="0">
+                            <nd ref="-1"/>
+                            <nd ref="-6"/>
+                            <nd ref="-2"/>
+                            <tag k="object_type" v="AX_Bahnstrecke"/>
+                        </way>
+                        <way id="-3" version="0">
+                            <nd ref="-2"/>
+                            <nd ref="-9"/>
+                            <nd ref="-5"/>
+                            <nd ref="-6"/>
+                            <nd ref="-2"/>
+                            <tag k="artDerBebauung" v="1000"/>
+                            <tag k="object_type" v="AX_Wohnbauflaeche"/>
+                        </way>
+                        <way id="-5" version="0">
+                            <nd ref="-1"/>
+                            <nd ref="-18"/>
+                            <nd ref="-19"/>
+                            <nd ref="-6"/>
+                            <nd ref="-1"/>
+                            <tag k="artDerBebauung" v="1000"/>
+                            <tag k="object_type" v="AX_Wohnbauflaeche"/>
+                        </way>
+                        <way id="-6" version="0">
+                            <nd ref="-19"/>
+                            <nd ref="-23"/>
+                            <nd ref="-2"/>
+                            <nd ref="-6"/>
+                            <nd ref="-19"/>
+                            <tag k="artDerBebauung" v="1000"/>
+                            <tag k="object_type" v="AX_Wohnbauflaeche"/>
+                        </way>
+                    </create>
+                    <modify/>
+                    <delete if-unused="true"/>
+                </osmChange>
+                """;
+
+        // Act
+        MvcResult mvcResult = this.mockMvc.perform(
+                        post("/osm-quality-framework/v1/quality-hub/check/changeset/{id}", CHANGESET_ID)
+                                .contentType(MediaType.APPLICATION_XML)
+                                .content(CHANGESET_XML)
+                                .param("steps", String.join(",", stepsToValidate))
+                                .param("rules", String.join(",", rulesToValidate)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        QualityHubResultDto qualityHubResultDto = this.objectMapper.readValue(mvcResult.getResponse().getContentAsByteArray(), QualityHubResultDto.class);
+
+        // Assert
+        assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
+        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        QualityServiceResultDto geometryCheck = qualityHubResultDto.qualityServiceResults().stream()
+                .filter(s -> "geometry-check".equals(s.qualityServiceId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("QualityService 'geometry-check' not found"));
+
+        assertThat(geometryCheck.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        assertThat(geometryCheck.errors())
+                .as("Errors of 'geometry-check' must not be empty")
+                .isNotEmpty();
+
+        assertThat(geometryCheck.errors())
+                .extracting(QualityServiceErrorDto::errorText)
+                .as("Error text of 'geometry-check'")
+                .contains("'AX_Strassenachse', 'AX_Fahrbahnachse', 'AX_Fahrwegachse', 'AX_Bahnstrecke', 'AX_Gewaesserachse' muss links und rechts jeweils eine eigenständige TN-Fläche haben.");
+    }
 }
+

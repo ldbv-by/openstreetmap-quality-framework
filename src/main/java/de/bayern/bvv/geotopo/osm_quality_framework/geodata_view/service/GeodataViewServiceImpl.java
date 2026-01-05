@@ -140,7 +140,9 @@ public class GeodataViewServiceImpl implements GeodataViewService {
                         }
 
                         if (!candidateMemberFeatures.isEmpty()) {
-                            Feature relationMemberFeature = this.aggregateFeatures(candidateMemberFeatures, SpatialAggregator.UNION);
+                            Feature relationMemberFeature = this.aggregateFeatures(candidateMemberFeatures, SpatialAggregator.UNION, referenceFeature)
+                                    .stream().findFirst().orElse(null);
+
                             if (relationMemberFeature == null) continue;
                             relationMemberFeature.setOsmId(relation.getOsmId());
                             relationMemberFeature.setObjectType(relation.getObjectType());
@@ -160,29 +162,40 @@ public class GeodataViewServiceImpl implements GeodataViewService {
 
                 for (Feature resultFeature : resultFeatures) {
 
-                    candidateDataSet.getNodes().stream()
-                            .filter(cr -> cr.getOsmId().equals(resultFeature.getOsmId()) &&
-                                    cr.getObjectType().equals(resultFeature.getObjectType()))
-                            .findFirst()
-                            .ifPresent(cr -> resultDataSet.getNodes().add(cr));
+                    if (resultFeature.getObjectType().equals("AGGREGATION_OBJECT")) {
+                        // Return new cumulated feature
+                        if (resultFeature.getGeometry() instanceof Point) {
+                            resultDataSet.getNodes().add(resultFeature);
+                        } else if (resultFeature.getGeometry() instanceof LineString || resultFeature.getGeometry() instanceof MultiLineString) {
+                            resultDataSet.getWays().add(resultFeature);
+                        } else {
+                            resultDataSet.getAreas().add(resultFeature);
+                        }
+                    } else {
+                        candidateDataSet.getNodes().stream()
+                                .filter(cr -> cr.getOsmId().equals(resultFeature.getOsmId()) &&
+                                        cr.getObjectType().equals(resultFeature.getObjectType()))
+                                .findFirst()
+                                .ifPresent(cr -> resultDataSet.getNodes().add(cr));
 
-                    candidateDataSet.getWays().stream()
-                            .filter(cr -> cr.getOsmId().equals(resultFeature.getOsmId()) &&
-                                    cr.getObjectType().equals(resultFeature.getObjectType()))
-                            .findFirst()
-                            .ifPresent(cr -> resultDataSet.getWays().add(cr));
+                        candidateDataSet.getWays().stream()
+                                .filter(cr -> cr.getOsmId().equals(resultFeature.getOsmId()) &&
+                                        cr.getObjectType().equals(resultFeature.getObjectType()))
+                                .findFirst()
+                                .ifPresent(cr -> resultDataSet.getWays().add(cr));
 
-                    candidateDataSet.getAreas().stream()
-                            .filter(cr -> cr.getOsmId().equals(resultFeature.getOsmId()) &&
-                                    cr.getObjectType().equals(resultFeature.getObjectType()))
-                            .findFirst()
-                            .ifPresent(cr -> resultDataSet.getAreas().add(cr));
+                        candidateDataSet.getAreas().stream()
+                                .filter(cr -> cr.getOsmId().equals(resultFeature.getOsmId()) &&
+                                        cr.getObjectType().equals(resultFeature.getObjectType()))
+                                .findFirst()
+                                .ifPresent(cr -> resultDataSet.getAreas().add(cr));
 
-                    candidateDataSet.getRelations().stream()
-                            .filter(cr -> cr.getOsmId().equals(resultFeature.getOsmId()) &&
-                                                    cr.getObjectType().equals(resultFeature.getObjectType()))
-                            .findFirst()
-                            .ifPresent(cr -> resultDataSet.getRelations().add(cr));
+                        candidateDataSet.getRelations().stream()
+                                .filter(cr -> cr.getOsmId().equals(resultFeature.getOsmId()) &&
+                                        cr.getObjectType().equals(resultFeature.getObjectType()))
+                                .findFirst()
+                                .ifPresent(cr -> resultDataSet.getRelations().add(cr));
+                    }
                 }
             }
         }
@@ -220,9 +233,9 @@ public class GeodataViewServiceImpl implements GeodataViewService {
 
         List<Feature> nonAggregateCandidates = new ArrayList<>(candidates);
         if (dataSetFilter.aggregator() != null) {
-            Feature aggregateFeature = this.aggregateFeatures(candidates, dataSetFilter.aggregator());
+            List<Feature> aggregateFeature = this.aggregateFeatures(candidates, dataSetFilter.aggregator(), referenceFeature);
             candidates.clear();
-            candidates.add(aggregateFeature);
+            candidates.addAll(aggregateFeature);
         }
 
         // Apply the requested spatial predicates to each candidate.
@@ -250,15 +263,7 @@ public class GeodataViewServiceImpl implements GeodataViewService {
                 }
 
                 if (match) {
-                    if (dataSetFilter.aggregator() != null) {
-                        for (Feature nonAggregateCandidate : nonAggregateCandidates) {
-                            if (referenceGeometry.getGeometry().intersects(nonAggregateCandidate.getGeometry())) {
-                                result.add(nonAggregateCandidate);
-                            }
-                        }
-                    } else {
-                        result.add(candidate);
-                    }
+                    if (!result.contains(candidate)) result.add(candidate);
                 }
             }
         }
@@ -269,7 +274,8 @@ public class GeodataViewServiceImpl implements GeodataViewService {
 
             Feature unionCandidate;
             if (dataSetFilter.aggregator() == null) {
-                unionCandidate = this.aggregateFeatures(candidates, SpatialAggregator.UNION);
+                unionCandidate = this.aggregateFeatures(candidates, SpatialAggregator.UNION, referenceFeature)
+                        .stream().findFirst().orElse(null);
             } else {
                 unionCandidate = candidates.stream().findFirst().orElse(null);
             }
@@ -338,36 +344,79 @@ public class GeodataViewServiceImpl implements GeodataViewService {
      * Aggregates the geometries of the given features using the specified spatial
      * aggregator and returns a synthetic feature representing the result.
      */
-    private Feature aggregateFeatures(List<Feature> features, SpatialAggregator aggregator) {
+    private List<Feature> aggregateFeatures(List<Feature> features, SpatialAggregator aggregator, Feature referenceFeature) {
+        List<Feature> aggregatedFeatures = new ArrayList<>();
+
         if (aggregator == SpatialAggregator.UNION) {
             Geometry aggregateGeometry = UnaryUnionOp.union(features.stream().map(Feature::getGeometry).toList());
-            return new Feature(aggregateGeometry, null, Collections.emptyList());
-        }
+            
+            Feature aggregateFeature = new Feature(aggregateGeometry, null, Collections.emptyList());
+            aggregateFeature.setOsmId(-1000000000000000L);
+            aggregateFeature.setObjectType("AGGREGATION_OBJECT");
+            aggregatedFeatures.add(aggregateFeature);
+        } else if (aggregator == SpatialAggregator.UNION_SPLIT) {
+            Geometry aggregateGeometry = UnaryUnionOp.union(
+                    features.stream().map(Feature::getGeometry).filter(Objects::nonNull).collect(Collectors.toList())
+            );
 
-        return null;
-    }
-
-    /**
-     * Computes the outer boundary geometry for the given geometry.
-     */
-    private Geometry getOuterBoundary(Geometry geometry) {
-        GeometryFactory geometryFactory = new GeometryFactory();
-        List<LineString> rings = new ArrayList<>();
-
-        if (geometry instanceof Polygon polygon) {
-            rings.add(polygon.getExteriorRing());
-        } else if (geometry instanceof MultiPolygon multiPolygon) {
-            for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
-                Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
-                rings.add(polygon.getExteriorRing());
+            Geometry splitter = (referenceFeature != null) ? referenceFeature.getGeometry() : null;
+            if (splitter == null || splitter.isEmpty()) {
+                aggregatedFeatures.add(new Feature(aggregateGeometry, null, Collections.emptyList()));
+                return aggregatedFeatures;
             }
-        } else if (geometry instanceof LineString || geometry instanceof MultiLineString) {
-            return geometry;
-        } else {
-            return geometry.getBoundary();
+
+            // Splitter muss linear sein
+            if (!(splitter instanceof LineString || splitter instanceof MultiLineString)) {
+                splitter = splitter.getBoundary();
+            }
+            if (splitter == null || splitter.isEmpty()) {
+                aggregatedFeatures.add(new Feature(aggregateGeometry, null, Collections.emptyList()));
+                return aggregatedFeatures;
+            }
+
+            GeometryFactory gf = aggregateGeometry.getFactory();
+            Envelope env = aggregateGeometry.getEnvelopeInternal();
+            Geometry extended = extendLineworkToEnvelope(splitter, env, gf);
+            Geometry linework = aggregateGeometry.getBoundary().union(extended).union();
+
+            Polygonizer polygonizer = new Polygonizer();
+            polygonizer.add(linework);
+
+            @SuppressWarnings("unchecked")
+            Collection<Polygon> polygons = (Collection<Polygon>) polygonizer.getPolygons();
+
+            if (polygons == null || polygons.isEmpty()) {
+                aggregatedFeatures.add(new Feature(aggregateGeometry, null, Collections.emptyList()));
+                return aggregatedFeatures;
+            }
+
+            List<Polygon> parts = polygons.stream()
+                    .filter(Objects::nonNull)
+                    .filter(p -> !p.isEmpty())
+                    .filter(p -> aggregateGeometry.covers(p.getInteriorPoint()))
+                    .sorted(Comparator.comparingDouble(Polygon::getArea).reversed())
+                    .toList();
+
+            if (parts.size() >= 2) {
+                Feature aggregateFeature1 = new Feature(parts.getFirst(), null, Collections.emptyList());
+                aggregateFeature1.setOsmId(-1000000000000001L);
+                aggregateFeature1.setObjectType("AGGREGATION_OBJECT");
+                aggregatedFeatures.add(aggregateFeature1);
+
+                Feature aggregateFeature2 = new Feature(parts.get(1), null, Collections.emptyList());
+                aggregateFeature2.setOsmId(-1000000000000002L);
+                aggregateFeature2.setObjectType("AGGREGATION_OBJECT");
+                aggregatedFeatures.add(aggregateFeature2);
+            } else {
+                Feature aggregateFeature = new Feature(aggregateGeometry, null, Collections.emptyList());
+                aggregateFeature.setOsmId(-1000000000000000L);
+                aggregateFeature.setObjectType("AGGREGATION_OBJECT");
+                aggregatedFeatures.add(aggregateFeature);
+            }
+            return aggregatedFeatures;
         }
 
-        return geometryFactory.createMultiLineString(rings.toArray(LineString[]::new));
+        return aggregatedFeatures;
     }
 
     /**
@@ -518,5 +567,71 @@ public class GeodataViewServiceImpl implements GeodataViewService {
     private static Polygon emptyPolygon(Geometry geom) {
         GeometryFactory gf = (geom != null) ? geom.getFactory() : new GeometryFactory();
         return gf.createPolygon();
+    }
+
+    private static Geometry extendLineworkToEnvelope(Geometry linework, Envelope env, GeometryFactory gf) {
+        double diag = Math.hypot(env.getWidth(), env.getHeight());
+        double extendDist = diag * 2.0; // sicher groß genug
+
+        if (linework instanceof LineString ls) {
+            return extendLineString(ls, extendDist, gf);
+        }
+        if (linework instanceof MultiLineString mls) {
+            List<LineString> out = new ArrayList<>();
+            for (int i = 0; i < mls.getNumGeometries(); i++) {
+                out.add(extendLineString((LineString) mls.getGeometryN(i), extendDist, gf));
+            }
+            return gf.createMultiLineString(out.toArray(LineString[]::new));
+        }
+        return linework;
+    }
+
+    private static LineString extendLineString(LineString ls, double extendDist, GeometryFactory gf) {
+        Coordinate[] cs = ls.getCoordinates();
+        if (cs.length < 2) return ls;
+
+        Coordinate p0 = cs[0];
+        Coordinate p1 = cs[1];
+        Coordinate pn = cs[cs.length - 1];
+        Coordinate pn1 = cs[cs.length - 2];
+
+        Coordinate startExt = extendPoint(p0, p1, extendDist);
+        Coordinate endExt   = extendPoint(pn, pn1, extendDist);
+
+        Coordinate[] out = new Coordinate[cs.length + 2];
+        out[0] = startExt;
+        System.arraycopy(cs, 0, out, 1, cs.length);
+        out[out.length - 1] = endExt;
+
+        return gf.createLineString(out);
+    }
+
+    private static Coordinate extendPoint(Coordinate from, Coordinate towards, double extendDist) {
+        double dx = from.x - towards.x;
+        double dy = from.y - towards.y;
+        double n = Math.hypot(dx, dy);
+        if (n == 0) return new Coordinate(from);
+        dx /= n; dy /= n;
+        return new Coordinate(from.x + dx * extendDist, from.y + dy * extendDist);
+    }
+
+    private Geometry getOuterBoundary(Geometry geometry) {
+        GeometryFactory geometryFactory = new GeometryFactory();
+        List<LineString> rings = new ArrayList<>();
+
+        if (geometry instanceof Polygon polygon) {
+            rings.add(polygon.getExteriorRing());
+        } else if (geometry instanceof MultiPolygon multiPolygon) {
+            for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
+                Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
+                rings.add(polygon.getExteriorRing());
+            }
+        } else if (geometry instanceof LineString || geometry instanceof MultiLineString) {
+            return geometry;
+        } else {
+            return geometry.getBoundary();
+        }
+
+        return geometryFactory.createMultiLineString(rings.toArray(LineString[]::new));
     }
 }
