@@ -139,7 +139,7 @@ public class GeodataViewServiceImpl implements GeodataViewService {
                             }
                         }
 
-                            if (!candidateMemberFeatures.isEmpty()) {
+                        if (!candidateMemberFeatures.isEmpty()) {
                             Feature relationMemberFeature = this.aggregateFeatures(candidateMemberFeatures, SpatialAggregator.UNION);
                             if (relationMemberFeature == null) continue;
                             relationMemberFeature.setOsmId(relation.getOsmId());
