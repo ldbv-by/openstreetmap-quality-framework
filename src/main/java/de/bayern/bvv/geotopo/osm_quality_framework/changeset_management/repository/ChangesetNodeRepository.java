@@ -13,7 +13,7 @@ public interface ChangesetNodeRepository extends JpaRepository<NodeEntity,Long>,
 
     @Query(value = """
         WITH v_relation_members AS (
-          SELECT DISTINCT rm.member_osm_id
+          SELECT DISTINCT rm.member_osm_id, rm.changeset_id
             FROM changeset_data.relation_members rm
            WHERE rm.relation_osm_id = :relationOsmId
              AND rm.member_type = 'n'
@@ -22,7 +22,7 @@ public interface ChangesetNodeRepository extends JpaRepository<NodeEntity,Long>,
         )
         SELECT n.*
           FROM changeset_data.nodes n
-          JOIN v_relation_members rm ON rm.member_osm_id = n.osm_id
+          JOIN v_relation_members rm ON rm.member_osm_id = n.osm_id AND rm.changeset_id = n.changeset_id
         """, nativeQuery = true)
     List<NodeEntity> fetchByRelationIdAndRole(@Param("changesetId")Long changesetId,
                                               @Param("relationOsmId")Long relationOsmId,

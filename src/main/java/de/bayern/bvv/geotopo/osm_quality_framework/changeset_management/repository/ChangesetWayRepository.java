@@ -13,7 +13,7 @@ public interface ChangesetWayRepository extends JpaRepository<WayEntity,Long>, C
 
     @Query(value = """
         WITH v_relation_members AS (
-          SELECT DISTINCT rm.member_osm_id
+          SELECT DISTINCT rm.member_osm_id, rm.changeset_id
             FROM changeset_data.relation_members rm
            WHERE rm.relation_osm_id = :relationOsmId
              AND rm.member_type = 'w'
@@ -22,7 +22,7 @@ public interface ChangesetWayRepository extends JpaRepository<WayEntity,Long>, C
         )
         SELECT w.*
           FROM changeset_data.ways w
-          JOIN v_relation_members rm ON rm.member_osm_id = w.osm_id
+          JOIN v_relation_members rm ON rm.member_osm_id = w.osm_id AND rm.changeset_id = w.changeset_id
         """, nativeQuery = true)
     List<WayEntity> fetchByRelationIdAndRole(@Param("changesetId")Long changesetId,
                                               @Param("relationOsmId")Long relationOsmId,
