@@ -30,6 +30,7 @@ spring:
       data-locations:
         - classpath:sql/openstreetmap_schema/aaa-basis-schema.sql
         - classpath:sql/openstreetmap_schema/atkis-basis-dlm-schema.sql
+        - classpath:sql/openstreetmap_schema/by-atkis-basis-dlm-schema.sql
         - classpath:sql/openstreetmap_schema/openstreetmap-quality-framework-schema.sql
         - classpath:sql/openstreetmap_schema/rules/**/*.sql
 
@@ -40,23 +41,20 @@ spring:
 quality:
   pipeline:
     steps:
-      - id: "object-number-assignment"
+      - id: "overhead-line-mast"
         waitsFor: []
 
-      - id: "overhead-line-mast"
-        waitsFor: [
-          "object-number-assignment"
-        ]
+      - id: "regional-attribute-mapping"
+        waitsFor: ["overhead-line-mast"]
+
+      - id: "object-number-assignment"
+        waitsFor: ["regional-attribute-mapping"]
 
       - id: "attribute-check"
-        waitsFor: [
-          "object-number-assignment", "overhead-line-mast"
-        ]
+        waitsFor: ["object-number-assignment"]
 
       - id: "geometry-check"
-        waitsFor: [
-          "object-number-assignment", "overhead-line-mast"
-        ]
+        waitsFor: ["object-number-assignment"]
 
 openstreetmap-tools:
   osm2pgsql: ${OSM2PGSQL_EXECUTABLE}

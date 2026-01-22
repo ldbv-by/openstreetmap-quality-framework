@@ -17,22 +17,19 @@ openstreetmap-tools:
 quality:
   pipeline:
     steps:
-      - id: "object-number-assignment"
+      - id: "overhead-line-mast"
         waitsFor: []
 
-      - id: "overhead-line-mast"
-        waitsFor: [
-          "object-number-assignment"
-        ]
+      - id: "regional-attribute-mapping"
+        waitsFor: ["overhead-line-mast"]
+
+      - id: "object-number-assignment"
+        waitsFor: ["regional-attribute-mapping"]
 
       - id: "attribute-check"
-        waitsFor: [
-          "object-number-assignment", "overhead-line-mast"
-        ]
+        waitsFor: ["object-number-assignment"]
 
       - id: "geometry-check"
-        waitsFor: [
-          "object-number-assignment", "overhead-line-mast"
-        ]
+        waitsFor: ["object-number-assignment"]
 
 openstreetmap-api: ${OSM_API_URL:https://api.openstreetmap.org/}

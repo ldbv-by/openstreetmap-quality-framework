@@ -216,6 +216,7 @@ public abstract class DatabaseIntegrationTest {
         populator.addScripts(
                 new ClassPathResource("sql/openstreetmap_schema/aaa-basis-schema.sql"),
                 new ClassPathResource("sql/openstreetmap_schema/atkis-basis-dlm-schema.sql"),
+                new ClassPathResource("sql/openstreetmap_schema/by-atkis-basis-dlm-schema.sql"),
                 new ClassPathResource("sql/openstreetmap_schema/openstreetmap-quality-framework-schema.sql")
         );
 
