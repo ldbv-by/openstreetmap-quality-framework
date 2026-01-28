@@ -19,6 +19,7 @@ public class QualityHubResultMapper {
         if (qualityHubResult == null) return null;
 
         return new QualityHubResultDto(
+                qualityHubResult.getChangeset().getId(),
                 ChangesetXml.toXml(qualityHubResult.getChangeset()),
                 qualityHubResult.isValid(),
                 qualityHubResult.getQualityServiceResults()
