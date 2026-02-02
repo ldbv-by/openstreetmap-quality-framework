@@ -141,4 +141,62 @@ class BY_41001_F_c_001_002 extends DatabaseIntegrationTest {
                 .as("Error text of 'attribute-check'")
                 .contains("Das Tag 'artDerBebauung' ist nicht vorhanden.");
     }
+
+    @Test
+    void createWohnbauflaecheMitByArtDerBebauung4Digit() throws Exception {
+        // Arrange
+        final String CHANGESET_XML = """
+                <osmChange version="0.6" generator="JOSM">
+                <create>
+                  <node id='-25361' changeset='-1' lat='49.88225125607' lon='12.32115595486' />
+                  <node id='-25360' changeset='-1' lat='49.88220160258' lon='12.32481623442' />
+                  <node id='-25359' changeset='-1' lat='49.88582617344' lon='12.32489329293' />
+                  <node id='-25358' changeset='-1' lat='49.88572687375' lon='12.32084772079' />
+                  <way id='-663' changeset='-1'>
+                    <nd ref='-25358' />
+                    <nd ref='-25359' />
+                    <nd ref='-25360' />
+                    <nd ref='-25361' />
+                    <nd ref='-25358' />
+                    <tag k='object_type' v='AX_Wohnbauflaeche' />
+                    <tag k='by:dlm:artDerBebauung' v='1000' />
+                    <tag k='artDerBebauung' v='1000' />
+                  </way>
+                </create>
+                </osmChange>
+                """;
+
+        // Act
+        MvcResult mvcResult = this.mockMvc.perform(
+                        post("/osm-quality-framework/v1/quality-hub/check/changeset/{id}", CHANGESET_ID)
+                                .contentType(MediaType.APPLICATION_XML)
+                                .content(CHANGESET_XML)
+                                .param("steps", String.join(",", stepsToValidate))
+                                .param("rules", String.join(",", rulesToValidate)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        QualityHubResultDto qualityHubResultDto = this.objectMapper.readValue(mvcResult.getResponse().getContentAsByteArray(), QualityHubResultDto.class);
+
+        // Assert
+        assertThat(qualityHubResultDto).as("Quality-Hub result must not be null").isNotNull();
+        assertThat(qualityHubResultDto.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        QualityServiceResultDto attributeCheck = qualityHubResultDto.qualityServiceResults().stream()
+                .filter(s -> "attribute-check".equals(s.qualityServiceId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("QualityService 'attribute-check' not found"));
+
+        assertThat(attributeCheck.isValid()).withFailMessage("Expected the result is not valid, but it was valid.").isFalse();
+
+        assertThat(attributeCheck.errors())
+                .as("Errors of 'attribute-check' must not be empty")
+                .isNotEmpty();
+
+        assertThat(attributeCheck.errors())
+                .extracting(QualityServiceErrorDto::errorText)
+                .as("Error text of 'attribute-check'")
+                .contains("Das Tag 'artDerBebauung' ist nicht vorhanden.");
+    }
 }
