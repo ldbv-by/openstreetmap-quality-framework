@@ -80,6 +80,11 @@ public class ChangesetEditor {
         tags.add(new Tag(key, value));
     }
 
+    public void removeTag(OsmPrimitive osmPrimitive, String key) {
+        List<Tag> tags = osmPrimitive.getTags();
+        tags.removeIf(tag -> tag.getK().equals(key));
+    }
+
     public Long getNextNegativeCreationId(Changeset changeset) {
         Set<Long> creationIds = changeset.getCreatePrimitives().stream()
                 .map(OsmPrimitive::getId)

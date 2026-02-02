@@ -31,6 +31,7 @@ public class RegionalAttributeMappingService implements QualityService {
     private final OsmSchemaService osmSchemaService;
 
     private static final String BY_DLM_PREFIX = "by:dlm:";
+    private static final Pattern FOUR_DIGITS = Pattern.compile("^\\d{4}$");
     private static final Pattern FIVE_DIGITS = Pattern.compile("^\\d{5}$");
 
     /**
@@ -54,7 +55,6 @@ public class RegionalAttributeMappingService implements QualityService {
             for (Map.Entry<String, String> tag : changedObject.getTags().entrySet()) {
 
                 if (!tag.getKey().startsWith(BY_DLM_PREFIX)) continue;
-                if (!FIVE_DIGITS.matcher(tag.getValue()).matches()) continue;
 
                 ObjectType objectType = Optional.ofNullable(this.osmSchemaService.getObjectTypeInfo(changedObject.getObjectType()))
                         .map(ObjectTypeMapper::toDomain)
@@ -62,12 +62,23 @@ public class RegionalAttributeMappingService implements QualityService {
 
                 if (objectType != null) {
                     String advKey = tag.getKey().substring(BY_DLM_PREFIX.length());
-                    String advValue = tag.getValue().substring(0, 4);
-
                     if (objectType.getTags().stream().anyMatch(t -> t.getKey().equals(advKey))) {
-                        OsmPrimitive osmPrimitive = ChangesetEditor.getOsmPrimitive(changedObject, modifiedChangeset);
-                        ChangesetEditor.upsertTag(osmPrimitive, advKey, advValue);
-                        qualityServiceResult.setModifiedChangeset(modifiedChangeset);
+
+                        if (FOUR_DIGITS.matcher(tag.getValue()).matches()) {
+                            if (changedObject.getTags().containsKey(advKey)) {
+                                // Delete the AdV tag. It is only a regional value.
+                                OsmPrimitive osmPrimitive = ChangesetEditor.getOsmPrimitive(changedObject, modifiedChangeset);
+                                ChangesetEditor.removeTag(osmPrimitive, advKey);
+                                qualityServiceResult.setModifiedChangeset(modifiedChangeset);
+                            }
+
+                        } else if (FIVE_DIGITS.matcher(tag.getValue()).matches()) {
+                            // Set the AdV tag. Shorten the number to four digits.
+                            OsmPrimitive osmPrimitive = ChangesetEditor.getOsmPrimitive(changedObject, modifiedChangeset);
+                            String advValue = tag.getValue().substring(0, 4);
+                            ChangesetEditor.upsertTag(osmPrimitive, advKey, advValue);
+                            qualityServiceResult.setModifiedChangeset(modifiedChangeset);
+                        }
                     }
                 }
             }
