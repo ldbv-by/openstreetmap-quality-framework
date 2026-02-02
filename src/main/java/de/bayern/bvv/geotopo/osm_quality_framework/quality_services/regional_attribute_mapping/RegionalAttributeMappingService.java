@@ -89,7 +89,7 @@ public class RegionalAttributeMappingService implements QualityService {
                                 qualityServiceResult.setModifiedChangeset(modifiedChangeset);
                             }
                         }
-                  }
+                    }
                 }
             }
         }
