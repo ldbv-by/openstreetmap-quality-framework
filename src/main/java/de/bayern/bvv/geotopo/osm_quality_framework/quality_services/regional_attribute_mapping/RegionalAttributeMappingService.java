@@ -78,8 +78,18 @@ public class RegionalAttributeMappingService implements QualityService {
                             String advValue = tag.getValue().substring(0, 4);
                             ChangesetEditor.upsertTag(osmPrimitive, advKey, advValue);
                             qualityServiceResult.setModifiedChangeset(modifiedChangeset);
+
+                        } else {
+                            if (changedObject.getTags().get(advKey) != null &&
+                                    !changedObject.getTags().get(advKey).equals(tag.getValue())) {
+
+                                // Copy the regional tag to the AdV tag.
+                                OsmPrimitive osmPrimitive = ChangesetEditor.getOsmPrimitive(changedObject, modifiedChangeset);
+                                ChangesetEditor.upsertTag(osmPrimitive, advKey, tag.getValue());
+                                qualityServiceResult.setModifiedChangeset(modifiedChangeset);
+                            }
                         }
-                    }
+                  }
                 }
             }
         }
