@@ -14,35 +14,35 @@
     abgebildet werden können.
  */
 
-INSERT INTO openstreetmap_schema.object_types (object_type, is_abstract, is_relation) VALUES
-    ('AA_Objekt', true, false),
-    ('AA_zeigtAufExternes', false, true), -- wird als Relation (eigener object_type) geführt
-    ('AA_modellart', false, true), -- wird als Relation (eigener object_type) geführt
+INSERT INTO openstreetmap_schema.object_types (object_type, is_abstract, is_relation, is_system) VALUES
+    ('AA_Objekt', true, false, false),
+    ('AA_zeigtAufExternes', false, true, true), -- wird als Relation (eigener object_type) geführt
+    ('AA_modellart', false, true, true), -- wird als Relation (eigener object_type) geführt
     /* ('AA_ObjektOhneRaumbezug', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
-    ('AA_NREO', true, false),
-    ('AA_REO', true, false),
-    ('AA_istAbgeleitetAus', false, true), -- wird als Relation (eigener object_type) geführt
-    ('AA_hatDirektUnten', false, true), -- wird als Relation (eigener object_type) geführt
-    ('AA_ZUSO', true, true), -- AA_ZUSO wird als Relation geführt
+    ('AA_NREO', true, false, false),
+    ('AA_REO', true, false, false),
+    ('AA_istAbgeleitetAus', false, true, true), -- wird als Relation (eigener object_type) geführt
+    ('AA_hatDirektUnten', false, true, true), -- wird als Relation (eigener object_type) geführt
+    ('AA_ZUSO', true, true, false), -- AA_ZUSO wird als Relation geführt
     /* ('AA_PMO', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
-    ('AG_Objekt', true, false),
+    ('AG_Objekt', true, false, false),
     /* ('AG_Punktobjekt', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
-    ('AG_Linienobjekt', true, false),
-    ('AG_Flaechenobjekt', true, false),
-    ('AA_Benutzergruppe', true, false),
-    ('AA_Benutzer', true, false),
+    ('AG_Linienobjekt', true, false, false),
+    ('AG_Flaechenobjekt', true, false, false),
+    ('AA_Benutzergruppe', true, false, false),
+    ('AA_Benutzer', true, false, false),
     /* ('AP_GPO', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AP_PPO', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AU_Punkthaufenobjekt', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AP_LPO', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
-    ('AU_Linienobjekt', true, false),
+    ('AU_Linienobjekt', true, false, false),
     /* ('AP_FPO', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
-    ('AU_Flaechenobjekt', true, false),
+    ('AU_Flaechenobjekt', true, false, false),
     /* ('AP_TPO', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AP_PTO', true, false),  -- wird nicht in ATKIS Basis-DLM benötigt */
-    ('AU_Punktobjekt', true, false),
+    ('AU_Punktobjekt', true, false, false),
     /* ('AP_LTO', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
-    ('AU_KontinuierlichesLinienobjekt', true, false),
+    ('AU_KontinuierlichesLinienobjekt', true, false, false),
     /* ('AP_Darstellung', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AP_KPO_3D', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AU_Punktobjekt_3D', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
@@ -56,17 +56,17 @@ INSERT INTO openstreetmap_schema.object_types (object_type, is_abstract, is_rela
     /* ('AD_GitterCoverage', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AD_ReferenzierbaresGitter', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AD_Wertematrix', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
-    ('AA_PunktLinienThema', true, false),
+    ('AA_PunktLinienThema', true, false, false),
     /* ('TA_PointComponent', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
-    ('TA_CurveComponent', true, false),
-    ('TA_SurfaceComponent', true, false),
-    ('TA_MultiSurfaceComponent', true, false),
-    ('AU_ObjektMitUnabhaengigerGeometrie', true, false),
-    ('AG_ObjektMitGemeinsamerGeometrie', true, false),
-    ('AG_thema', true, true), -- wird als Relation (eigener object_type) geführt
-    ('AU_Objekt', true, false),
-    ('AU_ObjektMitUnabhaengigerGeometrie_3D', true, false),
-    ('AU_MehrfachFlaechenObjekt_3D', true, false)
+    ('TA_CurveComponent', true, false, false),
+    ('TA_SurfaceComponent', true, false, false),
+    ('TA_MultiSurfaceComponent', true, false, false),
+    ('AU_ObjektMitUnabhaengigerGeometrie', true, false, false),
+    ('AG_ObjektMitGemeinsamerGeometrie', true, false, false),
+    ('AG_thema', true, true, false), -- wird als Relation (eigener object_type) geführt
+    ('AU_Objekt', true, false, false),
+    ('AU_ObjektMitUnabhaengigerGeometrie_3D', true, false, false),
+    ('AU_MehrfachFlaechenObjekt_3D', true, false, false)
     /* ('AU_GeometrieObjekt_3D', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AU_KoerperObjekt_3D', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AU_MehrfachLinienObjekt_3D', true, false), -- wird nicht in ATKIS Basis-DLM benötigt */
@@ -414,17 +414,17 @@ INSERT INTO openstreetmap_schema.datatypes_dictionary (datatype_id, dictionary_k
     /* ('AA_DurchfuehrungAktivitaet', '3000', 'optional') -- wird nicht in ATKIS Basis-DLM benötigt */
 ON CONFLICT (datatype_id, dictionary_key) DO NOTHING;
 
-INSERT INTO openstreetmap_schema.tags (object_type, tag_key, multiplicity, tag_datatype_id) VALUES
+INSERT INTO openstreetmap_schema.tags (object_type, tag_key, multiplicity, tag_datatype_id, is_system) VALUES
     /*('AA_Objekt', 'zeigtAufExternes', '0..*', 'AA_Fachdatenverbindung'), -- wird als Relation (eigener object_type) geführt */
-    ('AA_Objekt', 'quellobjektID', '0..1', 'CharacterString'),
-    ('AA_Objekt', 'identifikator', '1', 'AA_UUID'),
-    ('AA_Objekt', 'lebenszeitintervall', '1', 'AA_Lebenszeitintervall'),
+    ('AA_Objekt', 'quellobjektID', '0..1', 'CharacterString', true),
+    ('AA_Objekt', 'identifikator', '1', 'AA_UUID', true),
+    ('AA_Objekt', 'lebenszeitintervall', '1', 'AA_Lebenszeitintervall', true),
     /*('AA_Objekt', 'modellart', '1..*', 'AA_Modellart'), -- wird als Relation (eigener object_type) geführt */
-    ('AA_Objekt', 'anlass', '0..2', 'AA_Anlassart'),
-    ('AA_zeigtAufExternes', 'art', '1', 'URI'),
-    ('AA_zeigtAufExternes', 'fachdatenobjekt', '1', 'AA_Fachdatenobjekt'),
-    ('AA_modellart', 'advStandardModell', '1', 'AA_AdVStandardModell'),
-    ('AA_modellart', 'sonstigesModell', '0..1', 'AA_WeitereModellart'), -- Multiplicity angepasst, sonstigesModell wird in den Daten nicht geführt
+    ('AA_Objekt', 'anlass', '0..2', 'AA_Anlassart', true),
+    ('AA_zeigtAufExternes', 'art', '1', 'URI', false),
+    ('AA_zeigtAufExternes', 'fachdatenobjekt', '1', 'AA_Fachdatenobjekt', false),
+    ('AA_modellart', 'advStandardModell', '1', 'AA_AdVStandardModell', true),
+    ('AA_modellart', 'sonstigesModell', '0..1', 'AA_WeitereModellart', true), -- Multiplicity angepasst, sonstigesModell wird in den Daten nicht geführt
     /* ('AA_PMO', 'name', '0..1', 'CharacterString'), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AA_PMO', 'beschreibung', '0..1', 'CharacterString'), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AA_PMO', 'ausdehnung', '1', 'GM_Envelope'), -- wird nicht in ATKIS Basis-DLM benötigt */
@@ -467,7 +467,7 @@ INSERT INTO openstreetmap_schema.tags (object_type, tag_key, multiplicity, tag_d
     /* ('AD_Wertematrix', 'werte', '1', 'Sequence<Record>'), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AD_Wertematrix', 'werteReihenfolge', '0..1', 'CV_SequenceRule'), -- wird nicht in ATKIS Basis-DLM benötigt */
     /* ('AD_Wertematrix', 'startPunkt', '0..1', 'CV_GridCoordinate'), -- wird nicht in ATKIS Basis-DLM benötigt */
-    ('AA_PunktLinienThema', 'name', '1', 'CharacterString')
+    ('AA_PunktLinienThema', 'name', '1', 'CharacterString', false)
     /* ('TA_MultiSurfaceComponent', 'masche', '1..*', 'TS_Face') -- entspricht der Geometrie (bzw. den Nodes) in OSM */
     /* ('AU_Punktobjekt', 'position', '1', 'GM_Point'), -- entspricht der Geometrie (bzw. den Nodes) in OSM */
     /* ('AU_Linienobjekt', 'position', '1', 'GM_MultiCurve'), -- entspricht der Geometrie (bzw. den Nodes) in OSM */

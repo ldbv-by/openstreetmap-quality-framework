@@ -23,6 +23,8 @@ public class ObjectTypeEntityMapper {
         ObjectType objectType = new ObjectType();
         objectType.setName(objectTypeEntity.getObjectType());
         objectType.setIsRelation(objectTypeEntity.getIsRelation());
+        objectType.setIsAbstract(objectTypeEntity.getIsAbstract());
+        objectType.setIsSystem(objectTypeEntity.getIsSystem());
 
         addAllTags(objectType, objectTypeEntity);
         addAllRelations(objectType, objectTypeEntity);

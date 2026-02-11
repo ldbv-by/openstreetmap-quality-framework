@@ -10,6 +10,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.mode
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Tag;
 import lombok.experimental.UtilityClass;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +33,9 @@ public class ObjectTypeMapper {
         objectType.setTags(mapTagsToDomain(objectTypeDto.tags()));
         objectType.setRelations(mapRelationsToDomain(objectTypeDto.relations()));
         objectType.setRules(mapRulesToDomain(objectTypeDto.rules()));
+        objectType.setIsAbstract(objectTypeDto.isAbstract());
+        objectType.setIsRelation(objectTypeDto.isRelation());
+        objectType.setIsSystem(objectTypeDto.isSystem());
 
         return objectType;
     }
@@ -39,15 +43,57 @@ public class ObjectTypeMapper {
     /**
      * Map object_type domain to dto.
      */
-    public ObjectTypeDto toDto(ObjectType objectType) {
+    public ObjectTypeDto toDto(ObjectType objectType, boolean flattingTags, boolean withRules) {
         if (objectType == null) return null;
+        if (flattingTags && objectType.getIsAbstract()) return null;
+
+        List<TagDto> tags = mapTagsToDto(objectType.getTags());
+        if (flattingTags) {
+            List<TagDto> flatTags = new ArrayList<>();
+            for (TagDto tag : tags) {
+                getFlatTags(flatTags, tag, "");
+            }
+            tags = flatTags;
+        }
+
+        List<RuleDto> rules = null;
+        if (withRules) rules = mapRulesToDto(objectType.getRules());
 
         return new ObjectTypeDto(
                 objectType.getName(),
-                mapTagsToDto(objectType.getTags()),
-                mapRelationsToDto(objectType.getRelations()),
-                mapRulesToDto(objectType.getRules())
-        );
+                tags,
+                mapRelationsToDto(objectType.getRelations(), flattingTags, withRules),
+                rules,
+                objectType.getIsAbstract(),
+                objectType.getIsRelation(),
+                objectType.getIsSystem());
+    }
+
+    /**
+     * Map object_type domain to dto.
+     */
+    public ObjectTypeDto toDto(ObjectType objectType, boolean flattingTags) {
+        return toDto(objectType, flattingTags, true);
+    }
+
+    /**
+     * Map object_type domain to dto.
+     */
+    public ObjectTypeDto toDto(ObjectType objectType) {
+        return toDto(objectType, false);
+    }
+
+    private void getFlatTags(List<TagDto> flatTags, TagDto tag, String keyPrefix) {
+        if (!keyPrefix.isEmpty()) keyPrefix += ":";
+
+        if (tag.subTags().isEmpty()) {
+            flatTags.add(new TagDto(keyPrefix + tag.key(), tag.type(), tag.multiplicity(),
+                    tag.dictionary(), null, tag.isSystem()));
+        }
+
+        for (TagDto tagSub : tag.subTags()) {
+            getFlatTags(flatTags, tagSub, keyPrefix + tag.key());
+        }
     }
 
     /**
@@ -76,11 +122,11 @@ public class ObjectTypeMapper {
     /**
      * Map relations to dto.
      */
-    private List<RelationDto> mapRelationsToDto(List<Relation> relations) {
+    private List<RelationDto> mapRelationsToDto(List<Relation> relations, boolean flattingTags, boolean withRules) {
         if (relations == null || relations.isEmpty()) return Collections.emptyList();
         return relations.stream()
                 .filter(Objects::nonNull)
-                .map(RelationMapper::toDto)
+                .map(relation -> RelationMapper.toDto(relation, flattingTags, withRules))
                 .collect(Collectors.toList());
     }
 

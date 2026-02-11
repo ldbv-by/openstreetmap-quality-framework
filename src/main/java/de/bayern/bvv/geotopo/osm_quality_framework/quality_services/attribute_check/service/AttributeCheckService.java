@@ -3,6 +3,7 @@ package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.attribute_c
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.api.OsmSchemaService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.ChangesetDataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.dto.TagType;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.mapper.ObjectTypeMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.ObjectType;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Rule;
@@ -119,7 +120,7 @@ public class AttributeCheckService implements QualityService {
         String fullKey = prefix.isEmpty() ? tag.getKey() : prefix + Tag.SUBTYPE_SEPARATOR + tag.getKey();
 
         // ----- Check complex tag.
-        if (tag.getType() == Tag.Type.COMPLEX) {
+        if (tag.getType() == TagType.COMPLEX) {
             boolean hasDirectValue = taggedObject.getTags().containsKey(fullKey);
             boolean hasChildren = this.anyKeyWithPrefix(taggedObject.getTags(), fullKey + Tag.SUBTYPE_SEPARATOR);
             boolean groupPresent = hasDirectValue || hasChildren;
@@ -160,7 +161,7 @@ public class AttributeCheckService implements QualityService {
             this.setError(taggedObject, "Das Tag '" + fullKey + "' darf maximal " + tag.getMultiplicity().max() + " Werte haben.");
         }
 
-        if (tag.getType() == Tag.Type.DICTIONARY) {
+        if (tag.getType() == TagType.DICTIONARY) {
             for (String value : values) {
                 if (!tag.getDictionary().containsKey(value)) {
                     this.setError(taggedObject, "Das Tag '" + fullKey + "' hat einen ungültigen Wert.");

@@ -12,6 +12,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Objects;
+
 /**
  * Provides access to the institutional target schema definitions
  * (e.g. GeoInfoDok of the AdV) that describe how OSM object types
@@ -44,4 +47,18 @@ public class OsmSchemaServiceImpl implements OsmSchemaService {
 
         return ObjectTypeMapper.toDto(obj);
     }
+
+    /**
+     * Loads the institutional schema definition.
+     */
+    @Override
+    public List<ObjectTypeDto> getObjectTypes(boolean flattingTags, boolean withRules) {
+        return this.objectTypeRepository.findAll().stream()
+                .map(ObjectTypeEntityMapper::toDomain)
+                .map(objectType -> ObjectTypeMapper.toDto(objectType, flattingTags, withRules))
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+
 }

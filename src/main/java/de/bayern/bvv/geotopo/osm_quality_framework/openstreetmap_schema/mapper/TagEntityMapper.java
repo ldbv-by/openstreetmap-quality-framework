@@ -5,6 +5,7 @@ import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity.D
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity.DatatypeDictionaryEntity;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity.DatatypeEntity;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.entity.TagEntity;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.dto.TagType;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Multiplicity;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model.Tag;
 import lombok.experimental.UtilityClass;
@@ -21,12 +22,12 @@ public class TagEntityMapper {
      * Map tag to domain.
      */
     public Tag toDomain(TagEntity tagEntity) {
-        return resolveTag(tagEntity.getId().getTagKey(), tagEntity.getMultiplicity(), tagEntity.getTagDatatype());
+        return resolveTag(tagEntity.getId().getTagKey(), tagEntity.getMultiplicity(), tagEntity.getTagDatatype(), tagEntity.getIsSystem());
     }
 
-    private Tag resolveTag(String tagKey, String multiplicity, DatatypeEntity datatype) {
+    private Tag resolveTag(String tagKey, String multiplicity, DatatypeEntity datatype, boolean isSystem) {
         if (datatype.getDatatypeType() == DatatypeEntity.DatatypeType.PRIMITIVE) {
-            return new Tag(tagKey, Tag.Type.PRIMITIVE, parseMultiplicity(multiplicity), new HashMap<>(), new ArrayList<>());
+            return new Tag(tagKey, TagType.PRIMITIVE, parseMultiplicity(multiplicity), new HashMap<>(), new ArrayList<>(), isSystem);
         }
 
         if (datatype.getDatatypeType() == DatatypeEntity.DatatypeType.DICTIONARY) {
@@ -40,14 +41,14 @@ public class TagEntityMapper {
                 }
             }
 
-            return new Tag(tagKey, Tag.Type.DICTIONARY, parseMultiplicity(multiplicity), dictionary, new ArrayList<>());
+            return new Tag(tagKey, TagType.DICTIONARY, parseMultiplicity(multiplicity), dictionary, new ArrayList<>(), isSystem);
         }
 
         if (datatype.getDatatypeType() == DatatypeEntity.DatatypeType.COMPLEX && datatype.getComplexTags() != null) {
-            Tag resultTag = new Tag(tagKey, Tag.Type.COMPLEX, parseMultiplicity(multiplicity), new HashMap<>(), new ArrayList<>());
+            Tag resultTag = new Tag(tagKey, TagType.COMPLEX, parseMultiplicity(multiplicity), new HashMap<>(), new ArrayList<>(), isSystem);
 
             for (DatatypeComplexEntity ct : datatype.getComplexTags()) {
-                Tag subTag = resolveTag(ct.getId().getTagKey(), ct.getMultiplicity(), ct.getTagDatatype());
+                Tag subTag = resolveTag(ct.getId().getTagKey(), ct.getMultiplicity(), ct.getTagDatatype(), isSystem);
                 resultTag.getSubTags().add(subTag);
             }
 

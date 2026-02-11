@@ -20,6 +20,9 @@ public class TagEntity {
     @Column(name = "multiplicity")
     private String multiplicity;
 
+    @Column(name = "is_system", nullable = false)
+    private Boolean isSystem;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId("objectType")
     @JoinColumn(

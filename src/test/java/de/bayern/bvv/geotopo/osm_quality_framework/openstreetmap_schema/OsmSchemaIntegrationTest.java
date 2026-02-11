@@ -42,7 +42,7 @@ class OsmSchemaIntegrationTest extends DatabaseIntegrationTest {
         // --- artDerBebauung ---
         {
             var t = tag.apply("artDerBebauung");
-            assertThat(t.type()).isEqualTo(Tag.Type.DICTIONARY);
+            assertThat(t.type()).isEqualTo(TagType.DICTIONARY);
             assertThat(t.multiplicity().min()).isEqualTo(1);
             assertThat(t.multiplicity().max()).isEqualTo(1);
             assertThat(t.dictionary()).containsExactlyInAnyOrderEntriesOf(
@@ -57,7 +57,7 @@ class OsmSchemaIntegrationTest extends DatabaseIntegrationTest {
         // --- name ---
         {
             var t = tag.apply("name");
-            assertThat(t.type()).isEqualTo(Tag.Type.PRIMITIVE);
+            assertThat(t.type()).isEqualTo(TagType.PRIMITIVE);
             assertThat(t.multiplicity().min()).isEqualTo(0);
             assertThat(t.multiplicity().max()).isEqualTo(1);
             assertThat(t.dictionary()).isEmpty();
@@ -67,7 +67,7 @@ class OsmSchemaIntegrationTest extends DatabaseIntegrationTest {
         // --- zustand ---
         {
             var t = tag.apply("zustand");
-            assertThat(t.type()).isEqualTo(Tag.Type.DICTIONARY);
+            assertThat(t.type()).isEqualTo(TagType.DICTIONARY);
             assertThat(t.multiplicity().min()).isEqualTo(0);
             assertThat(t.multiplicity().max()).isEqualTo(1);
             assertThat(t.dictionary()).containsExactlyInAnyOrderEntriesOf(
@@ -79,7 +79,7 @@ class OsmSchemaIntegrationTest extends DatabaseIntegrationTest {
         // --- zweitname ---
         {
             var t = tag.apply("zweitname");
-            assertThat(t.type()).isEqualTo(Tag.Type.PRIMITIVE);
+            assertThat(t.type()).isEqualTo(TagType.PRIMITIVE);
             assertThat(t.multiplicity().min()).isEqualTo(0);
             assertThat(t.multiplicity().max()).isEqualTo(Integer.MAX_VALUE);
             assertThat(t.dictionary()).isEmpty();
@@ -89,7 +89,7 @@ class OsmSchemaIntegrationTest extends DatabaseIntegrationTest {
         // --- funktion ---
         {
             var t = tag.apply("funktion");
-            assertThat(t.type()).isEqualTo(Tag.Type.DICTIONARY);
+            assertThat(t.type()).isEqualTo(TagType.DICTIONARY);
             assertThat(t.multiplicity().min()).isEqualTo(0);
             assertThat(t.multiplicity().max()).isEqualTo(1);
             assertThat(t.dictionary()).containsExactlyInAnyOrderEntriesOf(
@@ -101,7 +101,7 @@ class OsmSchemaIntegrationTest extends DatabaseIntegrationTest {
         // --- datumDerLetztenUeberpruefung ---
         {
             var t = tag.apply("datumDerLetztenUeberpruefung");
-            assertThat(t.type()).isEqualTo(Tag.Type.PRIMITIVE);
+            assertThat(t.type()).isEqualTo(TagType.PRIMITIVE);
             assertThat(t.multiplicity().min()).isEqualTo(0);
             assertThat(t.multiplicity().max()).isEqualTo(1);
             assertThat(t.dictionary()).isEmpty();
@@ -111,7 +111,7 @@ class OsmSchemaIntegrationTest extends DatabaseIntegrationTest {
         // --- istWeitereNutzung ---
         {
             var t = tag.apply("istWeitereNutzung");
-            assertThat(t.type()).isEqualTo(Tag.Type.DICTIONARY);
+            assertThat(t.type()).isEqualTo(TagType.DICTIONARY);
             assertThat(t.multiplicity().min()).isEqualTo(0);
             assertThat(t.multiplicity().max()).isEqualTo(1);
             assertThat(t.dictionary()).containsExactlyInAnyOrderEntriesOf(
@@ -123,7 +123,7 @@ class OsmSchemaIntegrationTest extends DatabaseIntegrationTest {
         // --- ergebnisDerUeberpruefung ---
         {
             var t = tag.apply("ergebnisDerUeberpruefung");
-            assertThat(t.type()).isEqualTo(Tag.Type.DICTIONARY);
+            assertThat(t.type()).isEqualToTagType.DICTIONARY);
             assertThat(t.multiplicity().min()).isEqualTo(0);
             assertThat(t.multiplicity().max()).isEqualTo(1);
             assertThat(t.dictionary()).containsExactlyInAnyOrderEntriesOf(
@@ -183,7 +183,7 @@ class OsmSchemaIntegrationTest extends DatabaseIntegrationTest {
         // --- quellobjektID ---
         {
             var t = tag.apply("quellobjektID");
-            assertThat(t.type()).isEqualTo(Tag.Type.PRIMITIVE);
+            assertThat(t.type()).isEqualTo(TagType.PRIMITIVE);
             assertThat(t.multiplicity().min()).isEqualTo(0);
             assertThat(t.multiplicity().max()).isEqualTo(1);
             assertThat(t.dictionary()).isEmpty();
@@ -193,21 +193,21 @@ class OsmSchemaIntegrationTest extends DatabaseIntegrationTest {
         // --- identifikator (COMPLEX) ---
         {
             var t = tag.apply("identifikator");
-            assertThat(t.type()).isEqualTo(Tag.Type.COMPLEX);
+            assertThat(t.type()).isEqualTo(TagType.COMPLEX);
             assertThat(t.multiplicity().min()).isEqualTo(1);
             assertThat(t.multiplicity().max()).isEqualTo(1);
             assertThat(t.dictionary()).isEmpty();
             assertThat(t.subTags()).hasSize(2);
 
             var uuid = t.subTags().stream().filter(st -> "UUID".equals(st.key())).findFirst().orElseThrow();
-            assertThat(uuid.type()).isEqualTo(Tag.Type.PRIMITIVE);
+            assertThat(uuid.type()).isEqualTo(TagType.PRIMITIVE);
             assertThat(uuid.multiplicity().min()).isEqualTo(1);
             assertThat(uuid.multiplicity().max()).isEqualTo(1);
             assertThat(uuid.dictionary()).isEmpty();
             assertThat(uuid.subTags()).isEmpty();
 
             var uuidZeit = t.subTags().stream().filter(st -> "UUIDundZeit".equals(st.key())).findFirst().orElseThrow();
-            assertThat(uuidZeit.type()).isEqualTo(Tag.Type.PRIMITIVE);
+            assertThat(uuidZeit.type()).isEqualTo(TagType.PRIMITIVE);
             assertThat(uuidZeit.multiplicity().min()).isEqualTo(1);
             assertThat(uuidZeit.multiplicity().max()).isEqualTo(1);
             assertThat(uuidZeit.dictionary()).isEmpty();
@@ -217,19 +217,19 @@ class OsmSchemaIntegrationTest extends DatabaseIntegrationTest {
         // --- lebenszeitintervall (COMPLEX) ---
         {
             var t = tag.apply("lebenszeitintervall");
-            assertThat(t.type()).isEqualTo(Tag.Type.COMPLEX);
+            assertThat(t.type()).isEqualTo(TagType.COMPLEX);
             assertThat(t.multiplicity().min()).isEqualTo(1);
             assertThat(t.multiplicity().max()).isEqualTo(1);
             assertThat(t.dictionary()).isEmpty();
             assertThat(t.subTags()).hasSize(2);
 
             var beginnt = t.subTags().stream().filter(st -> "beginnt".equals(st.key())).findFirst().orElseThrow();
-            assertThat(beginnt.type()).isEqualTo(Tag.Type.PRIMITIVE);
+            assertThat(beginnt.type()).isEqualTo(TagType.PRIMITIVE);
             assertThat(beginnt.multiplicity().min()).isEqualTo(1);
             assertThat(beginnt.multiplicity().max()).isEqualTo(1);
 
             var endet = t.subTags().stream().filter(st -> "endet".equals(st.key())).findFirst().orElseThrow();
-            assertThat(endet.type()).isEqualTo(Tag.Type.PRIMITIVE);
+            assertThat(endet.type()).isEqualTo(TagType.PRIMITIVE);
             assertThat(endet.multiplicity().min()).isEqualTo(0);
             assertThat(endet.multiplicity().max()).isEqualTo(1);
         }
@@ -247,7 +247,7 @@ class OsmSchemaIntegrationTest extends DatabaseIntegrationTest {
         // --- anlass ---
         {
             var t = tag.apply("anlass");
-            assertThat(t.type()).isEqualTo(Tag.Type.DICTIONARY);
+            assertThat(t.type()).isEqualTo(TagType.DICTIONARY);
             assertThat(t.multiplicity().min()).isEqualTo(0);
             assertThat(t.multiplicity().max()).isEqualTo(2);
             assertThat(t.dictionary()).containsExactlyInAnyOrderEntriesOf(
