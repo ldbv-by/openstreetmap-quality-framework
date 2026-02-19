@@ -126,6 +126,7 @@ public class ObjectTypeMapper {
         if (relations == null || relations.isEmpty()) return Collections.emptyList();
         return relations.stream()
                 .filter(Objects::nonNull)
+                .filter(r -> !flattingTags || !r.getObjectType().getIsAbstract())
                 .map(relation -> RelationMapper.toDto(relation, flattingTags, withRules))
                 .collect(Collectors.toList());
     }
