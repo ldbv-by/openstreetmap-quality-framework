@@ -1,6 +1,9 @@
+# ---- PostgreSQL Tool Stage ----
 FROM postgis/postgis:17-3.5 AS pgtools
 
-FROM azul/zulu-openjdk:24.0.2-24.32 AS openstreetmap-quality-framework
+
+# ---- OSM Tools Stage (Build osm2pgsql + osmosis) ----
+FROM eclipse-temurin:25-jdk AS osmtools
 
 ARG OSM2PGSQL_REPO_URL
 ARG OSM2PGSQL_REPO_BRANCH
@@ -9,31 +12,29 @@ ARG OSMOSIS_REPO_TAR
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
-# Build dependencies (Lua 5.4, kein LuaJIT)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     make cmake g++ libboost-dev \
     libexpat1-dev zlib1g-dev libpotrace-dev \
     libopencv-dev libbz2-dev libpq-dev libproj-dev \
     lua5.4 liblua5.4-0 liblua5.4-dev \
     pandoc nlohmann-json3-dev pyosmium \
-    git maven postgresql-client \
+    git postgresql-client \
     curl ca-certificates tar gzip dos2unix \
  && rm -rf /var/lib/apt/lists/*
 
-# ---- Copy pgdump ----
+# ---- Copy pg_dump / pg_restore ----
 COPY --from=pgtools /usr/lib/postgresql/17/bin/pg_dump /usr/local/bin/pg_dump
 COPY --from=pgtools /usr/lib/postgresql/17/bin/pg_restore /usr/local/bin/pg_restore
 
-# ---- Build osm2pgsql (mit Lua 5.4) ----
+# ---- Build osm2pgsql (Lua 5.4, no LuaJIT) ----
 WORKDIR /src
 RUN git clone --branch "$OSM2PGSQL_REPO_BRANCH" "$OSM2PGSQL_REPO_URL"
 
 WORKDIR /src/osm2pgsql/build
-# Wichtig: KEIN WITH_LUAJIT, stattdessen explizit Lua 5.4
 RUN cmake -DWITH_LUA=lua5.4 -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 RUN make -j"$(nproc)" && make install
 
-# Sanity-Checks: Versionen & Integer-Genauigkeit
+# Sanity Checks
 RUN osm2pgsql --version && \
     lua5.4 -e "assert(math.type(100000000000000000)=='integer')" && \
     lua5.4 -e "local a=(1<<53); assert(a+1~=a, 'Lua numbers not precise')" || true
@@ -46,28 +47,39 @@ RUN curl -OL "$OSMOSIS_REPO_TAR" \
 
 ENV OSMOSIS_EXECUTABLE=/usr/local/osmosis-0.49.2/bin/osmosis
 
-# ---- Build openstreetmap-quality-framework ----
-WORKDIR /src/openstreetmap-quality-framework
+
+# ---- Build Stage ----
+FROM maven:3.9.12-eclipse-temurin-25 AS build
+
+WORKDIR /src
 COPY pom.xml .
-RUN mvn -DskipTests dependency:go-offline
+RUN mvn -B -DskipTests dependency:go-offline
 
 COPY src ./src
-RUN mvn -B -DskipTests clean package && \
-    install -d /app && \
-    JAR="$(find target -maxdepth 1 -type f -name '*.jar' \
-           ! -name '*-sources.jar' ! -name '*-javadoc.jar' | head -n 1)" && \
-    cp "$JAR" /app/openstreetmap-quality-framework.jar
+RUN mvn -B -DskipTests clean package
 
-# ---- Clean ----
-RUN rm -rf /src
 
-# ---- Copy initial openstreetmap-geometries data ----
+# ---- Runtime Stage ----
+FROM eclipse-temurin:25-jre
+
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+WORKDIR /app
+
+COPY --from=osmtools /usr/local/bin/osm2pgsql /usr/local/bin/osm2pgsql
+COPY --from=osmtools /usr/local/bin/pg_dump /usr/local/bin/pg_dump
+COPY --from=osmtools /usr/local/bin/pg_restore /usr/local/bin/pg_restore
+COPY --from=osmtools /usr/local/osmosis-0.49.2 /usr/local/osmosis-0.49.2
+
+ENV OSM2PGSQL_EXECUTABLE=/usr/local/bin/osm2pgsql
+ENV OSMOSIS_EXECUTABLE=/usr/local/osmosis-0.49.2/bin/osmosis
+
+COPY --from=build /src/target/*.jar ./openstreetmap-quality-framework.jar
+
 ENV OSM_LUA_FILE=file:/app/import/openstreetmap_geometries.lua
 COPY src/main/resources/lua/openstreetmap_geometries.lua /app/import/openstreetmap_geometries.lua
 
-# ---- Entrypoint Script ----
 COPY docker/entrypoint/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 8080
-ENTRYPOINT [ "/bin/sh", "-c", "dos2unix /usr/local/bin/docker-entrypoint.sh && /usr/local/bin/docker-entrypoint.sh" ]
+ENTRYPOINT ["/bin/sh", "-c", "dos2unix /usr/local/bin/docker-entrypoint.sh && /usr/local/bin/docker-entrypoint.sh"]
