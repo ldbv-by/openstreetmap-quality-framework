@@ -123,7 +123,7 @@ class OsmSchemaIntegrationTest extends DatabaseIntegrationTest {
         // --- ergebnisDerUeberpruefung ---
         {
             var t = tag.apply("ergebnisDerUeberpruefung");
-            assertThat(t.type()).isEqualToTagType.DICTIONARY);
+            assertThat(t.type()).isEqualTo(TagType.DICTIONARY);
             assertThat(t.multiplicity().min()).isEqualTo(0);
             assertThat(t.multiplicity().max()).isEqualTo(1);
             assertThat(t.dictionary()).containsExactlyInAnyOrderEntriesOf(
