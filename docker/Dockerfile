@@ -18,13 +18,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libopencv-dev libbz2-dev libpq-dev libproj-dev \
     lua5.4 liblua5.4-0 liblua5.4-dev \
     pandoc nlohmann-json3-dev pyosmium \
-    git postgresql-client \
-    curl ca-certificates tar gzip dos2unix \
+    git \
+    curl ca-certificates tar gzip \
  && rm -rf /var/lib/apt/lists/*
-
-# ---- Copy pg_dump / pg_restore ----
-COPY --from=pgtools /usr/lib/postgresql/17/bin/pg_dump /usr/local/bin/pg_dump
-COPY --from=pgtools /usr/lib/postgresql/17/bin/pg_restore /usr/local/bin/pg_restore
 
 # ---- Build osm2pgsql (Lua 5.4, no LuaJIT) ----
 WORKDIR /src
@@ -66,9 +62,9 @@ ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 WORKDIR /app
 
 COPY --from=osmtools /usr/local/bin/osm2pgsql /usr/local/bin/osm2pgsql
-COPY --from=osmtools /usr/local/bin/pg_dump /usr/local/bin/pg_dump
-COPY --from=osmtools /usr/local/bin/pg_restore /usr/local/bin/pg_restore
 COPY --from=osmtools /usr/local/osmosis-0.49.2 /usr/local/osmosis-0.49.2
+COPY --from=pgtools /usr/lib/postgresql/17/bin/pg_dump /usr/local/bin/pg_dump
+COPY --from=pgtools /usr/lib/postgresql/17/bin/pg_restore /usr/local/bin/pg_restore
 
 ENV OSM2PGSQL_EXECUTABLE=/usr/local/bin/osm2pgsql
 ENV OSMOSIS_EXECUTABLE=/usr/local/osmosis-0.49.2/bin/osmosis
@@ -79,7 +75,8 @@ ENV OSM_LUA_FILE=file:/app/import/openstreetmap_geometries.lua
 COPY src/main/resources/lua/openstreetmap_geometries.lua /app/import/openstreetmap_geometries.lua
 
 COPY docker/entrypoint/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+    && sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 8080
-ENTRYPOINT ["/bin/sh", "-c", "dos2unix /usr/local/bin/docker-entrypoint.sh && /usr/local/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
