@@ -1,7 +1,9 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_services.attribute_check.service;
 
+import de.bayern.bvv.geotopo.osm_quality_framework.geodata_view.api.GeodataViewService;
 import de.bayern.bvv.geotopo.osm_quality_framework.openstreetmap_schema.api.OsmSchemaService;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.ChangesetDataSetMapper;
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.mapper.DataSetMapper;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.dataset.model.*;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.dto.TagType;
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.mapper.ObjectTypeMapper;
@@ -18,6 +20,8 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.model.Qualit
 import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.spi.QualityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.operation.union.UnaryUnionOp;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -32,6 +36,7 @@ public class AttributeCheckService implements QualityService {
 
     private final OsmSchemaService osmSchemaService;
     private final RuleEngine ruleEngine;
+    private final GeodataViewService geodataViewService;
 
     /**
      * Executes the quality check for the given request.
@@ -201,6 +206,32 @@ public class AttributeCheckService implements QualityService {
             this.qualityServiceResult.addError(
                     new QualityServiceError(errorText, feature.getGeometry())
             );
+        } else if (taggedObject instanceof Relation relation){
+            DataSet memberDataSet = Optional.ofNullable(
+                    this.geodataViewService.getRelationMembers(relation.getOsmId(), null)
+            ) .map(DataSetMapper::toDomain).orElse(null);
+
+            if (memberDataSet != null) {
+                Geometry cumulativeGeometry = null;
+
+                List<Geometry> memberGeometries = memberDataSet.getAll().stream()
+                        .filter(Feature.class::isInstance)
+                        .map(Feature.class::cast)
+                        .map(Feature::getGeometry)
+                        .filter(Objects::nonNull)
+                        .toList();
+
+                if (memberGeometries.size() == 1) {
+                    cumulativeGeometry = memberGeometries.getFirst();
+                } else if (memberGeometries.size() > 1) {
+                    cumulativeGeometry = UnaryUnionOp.union(memberGeometries);
+                }
+
+                this.qualityServiceResult.addError(
+                        new QualityServiceError(errorText, cumulativeGeometry)
+                );
+
+            }
         } else {
             this.qualityServiceResult.addError(new QualityServiceError(errorText));
         }
