@@ -21,6 +21,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+ENV OSM2PGSQL_EXECUTABLE=/usr/bin/osm2pgsql
+ENV OSMOSIS_EXECUTABLE=/usr/bin/osmosis
+ENV OSM_LUA_FILE=file:/app/import/openstreetmap_geometries.lua
 
 WORKDIR /app
 COPY --from=build /src/target/*.jar ./openstreetmap-quality-framework.jar
