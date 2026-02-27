@@ -1,73 +1,40 @@
+# ---- PostgreSQL Tool Stage ----
 FROM postgis/postgis:17-3.5 AS pgtools
 
-FROM azul/zulu-openjdk:24.0.2-24.32 AS openstreetmap-quality-framework
 
-ARG OSM2PGSQL_REPO_URL
-ARG OSM2PGSQL_REPO_BRANCH
-ARG OSMOSIS_REPO_TAR
+# ---- Build Stage ----
+FROM maven:3.9.12-eclipse-temurin-25 AS build
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+WORKDIR /src
+COPY pom.xml .
+RUN mvn -B -DskipTests dependency:go-offline
 
-# Build dependencies (Lua 5.4, kein LuaJIT)
+COPY src ./src
+RUN mvn -B -DskipTests clean package
+
+
+# ---- Runtime Stage ----
+FROM eclipse-temurin:25-jre
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    make cmake g++ libboost-dev \
-    libexpat1-dev zlib1g-dev libpotrace-dev \
-    libopencv-dev libbz2-dev libpq-dev libproj-dev \
-    lua5.4 liblua5.4-0 liblua5.4-dev \
-    pandoc nlohmann-json3-dev pyosmium \
-    git maven postgresql-client \
-    curl ca-certificates tar gzip dos2unix \
+    postgresql-client osm2pgsql osmosis \
  && rm -rf /var/lib/apt/lists/*
 
-# ---- Copy pgdump ----
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+ENV OSM2PGSQL_EXECUTABLE=/usr/bin/osm2pgsql
+ENV OSMOSIS_EXECUTABLE=/usr/bin/osmosis
+ENV OSM_LUA_FILE=file:/app/import/openstreetmap_geometries.lua
+
+WORKDIR /app
+COPY --from=build /src/target/*.jar ./openstreetmap-quality-framework.jar
+
+COPY src/main/resources/lua/openstreetmap_geometries.lua /app/import/openstreetmap_geometries.lua
+COPY docker/entrypoint/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 COPY --from=pgtools /usr/lib/postgresql/17/bin/pg_dump /usr/local/bin/pg_dump
 COPY --from=pgtools /usr/lib/postgresql/17/bin/pg_restore /usr/local/bin/pg_restore
 
-# ---- Build osm2pgsql (mit Lua 5.4) ----
-WORKDIR /src
-RUN git clone --branch "$OSM2PGSQL_REPO_BRANCH" "$OSM2PGSQL_REPO_URL"
-
-WORKDIR /src/osm2pgsql/build
-# Wichtig: KEIN WITH_LUAJIT, stattdessen explizit Lua 5.4
-RUN cmake -DWITH_LUA=lua5.4 -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
-RUN make -j"$(nproc)" && make install
-
-# Sanity-Checks: Versionen & Integer-Genauigkeit
-RUN osm2pgsql --version && \
-    lua5.4 -e "assert(math.type(100000000000000000)=='integer')" && \
-    lua5.4 -e "local a=(1<<53); assert(a+1~=a, 'Lua numbers not precise')" || true
-
-ENV OSM2PGSQL_EXECUTABLE=/usr/local/bin/osm2pgsql
-
-# ---- Add osmosis ----
-RUN curl -OL "$OSMOSIS_REPO_TAR" \
- && tar -C /usr/local -xvf osmosis-0.49.2.tar
-
-ENV OSMOSIS_EXECUTABLE=/usr/local/osmosis-0.49.2/bin/osmosis
-
-# ---- Build openstreetmap-quality-framework ----
-WORKDIR /src/openstreetmap-quality-framework
-COPY pom.xml .
-RUN mvn -DskipTests dependency:go-offline
-
-COPY src ./src
-RUN mvn -B -DskipTests clean package && \
-    install -d /app && \
-    JAR="$(find target -maxdepth 1 -type f -name '*.jar' \
-           ! -name '*-sources.jar' ! -name '*-javadoc.jar' | head -n 1)" && \
-    cp "$JAR" /app/openstreetmap-quality-framework.jar
-
-# ---- Clean ----
-RUN rm -rf /src
-
-# ---- Copy initial openstreetmap-geometries data ----
-ENV OSM_LUA_FILE=file:/app/import/openstreetmap_geometries.lua
-COPY src/main/resources/lua/openstreetmap_geometries.lua /app/import/openstreetmap_geometries.lua
-
-# ---- Entrypoint Script ----
-COPY docker/entrypoint/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+    && sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 8080
-ENTRYPOINT [ "/bin/sh", "-c", "dos2unix /usr/local/bin/docker-entrypoint.sh && /usr/local/bin/docker-entrypoint.sh" ]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

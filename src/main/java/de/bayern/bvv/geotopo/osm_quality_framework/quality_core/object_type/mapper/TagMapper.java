@@ -28,6 +28,7 @@ public class TagMapper {
         tag.setType(tagDto.type());
         tag.setMultiplicity(new Multiplicity(tagDto.multiplicity().min(), tagDto.multiplicity().max()));
         tag.setDictionary(tagDto.dictionary());
+        tag.setIsSystem(tagDto.isSystem());
 
         List<Tag> subTags = new ArrayList<>();
         for (TagDto subTag : tagDto.subTags()) {
@@ -54,7 +55,8 @@ public class TagMapper {
                 tag.getType(),
                 new MultiplicityDto(tag.getMultiplicity().min(), tag.getMultiplicity().max()),
                 tag.getDictionary(),
-                subTagDtos
+                subTagDtos,
+                tag.getIsSystem()
         );
     }
 }

@@ -19,9 +19,12 @@ import de.bayern.bvv.geotopo.osm_quality_framework.quality_services.spi.QualityS
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.api.RuleEngine;
 import de.bayern.bvv.geotopo.osm_quality_framework.rule_engine.dto.RuleEvaluationDto;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.operation.union.UnaryUnionOp;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -118,6 +121,32 @@ public class GeometryCheckService implements QualityService {
             this.qualityServiceResult.addError(
                     new QualityServiceError(errorText, feature.getGeometry())
             );
+        } else if (taggedObject instanceof Relation relation){
+            DataSet memberDataSet = Optional.ofNullable(
+                    this.geodataViewService.getRelationMembers(relation.getOsmId(), null)
+            ) .map(DataSetMapper::toDomain).orElse(null);
+
+            if (memberDataSet != null) {
+                Geometry cumulativeGeometry = null;
+
+                List<Geometry> memberGeometries = memberDataSet.getAll().stream()
+                        .filter(Feature.class::isInstance)
+                        .map(Feature.class::cast)
+                        .map(Feature::getGeometry)
+                        .filter(Objects::nonNull)
+                        .toList();
+
+                if (memberGeometries.size() == 1) {
+                    cumulativeGeometry = memberGeometries.getFirst();
+                } else if (memberGeometries.size() > 1) {
+                    cumulativeGeometry = UnaryUnionOp.union(memberGeometries);
+                }
+
+                this.qualityServiceResult.addError(
+                        new QualityServiceError(errorText, cumulativeGeometry)
+                );
+
+            }
         } else {
             this.qualityServiceResult.addError(new QualityServiceError(errorText));
         }

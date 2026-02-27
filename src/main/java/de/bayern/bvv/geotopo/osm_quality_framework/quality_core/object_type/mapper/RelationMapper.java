@@ -36,7 +36,21 @@ public class RelationMapper {
     /**
      * Map relation domain to dto.
      */
+    public RelationDto toDto(Relation relation, boolean flattingTags) {
+        return toDto(relation, flattingTags, true);
+    }
+
+    /**
+     * Map relation domain to dto.
+     */
     public RelationDto toDto(Relation relation) {
+        return toDto(relation, false);
+    }
+
+    /**
+     * Map relation domain to dto.
+     */
+    public RelationDto toDto(Relation relation, boolean flattingTags, boolean withRules) {
         if (relation == null) return null;
 
         List<MemberDto> membersDto = new ArrayList<>();
@@ -45,7 +59,7 @@ public class RelationMapper {
         }
 
         return new RelationDto(
-                ObjectTypeMapper.toDto(relation.getObjectType()),
+                ObjectTypeMapper.toDto(relation.getObjectType(), flattingTags, withRules),
                 new MultiplicityDto(relation.getMultiplicity().min(), relation.getMultiplicity().max()),
                 membersDto);
     }

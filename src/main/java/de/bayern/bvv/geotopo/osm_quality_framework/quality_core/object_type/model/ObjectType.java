@@ -1,5 +1,6 @@
 package de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.model;
 
+import de.bayern.bvv.geotopo.osm_quality_framework.quality_core.object_type.dto.TagType;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ public class ObjectType {
     private List<Relation> relations = new ArrayList<>();
     private List<Rule> rules = new ArrayList<>();
     private Boolean isRelation;
+    private Boolean isAbstract;
+    private Boolean isSystem;
 
 
     /**
@@ -46,7 +49,7 @@ public class ObjectType {
         for (Tag tag : tags) {
             String fullKey = prefix.isEmpty() ? tag.getKey() : prefix + ":" + tag.getKey();
 
-            if (tag.getType() == Tag.Type.COMPLEX) {
+            if (tag.getType() == TagType.COMPLEX) {
                 this.collectTagKeys(fullKey, tag.getSubTags(), tagKeys);
             } else {
                 tagKeys.add(fullKey);
@@ -61,7 +64,7 @@ public class ObjectType {
         for (Tag tag : tags) {
             String fullKey = prefix.isEmpty() ? tag.getKey() : prefix + ":" + tag.getKey();
 
-            if (tag.getType() == Tag.Type.COMPLEX) {
+            if (tag.getType() == TagType.COMPLEX) {
                 tagGroups.add(fullKey);
                 this.collectTagGroups(fullKey, tag.getSubTags(), tagGroups);
             }

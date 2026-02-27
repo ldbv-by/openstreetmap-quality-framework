@@ -3,6 +3,7 @@
                 "quality_services :: *",
                 "rule_engine :: *",
                 "openstreetmap_schema :: *",
+                "geodata_view :: *",
                 "quality_core :: *"
         }
 )

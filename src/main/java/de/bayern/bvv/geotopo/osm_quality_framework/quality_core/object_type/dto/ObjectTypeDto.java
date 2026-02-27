@@ -9,5 +9,8 @@ public record ObjectTypeDto(
         String name,
         List<TagDto> tags,
         List<RelationDto> relations,
-        List<RuleDto> rules
+        List<RuleDto> rules,
+        Boolean isAbstract,
+        Boolean isRelation,
+        Boolean isSystem
 ) {}

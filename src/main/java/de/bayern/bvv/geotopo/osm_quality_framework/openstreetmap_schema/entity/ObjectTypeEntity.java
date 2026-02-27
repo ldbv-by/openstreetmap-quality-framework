@@ -30,6 +30,9 @@ public class ObjectTypeEntity {
     @Column(name = "is_relation", nullable = false)
     private Boolean isRelation;
 
+    @Column(name = "is_system", nullable = false)
+    private Boolean isSystem;
+
     @OneToMany(mappedBy = "objectType", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TagEntity> tags = new ArrayList<>();
 
